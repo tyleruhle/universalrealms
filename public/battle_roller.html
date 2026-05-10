@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚔ Battle Roller — Universal Realms 1066</title>
+<style>
+:root {
+  /* ── UNIVERSAL REALMS MASTER TOKENS ── */
+  --bg-void:        #0e0a04;
+  --bg-dark:        #1a1208;
+  --bg-card:        #150e04;
+  --bg-input:       #0a0600;
+  --parch:          #f5edd8;
+  --parch-mid:      #ede0c4;
+  --parch-dark:     #d4c49a;
+  --parch-deep:     #e6d9b8;
+  --ink:            #1e1a14;
+  --ink-soft:       #4a3f2f;
+  --ink-faint:      #8a7a5c;
+  --text-on-dark:   #e8d5a3;
+  --text-gold-dark: #c8a84c;
+  --text-muted-dark:#7a6035;
+  --text-dim-dark:  #4a3a18;
+  --gold:           #b8860b;
+  --gold-bright:    #d4a017;
+  --gold-dim:       #7a5a08;
+  --gold-pale:      rgba(184,134,11,0.10);
+  --gold-border:    rgba(184,134,11,0.28);
+  --victory:        #1a4a2a;
+  --victory-lt:     #3a8a4a;
+  --victory-pale:   #e0f0e4;
+  --blood:          #7a1a1a;
+  --blood-lt:       #c04040;
+  --blood-pale:     #f5e0e0;
+  --steel:          #2a3a4a;
+  --steel-lt:       #4a6a8a;
+  --border-dark:    #2a1e0a;
+  --border-dark-2:  #3a2a0a;
+  --font-display:   'Cinzel', 'Palatino Linotype', serif;
+  --font-body:      'EB Garamond', 'Crimson Text', Georgia, serif;
+  --font-mono:      'JetBrains Mono', 'Consolas', monospace;
+  --shadow-dark:    0 4px 24px rgba(0,0,0,0.5);
+  --shadow-light:   0 4px 24px rgba(26,14,5,0.18);
+  --radius-sm:      3px;
+  --radius-md:      5px;
+  --radius-lg:      7px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0e0904;color:#e0ccaa;font-family:var(--font-body);padding:20px;max-width:1060px;margin:0 auto;}
+
+/* ── Typography ───────────────────────────────────────────────── */
+h1{font-size:1.25rem;color:#c8a84c;margin-bottom:3px;letter-spacing:.06em;}
+.sub{font-size:.76rem;color:#6a5528;margin-bottom:24px;}
+
+/* ── Setup cards ──────────────────────────────────────────────── */
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
+@media(max-width:680px){.setup-grid{grid-template-columns:1fr;}}
+.card{background:#130c04;border-radius:7px;padding:15px;border:1px solid #2a1e0a;}
+.card.att{border-color:#2a4a6a;} .card.def{border-color:#6a2a2a;}
+.ctitle{font-size:.62rem;letter-spacing:.16em;font-weight:700;text-transform:uppercase;margin-bottom:11px;}
+.card.att .ctitle{color:#6aaad0;} .card.def .ctitle{color:#d06a6a;}
+.fg{margin-bottom:9px;}
+.fg label{display:block;font-size:.7rem;color:#7a6035;margin-bottom:3px;}
+input[type=number],input[type=text],select{width:100%;background:#0a0600;border:1px solid #2a1e0a;color:#e0ccaa;border-radius:4px;padding:6px 9px;font-size:.83rem;font-family:inherit;}
+input:focus,select:focus{outline:none;border-color:#6a5528;}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.tg label{font-size:.68rem;}
+.qn{font-size:.65rem;color:#4a3a18;margin-top:3px;}
+.stat-bar{height:5px;border-radius:3px;overflow:hidden;display:flex;margin-top:5px;}
+.sb-l{background:#4a6a8a;} .sb-r{background:#6a3a3a;} .sb-c{background:#3a7a5a;}
+.sb-a{background:#6a6a2a;} .sb-m{background:#6a3a7a;}
+.live-stat{font-size:.7rem;color:#7a6035;margin-top:5px;line-height:1.5;}
+.live-stat b{color:#c8a84c;}
+
+/* ── Conditions ───────────────────────────────────────────────── */
+.cond-card{background:#130c04;border:1px solid #2a1e0a;border-radius:7px;padding:15px;margin-bottom:14px;}
+.cond-card h3{font-size:.62rem;letter-spacing:.14em;color:#6a5528;text-transform:uppercase;margin-bottom:10px;}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:680px){.cgrid{grid-template-columns:1fr;}}
+
+/* ── Roll button ──────────────────────────────────────────────── */
+.rollbtn{display:block;width:100%;padding:15px;background:linear-gradient(135deg,#4a1400,#7a3000);border:1px solid #c8a84c;border-radius:6px;color:#ffd060;font-size:1rem;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:all .15s;margin-bottom:24px;}
+.rollbtn:hover{background:linear-gradient(135deg,#6a2000,#9a4800);transform:translateY(-1px);}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULT DISPLAY
+═══════════════════════════════════════════════════════════════ */
+#engine{display:none;}
+
+/* Battle header */
+.battle-header{text-align:center;padding:18px 20px 12px;background:linear-gradient(180deg,#1a0e04,#120900);border:1px solid #3a2a0a;border-radius:8px 8px 0 0;margin-bottom:0;}
+.battle-vs{font-size:1.1rem;font-weight:700;color:#e0ccaa;letter-spacing:.04em;}
+.battle-vs .att-name{color:#7abae0;} .battle-vs .def-name{color:#e07a7a;}
+.battle-vs .vs-sep{color:#5a4a28;margin:0 10px;}
+.battle-ts{font-size:.68rem;color:#4a3a18;margin-top:4px;}
+
+/* Two-column sides */
+.sides-wrap{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #2a1e0a;border-top:none;margin-bottom:0;}
+@media(max-width:700px){.sides-wrap{grid-template-columns:1fr;}}
+.side{padding:16px;}
+.side.s-att{background:#0f1520;border-right:1px solid #2a1e0a;}
+.side.s-def{background:#1a0f0f;}
+.side-title{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding-bottom:7px;border-bottom:1px solid;margin-bottom:12px;}
+.s-att .side-title{color:#7abae0;border-color:#2a4a6a;}
+.s-def .side-title{color:#e07a7a;border-color:#6a2a2a;}
+
+/* Step labels */
+.step-label{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:#4a3a18;margin:12px 0 5px;padding-bottom:3px;border-bottom:1px solid #1e1608;}
+.step-label span{color:#8a7040;}
+
+/* Troop table */
+.tb{width:100%;border-collapse:collapse;font-size:.76rem;margin-bottom:6px;}
+.tb th{text-align:left;color:#4a3a18;font-weight:400;font-size:.64rem;padding:2px 4px 4px;}
+.tb th:not(:first-child){text-align:right;}
+.tb td{padding:3px 4px;border-bottom:1px solid #1e1608;}
+.tb td:not(:first-child){text-align:right;}
+.tc{color:#b8a070;} .tn{color:#d8c898;} .tw{color:#7aaa5a;font-weight:700;} .te{color:#7abaa0;font-weight:700;}
+.tb-total td{border-top:1px solid #3a2a0a;border-bottom:none;font-weight:700;color:#d8c898;padding-top:5px;}
+.dice-pool-line{background:#0a0700;border:1px solid #2a1e0a;border-radius:4px;padding:6px 9px;font-size:.8rem;color:#d8c898;margin-top:4px;}
+.dice-pool-line b{color:#ffd060;font-size:.92rem;}
+.dice-pool-line .expl{font-size:.67rem;color:#5a4a28;display:block;margin-top:2px;}
+
+/* Modifier chain */
+.mod-chain{font-size:.76rem;}
+.mc-row{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-bottom:1px solid #1a1406;}
+.mc-lbl{flex:0 0 7.5rem;color:#b8a070;}
+.mc-val{flex:0 0 2.2rem;font-weight:700;font-size:.82rem;text-align:right;}
+.mc-pos{color:#6aba6a;} .mc-neg{color:#ba6a6a;} .mc-zer{color:#6a6a6a;}
+.mc-desc{color:#5a4a28;font-size:.67rem;font-style:italic;flex:1;}
+.mc-divider{border-top:1px solid #3a2a0a;margin:4px 0;}
+.mc-net-row{display:flex;align-items:baseline;gap:6px;padding:5px 0 3px;font-weight:700;}
+.mc-net-lbl{flex:0 0 7.5rem;color:#d8c898;font-size:.78rem;}
+.mc-net-val{flex:0 0 2.2rem;font-size:.9rem;text-align:right;}
+.mc-cap-note{font-size:.64rem;color:#9a6a28;font-style:italic;}
+.threshold-box{background:#0a0700;border:1px solid #2a1e0a;border-radius:4px;padding:6px 9px;margin-top:6px;text-align:center;font-size:.8rem;color:#d8c898;}
+.threshold-box b{color:#ffd060;font-size:1rem;}
+.threshold-box .expl{font-size:.67rem;color:#5a4a28;display:block;margin-top:2px;}
+
+/* Dice */
+.dice-row{display:flex;flex-wrap:wrap;gap:4px;margin:7px 0 4px;}
+.die{width:33px;height:33px;border-radius:5px;border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;line-height:1;transition:none;}
+.die-pip{font-size:.48rem;margin-top:1px;font-weight:700;}
+.die.ok{background:rgba(30,80,40,.6);border-color:#4aaa5a;color:#aaeeaa;}
+.die.ok .die-pip{color:#6acc7a;}
+.die.no{background:rgba(80,25,25,.6);border-color:#aa4a4a;color:#eeaaaa;}
+.die.no .die-pip{color:#cc7a7a;}
+.dice-overflow{font-size:.7rem;color:#9a8050;font-style:italic;margin-top:3px;padding:3px 7px;background:#0a0700;border-radius:3px;}
+.hits-summary{font-size:.82rem;color:#d8c898;margin-top:4px;}
+.hits-summary b{color:#ffd060;font-size:.92rem;}
+.hits-summary .miss{color:#8a6a5a;font-size:.7rem;margin-left:4px;}
+
+/* Casualty result per side */
+.cas-formula{font-size:.68rem;color:#8a7030;margin:3px 0;font-family:monospace;}
+.cas-block{margin-top:10px;padding:8px 10px;border-radius:4px;font-size:.79rem;}
+.cas-block.cas-w{background:rgba(20,60,30,.5);border:1px solid #2a6a3a;color:#7acc8a;}
+.cas-block.cas-l{background:rgba(60,20,20,.5);border:1px solid #6a2a2a;color:#cc8a8a;}
+.cas-block.cas-d{background:rgba(40,35,20,.5);border:1px solid #4a4020;color:#ccb870;}
+.cas-num{font-size:.95rem;font-weight:700;}
+.cas-expl{font-size:.67rem;opacity:.75;display:block;margin-top:2px;line-height:1.4;}
+
+/* Outcome banner */
+.outcome-wrap{border:1px solid #2a1e0a;border-top:none;border-bottom:none;}
+.outcome-banner{padding:13px 20px;text-align:center;font-size:.95rem;font-weight:700;letter-spacing:.05em;}
+.decisive{background:linear-gradient(90deg,#2a1000,#4a1800,#2a1000);color:#ffb060;border-top:2px solid #8a4010;}
+.solid{background:linear-gradient(90deg,#1e1800,#3a2e00,#1e1800);color:#ffe060;border-top:2px solid #7a6010;}
+.narrow{background:linear-gradient(90deg,#0e1a0e,#182e18,#0e1a0e);color:#90e090;border-top:2px solid #306030;}
+.draw{background:linear-gradient(90deg,#121220,#1e2040,#121220);color:#9090e0;border-top:2px solid #304070;}
+.outcome-sub{display:block;font-size:.72rem;font-weight:400;opacity:.75;margin-top:3px;letter-spacing:.02em;}
+
+/* Casualty summary */
+.cas-summary{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #2a1e0a;border-top:none;border-radius:0 0 8px 8px;overflow:hidden;}
+.cas-sum-box{padding:14px 16px;background:#130c04;}
+.cas-sum-box:first-child{border-right:1px solid #2a1e0a;}
+.cas-sum-label{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:#4a3a18;margin-bottom:6px;}
+.cas-sum-name{font-size:.8rem;font-weight:700;color:#d8c898;margin-bottom:8px;}
+.cas-sum-num{font-size:1.3rem;font-weight:700;color:#ffb060;line-height:1;}
+.cas-sum-pct{font-size:.78rem;color:#8a7050;margin-left:4px;}
+.cas-sum-remain{font-size:.72rem;color:#5a4a28;margin-top:4px;}
+.cas-sum-why{font-size:.67rem;color:#4a3a18;margin-top:6px;line-height:1.5;border-top:1px solid #1e1608;padding-top:6px;}
+.cas-sum-why b{color:#7a6535;}
+
+/* Discord report */
+.report-section{display:none;margin-top:20px;background:#0a0700;border:1px solid #2a1e0a;border-radius:7px;overflow:hidden;}
+.report-header{background:#130c04;padding:10px 14px;border-bottom:1px solid #2a1e0a;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:#6a5528;}
+.discord-out{font-family:'Consolas','Courier New',monospace;font-size:.77rem;white-space:pre-wrap;padding:12px 14px;max-height:320px;overflow-y:auto;color:#c8b070;line-height:1.6;}
+.report-footer{background:#130c04;padding:8px 14px;border-top:1px solid #2a1e0a;}
+.copybtn{padding:7px 16px;background:#1e3a1e;border:1px solid #3a6a3a;color:#7acc7a;border-radius:4px;cursor:pointer;font-size:.78rem;font-family:inherit;}
+.copybtn:hover{background:#2a4a2a;}
+
+/* ── Personal Combat ─── */
+.pc-section{margin-top:12px;padding:14px 16px;background:rgba(0,0,0,.25);border:1px solid #2a1e0a;border-radius:7px;}
+.pc-header{font-size:.6rem;letter-spacing:.14em;color:#6a5530;text-transform:uppercase;font-weight:700;margin-bottom:10px;}
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:600px){.pc-grid{grid-template-columns:1fr;}}
+.pc-block{padding:10px 12px;border-radius:5px;border:1px solid;font-size:.78rem;}
+.pc-safe{background:rgba(20,30,20,.3);border-color:#2a3a2a;}
+.pc-name{display:block;font-weight:700;color:#c8a84c;margin-bottom:3px;font-size:.82rem;}
+.pc-tier{display:block;font-size:.7rem;color:#7a6535;margin-bottom:5px;}
+.pc-status{display:block;font-size:.72rem;color:#4a5a4a;font-style:italic;}
+.pc-roll{font-size:.76rem;color:#a09060;margin:4px 0 3px;}
+.pc-outcome{font-weight:700;font-size:.88rem;margin:4px 0 3px;padding:3px 8px;border-radius:3px;display:inline-block;}
+.pc-severity{font-size:.7rem;color:#7a6535;line-height:1.4;margin-top:4px;}
+/* wound colours */
+.wound-mortal .pc-outcome,.pc-block.pc-wound-mortal .pc-outcome{background:rgba(120,0,0,.4);color:#ff8080;border:1px solid #800000;}
+.wound-grievous .pc-outcome,.pc-block.pc-wound-grievous .pc-outcome{background:rgba(100,30,0,.4);color:#ff9060;border:1px solid #6a2000;}
+.wound-serious .pc-outcome,.pc-block.pc-wound-serious .pc-outcome{background:rgba(80,60,0,.4);color:#ffd060;border:1px solid #5a4000;}
+.wound-minor .pc-outcome,.pc-block.pc-wound-minor .pc-outcome{background:rgba(40,60,40,.4);color:#90d090;border:1px solid #2a4a2a;}
+.wound-none .pc-outcome,.pc-block.pc-wound-none .pc-outcome{background:rgba(20,40,20,.4);color:#70c070;border:1px solid #1a3a1a;}
+.wound-heroic .pc-outcome,.pc-block.pc-wound-heroic .pc-outcome{background:rgba(60,50,0,.5);color:#ffe040;border:1px solid #7a6000;}
+.pc-block.pc-wound-mortal{border-color:#800000;background:rgba(60,0,0,.2);}
+.pc-block.pc-wound-grievous{border-color:#6a2000;background:rgba(50,15,0,.2);}
+.pc-block.pc-wound-serious{border-color:#5a4000;background:rgba(40,30,0,.2);}
+.pc-block.pc-wound-minor{border-color:#2a4a2a;background:rgba(10,25,10,.2);}
+.pc-block.pc-wound-none{border-color:#1a3a1a;background:rgba(5,20,5,.2);}
+.pc-block.pc-wound-heroic{border-color:#7a6000;background:rgba(40,30,0,.2);}
+
+/* ── Rout check blocks ─── */
+.rout-section{margin-top:12px;padding:12px 16px;background:rgba(0,0,0,.28);border:1px solid #2e1e0a;border-radius:7px;}
+.rout-section-hdr{font-size:.6rem;letter-spacing:.14em;color:#6a5530;text-transform:uppercase;font-weight:700;margin-bottom:10px;}
+.rout-block{padding:10px 14px;border-radius:5px;border:1px solid;margin-bottom:8px;}
+.rout-block:last-child{margin-bottom:0;}
+.rout-fail{background:rgba(100,10,10,.3);border-color:#8a2020;}
+.rout-hold{background:rgba(10,60,20,.3);border-color:#207040;}
+.rout-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;}
+.rout-name{font-size:.82rem;font-weight:700;color:#e0d0b0;}
+.rout-verdict{font-size:.92rem;font-weight:700;}
+.rout-fail .rout-verdict{color:#ff6060;}
+.rout-hold .rout-verdict{color:#60d080;}
+.rout-detail{font-size:.76rem;color:#a09060;line-height:1.6;}
+.rout-fail-note{color:#cc5050;margin-left:6px;}
+.rout-hold-note{color:#50b060;margin-left:6px;}
+.rout-pursuit{font-size:.74rem;color:#ff8060;margin-top:5px;padding:4px 8px;background:rgba(120,20,20,.25);border-radius:3px;border-left:3px solid #8a3020;}
+
+/* ── Phase 2 section ─── */
+.phase2-section{margin-top:16px;}
+.phase2-hdr{
+  text-align:center;padding:8px 16px;border-radius:6px 6px 0 0;
+  background:rgba(60,40,0,.4);border:1px solid #7a5a00;border-bottom:none;
+  font-size:.8rem;font-weight:700;color:#d4a030;letter-spacing:.06em;}
+.phase2-body{border:1px solid #7a5a00;border-radius:0 0 6px 6px;padding:14px;}
+.phase-label{
+  display:inline-block;font-size:.55rem;letter-spacing:.16em;font-weight:700;
+  text-transform:uppercase;padding:2px 8px;border-radius:20px;margin-bottom:6px;
+  background:rgba(100,70,0,.3);color:#d4a030;border:1px solid rgba(100,70,0,.5);}
+.phase-summary{
+  text-align:center;padding:8px;border-radius:5px;
+  font-size:.82rem;font-weight:700;margin:10px 0;border:1px solid;}
+
+/* ── Total casualties summary ─── */
+.total-cas-section{
+  margin-top:12px;padding:12px 14px;
+  background:rgba(0,0,0,.3);border:1px solid #3a2a10;border-radius:6px;}
+.total-cas-hdr{font-size:.6rem;letter-spacing:.14em;color:#6a5530;text-transform:uppercase;font-weight:700;margin-bottom:8px;}
+.total-cas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.total-cas-box{background:rgba(0,0,0,.2);padding:8px 10px;border-radius:4px;border:1px solid #2a1e08;}
+.total-cas-name{font-size:.72rem;color:#c8a84c;font-weight:700;margin-bottom:3px;}
+.total-cas-num{font-size:1.0rem;font-weight:700;color:#e0d0b0;}
+.total-cas-pct{font-size:.72rem;color:#8a7040;margin-left:4px;}
+.total-cas-remain{font-size:.7rem;color:#6a5530;margin-top:2px;}
+
+
+/* ══ UNIVERSAL REALMS NAV ══ */
+.ur-nav-shell {
+  height: 52px; display: flex; align-items: stretch;
+  background: #1a1208; border-bottom: 1px solid #2a1e0a;
+  position: relative; z-index: 1000; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+}
+.ur-nav-shell::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(184,134,11,0.4) 20%, rgba(184,134,11,0.4) 80%, transparent 100%);
+}
+.ur-logo-btn {
+  padding: 0 20px; display: flex; flex-direction: column;
+  justify-content: center; border-right: 1px solid rgba(255,255,255,0.06);
+  text-decoration: none; flex-shrink: 0; transition: background 0.15s;
+}
+.ur-logo-btn:hover { background: rgba(255,255,255,0.03); }
+.ur-logo-name {
+  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+  color: #f5edd8; letter-spacing: 2.5px; text-transform: uppercase; line-height: 1;
+}
+.ur-logo-tag {
+  font-family: 'EB Garamond', serif; font-size: 9px; color: #b8860b;
+  letter-spacing: 1.5px; margin-top: 3px; font-style: italic; opacity: 0.75;
+}
+.ur-nav-links {
+  display: flex; align-items: stretch; flex: 1;
+  padding: 0 4px; overflow-x: auto;
+}
+.ur-nav-links::-webkit-scrollbar { display: none; }
+.ur-nav-lnk {
+  display: flex; align-items: center; gap: 7px; padding: 0 13px;
+  font-family: 'EB Garamond', Georgia, serif; font-size: 13.5px; font-style: italic;
+  color: #9a8468; text-decoration: none;
+  border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
+}
+.ur-nav-lnk:hover { color: #e8d9bb; background: rgba(255,255,255,0.03); }
+.ur-nav-lnk.cur {
+  color: #d4ab55; border-bottom-color: #c99c3a;
+  font-style: normal; font-weight: 500; background: rgba(184,134,11,0.06);
+}
+.ur-nav-ic { font-size: 10px; opacity: 0.65; }
+.ur-nav-lnk.cur .ur-nav-ic { opacity: 1; }
+.ur-nav-right {
+  display: flex; align-items: center; padding: 0 16px; flex-shrink: 0;
+  border-left: 1px solid rgba(255,255,255,0.06); gap: 10px;
+}
+.ur-tool-tag {
+  font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: 2px;
+  text-transform: uppercase; padding: 4px 12px;
+  border: 1px solid; border-radius: 2px;
+}
+
+/* ── Battle Roller — UR Unified Theme ── */
+body {
+  font-family: 'EB Garamond', Georgia, serif !important;
+  background: var(--bg-void) !important;
+  color: var(--text-on-dark) !important;
+}
+h1 { font-family: var(--font-display) !important; color: var(--text-gold-dark) !important; letter-spacing: 0.08em; }
+.sub { font-family: var(--font-body) !important; font-style: italic; color: var(--text-muted-dark) !important; }
+.card { background: var(--bg-card) !important; border-color: var(--border-dark) !important; border-radius: var(--radius-lg) !important; }
+.card.att { border-color: rgba(122,186,224,0.35) !important; }
+.card.def { border-color: rgba(224,122,122,0.35) !important; }
+input[type=number], input[type=text], select {
+  font-family: var(--font-body) !important;
+  background: var(--bg-input) !important;
+  border-color: var(--border-dark) !important;
+  color: var(--text-on-dark) !important;
+  border-radius: var(--radius-sm) !important;
+}
+input:focus, select:focus { border-color: var(--gold-dim) !important; }
+.rollbtn {
+  font-family: var(--font-display) !important;
+  background: linear-gradient(135deg, #3a0e00, #6a2800) !important;
+  border-color: var(--gold) !important;
+  border-radius: var(--radius-md) !important;
+  letter-spacing: 0.12em;
+}
+.rollbtn:hover { background: linear-gradient(135deg, #5a1800, #8a3800) !important; }
+.cond-card { background: var(--bg-card) !important; border-color: var(--border-dark) !important; border-radius: var(--radius-lg) !important; }
+.cond-card h3 { font-family: var(--font-display) !important; color: var(--gold-dim) !important; }
+.fg label { font-family: var(--font-display) !important; font-size: 0.68rem; color: var(--text-muted-dark) !important; letter-spacing: 0.08em; }
+.site-header { border-bottom: 1px solid var(--border-dark); padding-bottom: 14px; margin-bottom: 18px; }
+.report-section { background: var(--bg-card) !important; border-color: var(--border-dark) !important; border-radius: var(--radius-lg) !important; }
+
+</style>
+</head>
+<body>
+<div class="ur-nav-shell">
+  <a href="index.html" class="ur-logo-btn">
+    <div class="ur-logo-name">Universal Realms</div>
+    <div class="ur-logo-tag">World Engine</div>
+  </a>
+  <div class="ur-nav-links">
+    <a href="index.html"             class="ur-nav-lnk"><span class="ur-nav-ic">⌂</span>Dashboard</a>
+    <a href="character_creator.html" class="ur-nav-lnk "><span class="ur-nav-ic">◉</span>Characters</a>
+    <a href="battle_roller.html"     class="ur-nav-lnk cur"><span class="ur-nav-ic">⚔</span>Battle</a>
+    <a href="duel_roller.html"       class="ur-nav-lnk "><span class="ur-nav-ic">◈</span>Duel</a>
+    <a href="raid_roller.html"       class="ur-nav-lnk "><span class="ur-nav-ic">⚑</span>Raid</a>
+    <a href="chronicle_map.html"     class="ur-nav-lnk "><span class="ur-nav-ic">⊞</span>Chronicle Map</a>
+  </div>
+  <div class="ur-nav-right">
+    <div class="ur-tool-tag" style="color:#7abae0;border-color:rgba(122,186,224,0.3);background:rgba(122,186,224,0.3)">Battle Roller</div>
+    <div id="ur-auth-nav"></div>
+  </div>
+</div>
+<!-- UNIVERSAL REALMS NAV SHELL -->
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+:root{
+  --ink-800:#2a1c0d;--ink-700:#3d2b14;
+  --parch-100:#fdf8ef;--parch-200:#f5edd8;--parch-300:#ecdcc0;
+  --gold-300:#d4ab55;--gold-400:#c99c3a;--gold-500:#b8892a;
+  --gold-border:rgba(184,137,42,0.28);--gold-100:rgba(184,137,42,0.10);
+  --text-muted:#8a7055;--border-mid:rgba(142,108,58,0.24);
+  --font-display:'Cinzel',serif;--font-body:'EB Garamond',Georgia,serif;
+}
+.ur-nav{
+  display:flex;align-items:stretch;height:50px;
+  background:var(--ink-800);border-bottom:1px solid var(--ink-700);
+  position:sticky;top:0;z-index:1000;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+.ur-nav::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,137,42,0.35) 20%,rgba(184,137,42,0.35) 80%,transparent);
+  pointer-events:none;
+}
+.ur-logo{
+  padding:0 20px;display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid rgba(255,255,255,0.06);text-decoration:none;
+  flex-shrink:0;transition:background 0.15s;
+}
+.ur-logo:hover{background:rgba(255,255,255,0.03);}
+.ur-logo-mark{
+  font-family:var(--font-display);font-size:12px;font-weight:600;
+  color:#f5edd8;letter-spacing:2.5px;text-transform:uppercase;line-height:1;
+}
+.ur-logo-sub{
+  font-family:var(--font-body);font-size:9px;color:var(--gold-500);
+  letter-spacing:1.5px;margin-top:3px;font-style:italic;opacity:0.7;
+}
+.ur-nav-links{display:flex;align-items:stretch;flex:1;padding:0 4px;overflow-x:auto;}
+.ur-nav-links::-webkit-scrollbar{display:none;}
+.ur-nav-link{
+  display:flex;align-items:center;gap:6px;padding:0 14px;
+  font-family:var(--font-body);font-size:13px;font-style:italic;
+  color:#9a8468;text-decoration:none;border-bottom:2px solid transparent;
+  transition:all 0.15s;white-space:nowrap;
+}
+.ur-nav-link:hover{color:#e8d9bb;background:rgba(255,255,255,0.03);}
+.ur-nav-link.active{
+  color:var(--gold-300);border-bottom-color:var(--gold-400);
+  font-style:normal;font-weight:500;background:rgba(184,137,42,0.06);
+}
+.ur-nav-icon{font-size:10px;opacity:0.7;}
+.ur-nav-link.active .ur-nav-icon{opacity:1;}
+.ur-nav-right{
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.06);
+}
+.ur-home-btn{
+  font-family:var(--font-display);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold-400);text-decoration:none;
+  padding:6px 14px;border:1px solid var(--gold-border);border-radius:2px;
+  background:rgba(184,137,42,0.08);transition:all 0.15s;white-space:nowrap;
+}
+.ur-home-btn:hover{background:rgba(184,137,42,0.15);color:var(--gold-300);}
+</style>
+
+<script>
+  (function(){
+    var el = document.getElementById('nav-battle');
+    if (el) el.classList.add('active');
+  })();
+</script>
+
+<div class="site-header"><h1>⚔ Universal Realms 1066 — Battle Roller</h1><p class="sub">Single battle resolution &nbsp;·&nbsp; Troop quality dice pool &nbsp;·&nbsp; Exchange-ratio casualties</p></div>
+
+<div class="setup-grid">
+<!-- ATTACKER -->
+<div class="card att">
+  <div class="ctitle">⚔ Attacker</div>
+  <div class="fg"><label>Commander Name</label><input type="text" id="a-name" placeholder="e.g. Lord Eustace of Boulogne"></div>
+  <div class="fg"><label>Martial Stat</label><input type="number" id="a-martial" min="1" max="30" value="10" oninput="upd('a')">
+  <div class="fg"><label>Personal Combat Score <span style="font-size:.65rem;color:#4a3820;">(1–20 · affects commander survival)</span></label><input type="number" id="a-pc" min="1" max="20" value="10">
+    <div id="a-pc-note" style="font-size:.67rem;color:#5a4828;margin-top:2px;"></div></div></div>
+  <div class="fg"><label>Culture</label>
+    <select id="a-culture" onchange="upd('a')">
+      <option value="feudal">English / Norman / French / German / Iberian / Scandinavian</option>
+      <option value="byzantine">Byzantine / Italian / Persian</option>
+      <option value="regional">Polish / Russian / Arab / Scottish / Caucasian / Egyptian</option>
+      <option value="steppe">Steppe / Nomadic / Berber / Almoravid / Bedouin / Arabian</option>
+      <option value="balkan">Balkan / Irish</option>
+    </select></div>
+  <div class="fg"><label>Troops</label>
+    <div class="tg">
+      <div><label>Levy Infantry</label><input type="number" id="a-levy" min="0" value="0" oninput="upd('a')"></div>
+      <div><label>Retinue ✦</label><input type="number" id="a-ret" min="0" value="0" oninput="upd('a')"></div>
+      <div><label>Cavalry ✦</label><input type="number" id="a-cav" min="0" value="0" oninput="upd('a')"></div>
+      <div><label>Archers</label><input type="number" id="a-arch" min="0" value="0" oninput="upd('a')"></div>
+      <div><label>Mercenaries ✦</label><input type="number" id="a-mercs" min="0" value="0" oninput="upd('a')"></div>
+    </div>
+    <div style="font-size:.68rem;color:#5a4a28;margin-top:4px;">✦ = quality troops</div></div>
+  <div class="live-stat" id="a-live">—</div>
+  <div class="stat-bar" id="a-bar" style="margin-top:5px;"></div>
+</div>
+
+<!-- DEFENDER -->
+<div class="card def">
+  <div class="ctitle">🛡 Defender</div>
+  <div class="fg"><label>Commander Name</label><input type="text" id="d-name" placeholder="e.g. Thegn Edmund of Mercia"></div>
+  <div class="fg"><label>Martial Stat</label><input type="number" id="d-martial" min="1" max="30" value="10" oninput="upd('d')">
+  <div class="fg"><label>Personal Combat Score <span style="font-size:.65rem;color:#4a3820;">(1–20 · affects commander survival)</span></label><input type="number" id="d-pc" min="1" max="20" value="10">
+    <div id="d-pc-note" style="font-size:.67rem;color:#5a4828;margin-top:2px;"></div></div></div>
+  <div class="fg"><label>Culture</label>
+    <select id="d-culture" onchange="upd('d')">
+      <option value="feudal">English / Norman / French / German / Iberian / Scandinavian</option>
+      <option value="byzantine">Byzantine / Italian / Persian</option>
+      <option value="regional">Polish / Russian / Arab / Scottish / Caucasian / Egyptian</option>
+      <option value="steppe">Steppe / Nomadic / Berber / Almoravid / Bedouin / Arabian</option>
+      <option value="balkan">Balkan / Irish</option>
+    </select></div>
+  <div class="fg"><label>Troops</label>
+    <div class="tg">
+      <div><label>Levy Infantry</label><input type="number" id="d-levy" min="0" value="0" oninput="upd('d')"></div>
+      <div><label>Retinue ✦</label><input type="number" id="d-ret" min="0" value="0" oninput="upd('d')"></div>
+      <div><label>Cavalry ✦</label><input type="number" id="d-cav" min="0" value="0" oninput="upd('d')"></div>
+      <div><label>Archers</label><input type="number" id="d-arch" min="0" value="0" oninput="upd('d')"></div>
+      <div><label>Mercenaries ✦</label><input type="number" id="d-mercs" min="0" value="0" oninput="upd('d')"></div>
+    </div>
+    <div style="font-size:.68rem;color:#5a4a28;margin-top:4px;">✦ = quality troops</div></div>
+  <div class="live-stat" id="d-live">—</div>
+  <div class="stat-bar" id="d-bar" style="margin-top:5px;"></div>
+</div>
+</div>
+
+<!-- CONDITIONS -->
+<div class="cond-card">
+  <h3>⚙ Battle Conditions</h3>
+  <div class="cgrid">
+    <div class="fg"><label>Attacker Advantage</label>
+      <select id="a-adv">
+        <option value="0">None</option>
+        <option value="1">Ambush / Surprise (+1)</option>
+        <option value="2">Strong Position — High Ground, River Crossing favours them (+2)</option>
+        <option value="3">Overwhelming Advantage — Ambush + Terrain (+3)</option>
+        <option value="-1">Forced March / Fatigued (−1)</option>
+        <option value="-2">River Crossing / Difficult Approach (−2)</option>
+        <option value="-3">Severe Disadvantage (−3)</option>
+      </select></div>
+    <div class="fg"><label>Defender Advantage</label>
+      <select id="d-adv">
+        <option value="1">Defending own province (+1)</option>
+        <option value="2">Fortified position / High ground (+2)</option>
+        <option value="3">Prepared ground + Defensive CB (+3)</option>
+        <option value="0">None — fighting in enemy territory</option>
+        <option value="-1">Disadvantaged position (−1)</option>
+      </select></div>
+    <div class="fg"><label>Attacker RP Bonus</label>
+      <select id="a-rp">
+        <option value="0">None</option>
+        <option value="1">+1 — Good battle narrative</option>
+        <option value="2">+2 — Excellent narrative</option>
+        <option value="3">+3 — Exceptional narrative</option>
+      </select></div>
+    <div class="fg"><label>Defender RP Bonus</label>
+      <select id="d-rp">
+        <option value="0">None</option>
+        <option value="1">+1 — Good battle narrative</option>
+        <option value="2">+2 — Excellent narrative</option>
+        <option value="3">+3 — Exceptional narrative</option>
+      </select></div>
+  </div>
+</div>
+
+<button class="rollbtn" onclick="rollBattle()">⚔ ROLL BATTLE ⚔</button>
+
+<div id="engine">
+  <div id="result-block"></div>
+  <div class="report-section" id="report-section">
+    <div class="report-title">📜 Battle Report — Copy to Discord</div>
+    <div class="discord-out" id="discord-out"></div>
+    <button class="copybtn" onclick="copyOut()">📋 Copy to Discord</button>
+  </div>
+</div>
+
+<script>
+// Culture profiles: troops needed per additional die beyond the base 3
+const CULTURES={
+  feudal:   {name:'English / Norman / French / German / Iberian / Scandinavian',
+             levy:850, arch:450, ret:250, mercs:300, cav:80,
+             note:'Feudal heavy cavalry dominance — cavalry efficient, strong retinue core'},
+  byzantine:{name:'Byzantine / Italian / Persian',
+             levy:900, arch:500, ret:250, mercs:300, cav:50,
+             note:'Professional combined-arms — organised, well-drilled, cavalry elite'},
+  regional: {name:'Polish / Russian / Arab / Scottish / Caucasian / Egyptian',
+             levy:1100,arch:500, ret:350, mercs:300, cav:80,
+             note:'Regional powers — broad levy manpower, mixed troop quality'},
+  steppe:   {name:'Steppe / Nomadic / Berber / Almoravid / Bedouin / Arabian',
+             levy:1200,arch:400, ret:350, mercs:300, cav:60,
+             note:'Highly mobile warfare — archers and cavalry elite, mass levy unreliable'},
+  balkan:   {name:'Balkan / Irish',
+             levy:1100,arch:575, ret:350, mercs:300, cav:90,
+             note:'Fragmented rugged armies — tough fighters, expensive cavalry, inefficient archers'},
+}
+const BASE_DICE=3; // Every army gets 3 dice regardless of size
+const D_SIDES=40;  // D40 system
+const MOD_CAP=10;  // ±10 modifier cap
+
+const gi=id=>parseInt(document.getElementById(id).value)||0;
+const gs=id=>document.getElementById(id).value;
+
+function armyStats(p){
+  const ckey=gs(`${p}-culture`)||'feudal';
+  const C=CULTURES[ckey]||CULTURES.feudal;
+  const levy=gi(`${p}-levy`),ret=gi(`${p}-ret`),cav=gi(`${p}-cav`);
+  const arch=gi(`${p}-arch`),mercs=gi(`${p}-mercs`);
+  const total=levy+ret+cav+arch+mercs;
+  // Effective strength (for casualty exchange ratio only — not for dice)
+  const eff=levy*1+arch*2+ret*5+cav*15+mercs*5;
+  // Per-troop dice: floor(count / threshold_per_die)
+  const dLevy  = levy  ? Math.floor(levy /C.levy)  : 0;
+  const dArch  = arch  ? Math.floor(arch /C.arch)  : 0;
+  const dRet   = ret   ? Math.floor(ret  /C.ret)   : 0;
+  const dMercs = mercs ? Math.floor(mercs/C.mercs) : 0;
+  const dCav   = cav   ? Math.floor(cav  /C.cav)   : 0;
+  const troopDice=dLevy+dArch+dRet+dMercs+dCav;
+  const dice=BASE_DICE+troopDice;
+  return{levy,ret,cav,arch,mercs,total,eff,dice,
+         dLevy,dArch,dRet,dMercs,dCav,troopDice,
+         C,ckey};
+}
+
+function martialBonus(m){return m>=20?3:m>=15?2:m>=10?1:0;}
+
+function sizeRatioMod(effA,effB){
+  if(!effA||!effB) return{modA:0,modB:0,label:''};
+  const r=effA>=effB?effA/effB:effB/effA;
+  const mod=r>=5?3:r>=3?2:r>=2?1:0;
+  if(!mod) return{modA:0,modB:0,label:''};
+  const tag=r>=5?'5:1':r>=3?'3:1':'2:1';
+  const label=`${tag} numbers advantage → +${mod}`;
+  return effA>=effB?{modA:mod,modB:0,label}:{modA:0,modB:mod,label};
+}
+
+function calcNet(martial,adv,rp,size){
+  return Math.max(-MOD_CAP,Math.min(MOD_CAP,martialBonus(martial)+adv+rp+size));
+}
+
+// 2D6 roller for casualty variance
+function roll2d6(){return Math.ceil(Math.random()*6)+Math.ceil(Math.random()*6);}
+
+function casualties(effA,effB,margin){
+  const absM=Math.abs(margin);
+  const aWins=margin>=0;
+
+  // 1 — Continuous base rates driven by margin magnitude
+  //     loser:  8% base + 3.5% per hit of margin (cap 50%)
+  //     winner: 4% base + 1.0% per hit of margin (cap 20%)
+  const loserBase  = Math.min(0.50, 0.08 + absM * 0.035);
+  const winnerBase = Math.min(0.20, 0.04 + absM * 0.010);
+  const aBase = aWins ? winnerBase : loserBase;
+  const bBase = aWins ? loserBase  : winnerBase;
+
+  // 2 — Exchange ratio: how hard can the opponent physically reach you?
+  //     Determined by relative effective strength (quality × numbers)
+  //     Capped at 1.0 (can never inflict more than full base rate)
+  const aExch = Math.min(1.0, Math.max(0.05, effB / Math.max(effA, 1)));
+  const bExch = Math.min(1.0, Math.max(0.05, effA / Math.max(effB, 1)));
+
+  // 3 — Variance roll: 2D6 per side (average 7 → factor 1.0, range 0.29–1.71)
+  //     Same margin, different battle → different casualty magnitude
+  const aRoll = roll2d6();
+  const bRoll = roll2d6();
+  const aVar  = aRoll / 7.0;
+  const bVar  = bRoll / 7.0;
+
+  // 4 — Final casualties
+  //     winner floor: 1%  (you always bleed something)
+  //     loser  floor: 5%  (defeat always costs)
+  const aC = Math.max(aWins ? 0.01 : 0.05, aBase * aExch * aVar);
+  const bC = Math.max(aWins ? 0.05 : 0.01, bBase * bExch * bVar);
+
+  return{aCas:aC, bCas:bC, aExch, bExch,
+         aBase, bBase, aVar, bVar, aRoll, bRoll, absM};
+}
+
+function d20(){return Math.ceil(Math.random()*D_SIDES);} // uses D40
+
+function upd(p){
+  const s=armyStats(p);
+  const el=document.getElementById(`${p}-live`);
+  const bar=document.getElementById(`${p}-bar`);
+  if(!s.total){el.innerHTML='Enter troops above';bar.innerHTML='';return;}
+  const dParts=[];
+  if(s.dLevy)  dParts.push(`Levy:${s.dLevy}D`);
+  if(s.dArch)  dParts.push(`Arch:${s.dArch}D`);
+  if(s.dRet)   dParts.push(`Ret:${s.dRet}D`);
+  if(s.dMercs) dParts.push(`Mercs:${s.dMercs}D`);
+  if(s.dCav)   dParts.push(`Cav:${s.dCav}D`);
+  const dNote=dParts.length?` <span style="font-size:.65rem;color:#6a5535;">(${BASE_DICE} base + ${dParts.join(' + ')})</span>`:'';
+  el.innerHTML=`Headcount: <b>${s.total.toLocaleString()}</b> &nbsp;·&nbsp; Eff.Str: <b>${s.eff.toLocaleString()}</b> &nbsp;·&nbsp; Pool: <b>${s.dice}D40</b>${dNote}`;
+  const t=s.total;
+  bar.innerHTML=[
+    `<div class="sb-l" style="flex:${s.levy/t}"></div>`,
+    `<div class="sb-r" style="flex:${s.ret/t}"></div>`,
+    `<div class="sb-c" style="flex:${s.cav/t}"></div>`,
+    `<div class="sb-a" style="flex:${s.arch/t}"></div>`,
+    `<div class="sb-m" style="flex:${s.mercs/t}"></div>`,
+  ].join('');
+}
+
+// ── Rendering helpers ─────────────────────────────────────────────────
+
+function renderTroopTable(s){
+  const rows=[];
+  const addRow=(name,count,perDie,dice)=>{
+    if(!count) return;
+    rows.push(`<tr>
+      <td class="tc">${name}</td>
+      <td class="tn">${count.toLocaleString()}</td>
+      <td class="tw">${perDie.toLocaleString()}</td>
+      <td class="te">${dice > 0 ? dice+'D' : '<span style="color:#5a4828">—</span>'}</td>
+    </tr>`);
+  };
+  const C=s.C;
+  addRow('Levy Infantry',s.levy,C.levy,s.dLevy);
+  addRow('Archers',      s.arch, C.arch, s.dArch);
+  addRow('Retinue',      s.ret,  C.ret,  s.dRet);
+  addRow('Cavalry',      s.cav,  C.cav,  s.dCav);
+  addRow('Mercenaries',  s.mercs,C.mercs,s.dMercs);
+  return `
+  <table class="troop-tbl">
+    <tr>
+      <th>Troop type</th>
+      <th>Count</th>
+      <th>Per die</th>
+      <th>Dice</th>
+    </tr>
+    ${rows.join('')}
+    <tr class="tr-total">
+      <td colspan="2">${s.total.toLocaleString()} men</td>
+      <td></td>
+      <td class="te">${s.troopDice}D</td>
+    </tr>
+  </table>
+  <div class="pool-line">
+    <span>${BASE_DICE} base + ${s.troopDice} from troops</span>
+    <span class="pool-dice">${s.dice}D40</span>
+  </div>`;
+}
+
+function renderModChain(martial,adv,advLabel,rp,sizeBonus,sizeLbl,net,raw){
+  const mBonus=martialBonus(martial);
+  const rows=[];
+  const addRow=(label,val,desc)=>{
+    if(val===0) return;
+    const cls=val>0?'mod-pos':'mod-neg';
+    rows.push(`<div class="mod-row">
+      <span class="mod-label">${label}</span>
+      <span class="mod-val ${cls}">${val>0?'+':''}${val}</span>
+      <span class="mod-desc">${desc}</span>
+    </div>`);
+  };
+  addRow('Martial',mBonus,`Martial stat ${martial} — commander's battlefield experience`);
+  addRow('Position',adv,advLabel);
+  addRow('RP Award',rp,'Moderator award for quality battle narrative');
+  if(sizeBonus) addRow('Numbers',sizeBonus,sizeLbl);
+  const netCls=net>0?'mod-pos':net<0?'mod-neg':'mod-zer';
+  const capNote=raw!==net?` <span style="color:#a07030;font-size:.65rem;">(raw ${raw>0?'+':''}${raw}, capped at ±10)</span>`:'';
+  return `
+  <div class="mod-chain">
+    ${rows.join('')}
+    ${rows.length?'<div class="mod-divider"></div>':''}
+    <div class="mod-net-row">
+      <span class="mod-net-lbl">Net modifier</span>
+      <span class="mod-net-val ${netCls}">${net>0?'+':''}${net}</span>
+      ${capNote}
+    </div>
+  </div>
+  <div class="threshold-box">
+    Need <b>${(D_SIDES/2)-net}+</b> on each D40 to score a hit
+    <small>20 − (${net>=0?'+':''}${net}) = ${(D_SIDES/2)-net} &nbsp;·&nbsp; Hit rate: ${((D_SIDES-(D_SIDES/2-net)+1)/D_SIDES*100).toFixed(0)}%</small>
+  </div>`;
+}
+
+function renderDice(rolls,thresh){
+  const show=rolls.slice(0,24); // show up to 24 D40 dice
+  const extra=rolls.length-show.length;
+  const dice=show.map(r=>`<div class="die ${r>=thresh?'ok':'no'}" title="Rolled ${r} on D40 — ${r>=thresh?'HIT ✓':'miss ✗'}">
+    ${r}<div class="die-pip">${r>=thresh?'HIT':'miss'}</div>
+  </div>`).join('');
+  const overflow=extra?`<div class="dice-overflow">+${extra} more dice not shown — all counted in totals</div>`:'';
+  return dice+overflow;
+}
+
+function renderHitsSummary(succ,total,thresh){
+  const rate=total>0?(succ/total*100).toFixed(0):0;
+  const cls=succ/total>0.5?'hits-ok':'hits-low';
+  return `<div class="hits-summary ${cls}">
+    <div>
+      <div class="hits-count">${succ} / ${total}</div>
+      <div class="hits-detail">dice hit (${rate}% success rate)</div>
+    </div>
+    <div class="hits-detail" style="margin-left:auto;text-align:right;">
+      Need ${thresh}+ · rolled ${total}D40
+    </div>
+  </div>`;
+}
+
+function renderCasPanel(name,lost,total,casPct,exch,baseRate,wins,oppEff,yourEff){
+  const cls=wins?'cas-win-p':'cas-lose-p';
+  const remaining=total-lost;
+  // Plain-English explanation
+  let explain;
+  const ratio=(yourEff/Math.max(oppEff,1)).toFixed(1);
+  if(exch<0.3){
+    explain=`Your effective strength (${yourEff.toLocaleString()}) greatly outmatches the enemy (${oppEff.toLocaleString()}). They could barely reach your lines — exchange ratio ${exch.toFixed(2)} reduces their damage potential to ${(exch*100).toFixed(0)}% of base.`;
+  } else if(exch>0.9){
+    explain=`Roughly equal fighting power. Both sides could inflict casualties freely — exchange ratio ${exch.toFixed(2)}.`;
+  } else {
+    explain=`Enemy effective strength (${oppEff.toLocaleString()}) vs yours (${yourEff.toLocaleString()}). Exchange ratio ${exch.toFixed(2)} — the weaker side's damage is scaled down proportionally.`;
+  }
+  return `<div class="cas-panel ${cls}">
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
+      <span class="cas-number">${lost.toLocaleString()}</span>
+      <span class="cas-pct">men lost &nbsp;·&nbsp; ${(casPct*100).toFixed(1)}% of force</span>
+    </div>
+    <div style="font-size:.76rem;margin-bottom:4px;">
+      ${remaining.toLocaleString()} remaining of ${total.toLocaleString()} starting
+    </div>
+    <div class="cas-explain">${explain}</div>
+  </div>`;
+}
+
+function renderSidePanel(name,role,s,rolls,succ,thresh,net,raw,adv,advLabel,rp,sizeBonus,sizeLbl,martial,lost,casPct,exch,baseRate,wins,oppEff,panelCls){
+  const icon=role==='Attacker'?'⚔':'🛡';
+  return `<div class="side-panel ${panelCls}">
+    <div class="side-name">
+      ${icon} ${name}
+      <span class="side-role">${role}</span>
+    </div>
+
+    <div class="step-chip chip-army">① Army Strength → Dice Pool</div>
+    ${renderTroopTable(s)}
+
+    <div class="step-chip chip-mod" style="margin-top:12px;">② Modifiers → Threshold</div>
+    ${renderModChain(martial,adv,advLabel,rp,sizeBonus,sizeLbl,net,raw)}
+
+    <div class="step-chip chip-roll" style="margin-top:12px;">③ The Roll — ${rolls.length}D40, need ${thresh}+</div>
+    <div class="dice-row">${renderDice(rolls,thresh)}</div>
+    ${renderHitsSummary(succ,rolls.length,thresh)}
+
+    <div class="step-chip chip-cas" style="margin-top:12px;">④ Casualties</div>
+    ${renderCasPanel(name,lost,s.total,casPct,exch,baseRate,wins,oppEff,s.eff)}
+  </div>`;
+}
+
+function outcomeDesc(cls,margin,aSucc,dSucc,winner){
+  const descs={
+    decisive:{
+      win:`A dominant performance. The winning army overwhelmed the enemy at every point — the loser's line broke completely.`,
+      draw:`[impossible at decisive margin]`
+    },
+    solid:{
+      win:`A clear victory. The winning side held the initiative and ground the enemy down. The loser retreats in reasonable order.`,
+      draw:`[impossible at solid margin]`
+    },
+    narrow:{
+      win:`A hard-fought contest. The winner barely had the edge — both sides took similar punishment. The loser withdraws but remains capable.`,
+      draw:`[impossible at narrow margin]`
+    },
+    draw:{
+      win:``,
+      draw:`Neither side could break the other. The field is contested — both armies withdraw to regroup. No province changes hands.`
+    }
+  };
+  if(margin===0) return descs.draw.draw;
+  return descs[cls].win;
+}
+
+
+// ── Personal Combat ──────────────────────────────────────────
+function pcTier(pc){
+  if(pc>=16) return{label:'Elite',survMod:+2,color:'#70c080'};
+  if(pc>=10) return{label:'Average',survMod:0,color:'#c8b870'};
+  return{label:'Poor',survMod:-1,color:'#c07070'};
+}
+
+function rollPersonalCombat(pc,won){
+  // Exposure chance: winner 10%, loser 25%, (draw 15% each — treated as loser-side)
+  const exposureChance = won ? 0.10 : 0.25;
+  const exposed = Math.random() < exposureChance;
+  if(!exposed) return{exposed:false,exposureChance};
+
+  const roll = Math.ceil(Math.random()*20);
+  const tier = pcTier(pc);
+  const total = roll + tier.survMod;
+  let outcome, severity, cls;
+  if(total<=5) { outcome='MORTALLY WOUNDED'; severity='May die — D20 vs 15 recovery roll required this turn'; cls='wound-mortal'; }
+  else if(total<=9) { outcome='GRIEVOUSLY WOUNDED'; severity='Incapacitated 1 month · −3 all stats for 2 months · D20 vs 12 recovery'; cls='wound-grievous'; }
+  else if(total<=13){ outcome='SERIOUSLY WOUNDED'; severity='Cannot lead armies 2 months · −2 physical stats · D20 vs 10 recovery'; cls='wound-serious'; }
+  else if(total<=17){ outcome='MINOR WOUND'; severity='−1 to Martial or Intrigue for 1 month · Full recovery'; cls='wound-minor'; }
+  else if(total<=19){ outcome='UNSCATHED'; severity='Fought through without meaningful injury'; cls='wound-none'; }
+  else { outcome='HEROIC'; severity='Unscathed and inspiring — +1 to one ally die in a future phase'; cls='wound-heroic'; }
+  return{exposed:true,exposureChance,roll,survMod:tier.survMod,total,outcome,severity,cls};
+}
+
+function renderPC(name,pc,won,result){
+  const tier=pcTier(pc);
+  const tierBadge=`<span style="color:${tier.color};font-weight:700;">${tier.label}</span>`;
+  if(!result.exposed){
+    return `<div class="pc-block pc-safe">
+      <span class="pc-name">${name}</span>
+      <span class="pc-tier">PC ${pc} — ${tierBadge}</span>
+      <span class="pc-status">Not exposed this battle (${Math.round(result.exposureChance*100)}% chance)</span>
+    </div>`;
+  }
+  return `<div class="pc-block pc-${result.cls}">
+    <span class="pc-name">${name}</span>
+    <span class="pc-tier">PC ${pc} — ${tierBadge} · Survival mod ${result.survMod>=0?'+':''}${result.survMod}</span>
+    <div class="pc-roll">Roll: ${result.roll} ${result.survMod!==0?`+ (${result.survMod>=0?'+':''}${result.survMod}) = <b>${result.total}</b>`:`= <b>${result.total}</b>`}</div>
+    <div class="pc-outcome ${result.cls}">${result.outcome}</div>
+    <div class="pc-severity">${result.severity}</div>
+  </div>`;
+}
+
+// ── Army rebuild (no DOM) ────────────────────────────────────────────────
+// Takes raw troop counts + culture key, returns same shape as armyStats()
+function armyStatsFrom(troops, ckey){
+  const C = CULTURES[ckey] || CULTURES.feudal;
+  const {levy=0, ret=0, cav=0, arch=0, mercs=0} = troops;
+  const total = levy + ret + cav + arch + mercs;
+  const eff   = levy*1 + arch*2 + ret*5 + cav*15 + mercs*5;
+  const dLevy  = levy  ? Math.floor(levy /C.levy)  : 0;
+  const dArch  = arch  ? Math.floor(arch /C.arch)  : 0;
+  const dRet   = ret   ? Math.floor(ret  /C.ret)   : 0;
+  const dMercs = mercs ? Math.floor(mercs/C.mercs) : 0;
+  const dCav   = cav   ? Math.floor(cav  /C.cav)   : 0;
+  const troopDice = dLevy + dArch + dRet + dMercs + dCav;
+  const dice = BASE_DICE + troopDice;
+  return {levy, ret, cav, arch, mercs, total, eff, dice,
+          dLevy, dArch, dRet, dMercs, dCav, troopDice, C, ckey};
+}
+
+// Proportionally reduce troops by casualty percentage
+function applyLosses(s, casPct){
+  const f = Math.max(0, 1 - casPct);
+  return {
+    levy:  Math.round(s.levy  * f),
+    ret:   Math.round(s.ret   * f),
+    cav:   Math.round(s.cav   * f),
+    arch:  Math.round(s.arch  * f),
+    mercs: Math.round(s.mercs * f),
+  };
+}
+
+// ── Rout check ───────────────────────────────────────────────────────────
+// Returns {routed, roll, dc, pursuitCas, pursuitLost, martialMod}
+function rollRout(casPct, martial, remaining){
+  const martialMod = martialBonus(martial);
+  // DC scales with severity: 40% = DC10, +0.5 per % above 40, cap DC30
+  const dc  = Math.min(30, 10 + (casPct - 0.40) * 50);
+  const roll = Math.ceil(Math.random() * 20);
+  const total = roll + martialMod;
+  const routed = total < dc;
+  // If routed: pursuing cavalry roll 1D6 → 1–3 = 1D6×2% extra casualties
+  let pursuitCas = 0, pursuitLost = 0;
+  if(routed){
+    const pursuitDie = Math.ceil(Math.random() * 6);
+    pursuitCas  = Math.min(0.30, pursuitDie * 0.02); // 2–12% extra
+    pursuitLost = Math.round(remaining * pursuitCas);
+  }
+  return {routed, roll, dc: Math.round(dc), total, martialMod,
+          pursuitCas, pursuitLost};
+}
+
+// Render a rout check block
+function renderRoutCheck(name, casPct, routResult){
+  const pctStr = (casPct * 100).toFixed(1);
+  const cls    = routResult.routed ? 'rout-fail' : 'rout-hold';
+  const verdict= routResult.routed ? '⚡ ROUTED' : '✦ HOLDS';
+  const pursuit= routResult.routed
+    ? `<div class="rout-pursuit">Pursuit: +${(routResult.pursuitCas*100).toFixed(1)}% additional casualties — ${routResult.pursuitLost.toLocaleString()} more men lost in the rout.</div>`
+    : '';
+  return `<div class="rout-block ${cls}">
+  <div class="rout-header">
+    <span class="rout-name">${name}</span>
+    <span class="rout-verdict">${verdict}</span>
+  </div>
+  <div class="rout-detail">
+    ${pctStr}% casualties → DC ${routResult.dc} &nbsp;|&nbsp;
+    Rolled D20: ${routResult.roll} + Martial ${routResult.martialMod>=0?'+':''}${routResult.martialMod} = <b>${routResult.total}</b>
+    ${routResult.routed
+      ? `<span class="rout-fail-note">(needed ${routResult.dc}+ — failed by ${routResult.dc - routResult.total})</span>`
+      : `<span class="rout-hold-note">(needed ${routResult.dc}+ — passed by ${routResult.total - routResult.dc})</span>`
+    }
+  </div>
+  ${pursuit}
+</div>`;
+}
+
+// ── Main roll function ─────────────────────────────────────────────────
+
+function rollBattle(){
+  const aS=armyStats('a'), dS=armyStats('d');
+  if(aS.total===0||dS.total===0){alert('Both armies need troops.');return;}
+
+  const aName=gs('a-name')||'Attacker', dName=gs('d-name')||'Defender';
+  const aMartial=gi('a-martial'), dMartial=gi('d-martial');
+  const aAdv=parseInt(gs('a-adv')), dAdv=parseInt(gs('d-adv'));
+  const aRp=gi('a-rp'), dRp=gi('d-rp');
+  const sizeRM=sizeRatioMod(aS.eff,dS.eff);
+  const aNet=calcNet(aMartial,aAdv,aRp,sizeRM.modA);
+  const dNet=calcNet(dMartial,dAdv,dRp,sizeRM.modB);
+  const aThresh=(D_SIDES/2)-aNet, dThresh=(D_SIDES/2)-dNet; // D40 midpoint 20
+  const aRolls=Array.from({length:aS.dice},d20);
+  const dRolls=Array.from({length:dS.dice},d20);
+  const aSucc=aRolls.filter(r=>r>=aThresh).length;
+  const dSucc=dRolls.filter(r=>r>=dThresh).length;
+  const margin=aSucc-dSucc, absM=Math.abs(margin);
+  const aWins=margin>0, dWins=margin<0;
+
+  let outcome,cls,outVerb;
+  if(absM>=4){outcome='DECISIVE VICTORY';cls='decisive';outVerb='decisively defeated';}
+  else if(absM>=2){outcome='SOLID VICTORY';cls='solid';outVerb='solidly defeated';}
+  else if(absM===1){outcome='NARROW VICTORY';cls='narrow';outVerb='narrowly defeated';}
+  else{outcome='DRAW';cls='draw';outVerb='fought to a standstill with';}
+
+  const{aCas,bCas,aExch,bExch,aBase,bBase,aVar,bVar,aRoll,bRoll,absM:casAbsM}=casualties(aS.eff,dS.eff,margin);
+  const aLost=Math.round(aS.total*aCas);
+  const dLost=Math.round(dS.total*bCas);
+  const aRemain=Math.max(0,aS.total-aLost);
+  const dRemain=Math.max(0,dS.total-dLost);
+  const winner=aWins?aName:dWins?dName:null;
+  const loser =aWins?dName:dWins?aName:null;
+
+  // Personal Combat rolls
+  const aPC=gi('a-pc')||10, dPC=gi('d-pc')||10;
+  const aPCResult=rollPersonalCombat(aPC,aWins);
+  const dPCResult=rollPersonalCombat(dPC,dWins);
+
+  // ── Rout checks (Phase 1) ───────────────────────────────────────────────
+  // Triggered if either side takes ≥ 40% casualties
+  const aRoutResult = aCas >= 0.40 ? rollRout(aCas, aMartial, aRemain) : null;
+  const dRoutResult = bCas >= 0.40 ? rollRout(bCas, dMartial, dRemain) : null;
+
+  // Apply pursuit casualties to routed armies
+  const aRouted  = aRoutResult && aRoutResult.routed;
+  const dRouted  = dRoutResult && dRoutResult.routed;
+  const aRemainP1 = aRouted ? Math.max(0, aRemain - (aRoutResult.pursuitLost||0)) : aRemain;
+  const dRemainP1 = dRouted ? Math.max(0, dRemain - (dRoutResult.pursuitLost||0)) : dRemain;
+  const aTotalLostP1 = aS.total - aRemainP1;
+  const dTotalLostP1 = dS.total - dRemainP1;
+
+  // ── Phase 2 setup ────────────────────────────────────────────────────────
+  // Fires if: both armies still have men AND neither has routed
+  const doPhase2 = !aRouted && !dRouted && aRemainP1 > 0 && dRemainP1 > 0;
+
+  let p2={};
+  if(doPhase2){
+    // Rebuild armies proportionally from surviving counts
+    const aP2troops = applyLosses(aS, aCas);
+    const dP2troops = applyLosses(dS, bCas);
+    const aP2 = armyStatsFrom(aP2troops, aS.ckey);
+    const dP2 = armyStatsFrom(dP2troops, dS.ckey);
+
+    // Phase 2 uses same modifiers — position/morale unchanged mid-battle
+    // But size ratio is recalculated from new effective strengths
+    const sRM2   = sizeRatioMod(aP2.eff, dP2.eff);
+    const aNet2  = calcNet(aMartial, aAdv, aRp, sRM2.modA);
+    const dNet2  = calcNet(dMartial, dAdv, dRp, sRM2.modB);
+    const aT2    = (D_SIDES/2) - aNet2;
+    const dT2    = (D_SIDES/2) - dNet2;
+
+    const aR2    = Array.from({length: aP2.dice}, d20);
+    const dR2    = Array.from({length: dP2.dice}, d20);
+    const aS2    = aR2.filter(r => r >= aT2).length;
+    const dS2    = dR2.filter(r => r >= dT2).length;
+    const mg2    = aS2 - dS2;
+    const absM2  = Math.abs(mg2);
+    const aW2    = mg2 > 0, dW2 = mg2 < 0;
+
+    let oc2, cls2;
+    if(absM2>=4){oc2='DECISIVE VICTORY';cls2='decisive';}
+    else if(absM2>=2){oc2='SOLID VICTORY';cls2='solid';}
+    else if(absM2===1){oc2='NARROW VICTORY';cls2='narrow';}
+    else{oc2='DRAW';cls2='draw';}
+
+    const cas2 = casualties(aP2.eff, dP2.eff, mg2);
+    const aL2  = Math.round(aP2.total * cas2.aCas);
+    const dL2  = Math.round(dP2.total * cas2.bCas);
+
+    // Rout checks from Phase 2 casualties
+    const aRemP2raw = Math.max(0, aP2.total - aL2);
+    const dRemP2raw = Math.max(0, dP2.total - dL2);
+    const aRout2 = cas2.aCas >= 0.40 ? rollRout(cas2.aCas, aMartial, aRemP2raw) : null;
+    const dRout2 = cas2.bCas >= 0.40 ? rollRout(cas2.bCas, dMartial, dRemP2raw) : null;
+    const aRemP2 = (aRout2&&aRout2.routed) ? Math.max(0,aRemP2raw-(aRout2.pursuitLost||0)) : aRemP2raw;
+    const dRemP2 = (dRout2&&dRout2.routed) ? Math.max(0,dRemP2raw-(dRout2.pursuitLost||0)) : dRemP2raw;
+
+    p2 = {
+      aP2, dP2, aNet2, dNet2, aT2, dT2,
+      aR2, dR2, aS2, dS2, mg2, absM2, aW2, dW2,
+      oc2, cls2, sRM2,
+      cas2,
+      aL2, dL2, aRemP2raw, dRemP2raw, aRemP2, dRemP2,
+      aRout2, dRout2,
+      winner2: aW2?aName:dW2?dName:null,
+    };
+  }
+
+  // ── Grand totals across both phases ─────────────────────────────────────
+  const aTotalLost = aS.total - (doPhase2 ? p2.aRemP2 : aRemainP1);
+  const dTotalLost = dS.total - (doPhase2 ? p2.dRemP2 : dRemainP1);
+  const aFinalRemain = Math.max(0, aS.total - aTotalLost);
+  const dFinalRemain = Math.max(0, dS.total - dTotalLost);
+
+  // ── Friendly labels ──────────────────────────────────────────────────
+  const aAdvTxt=document.getElementById('a-adv').options[document.getElementById('a-adv').selectedIndex].text;
+  const dAdvTxt=document.getElementById('d-adv').options[document.getElementById('d-adv').selectedIndex].text;
+
+  // ── Troop table HTML ─────────────────────────────────────────────────
+  function troopTable(s){
+    const rows=[];
+    const add=(name,count,w)=>{
+      if(!count) return;
+      rows.push(`<tr><td class="tc">${name}</td><td class="tn">${count.toLocaleString()}</td><td class="tw">×${w}</td><td class="te">${(count*w).toLocaleString()}</td></tr>`);
+    };
+    add('Levy Infantry',s.levy,1);
+    add('Archers',s.arch,2);
+    add('Retinue',s.ret,5);
+    add('Cavalry',s.cav,15);
+    add('Mercenaries',s.mercs,5);
+    const expl=`Each troop type is multiplied by its quality weight. Levy×1 fights as raw headcount. Cavalry×15 fights as fifteen levy in effectiveness.`;
+    return `<table class="tb">
+      <thead><tr><th>Troop Type</th><th>Count</th><th>Weight</th><th>Eff.Str</th></tr></thead>
+      <tbody>${rows.join('')}
+      <tr class="tb-total"><td colspan="2">${s.total.toLocaleString()} men total</td><td></td><td class="te">${s.eff.toLocaleString()}</td></tr>
+      </tbody></table>
+    <div class="dice-pool-line">
+      <b>${s.dice}D40</b> — ${s.eff.toLocaleString()} eff.str (used for casualty exchange ratio)
+      <span class="expl">${expl}</span>
+    </div>`;
+  }
+
+  // ── Modifier chain HTML ──────────────────────────────────────────────
+  function modChain(martial,adv,advTxt,rp,sizeBonus,sizeLbl,net,raw){
+    const rows=[];
+    const row=(lbl,val,desc)=>{
+      if(val===0) return;
+      const vc=val>0?'mc-pos':'mc-neg';
+      rows.push(`<div class="mc-row">
+        <span class="mc-lbl">${lbl}</span>
+        <span class="mc-val ${vc}">${val>0?'+':''}${val}</span>
+        <span class="mc-desc">${desc}</span>
+      </div>`);
+    };
+    const mb=martialBonus(martial);
+    row('Martial',mb,`Martial stat ${martial} — ${martial>=20?'exceptional general':martial>=15?'experienced commander':martial>=10?'capable leader':'poor tactician'}`);
+    row('Att / Def Bonus',adv,advTxt);
+    if(rp>0) row('RP Bonus',rp,'Moderator award for battle narrative quality');
+    if(sizeBonus>0) row('Numbers Advantage',sizeBonus,sizeLbl+'  —  larger force applies pressure');
+    const capNote=raw!==net?`<span class="mc-cap-note">(raw was ${raw>0?'+':''}${raw}, capped at ±10)</span>`:'';
+    const netCls=net>0?'mc-pos':net<0?'mc-neg':'mc-zer';
+    const thresh=20-net; // D40 midpoint
+    const thrExpl=thresh<=12?'Very favourable — hitting on most rolls ('+Math.round((40-thresh+1)/40*100)+'% per die)':thresh<=17?'Favourable threshold ('+Math.round((40-thresh+1)/40*100)+'% per die)':thresh<=22?'Neutral threshold ('+Math.round((40-thresh+1)/40*100)+'% per die)':thresh<=27?'Difficult — needs strong rolls ('+Math.round((40-thresh+1)/40*100)+'% per die)':'Very hard — severe disadvantage ('+Math.round((40-thresh+1)/40*100)+'% per die)';
+    return `<div class="mod-chain">
+      ${rows.join('')}
+      <div class="mc-divider"></div>
+      <div class="mc-net-row">
+        <span class="mc-net-lbl">Net Modifier</span>
+        <span class="mc-net-val ${netCls}">${net>0?'+':''}${net}</span>
+        ${capNote}
+      </div>
+    </div>
+    <div class="threshold-box">
+      Must roll <b>${thresh}+</b> on each D40 to score a hit
+      <span class="expl">${thrExpl}</span>
+    </div>`;
+  }
+
+  // ── Dice display HTML ────────────────────────────────────────────────
+  function diceBlock(rolls,thresh,succ){
+    const show=rolls.slice(0,20);
+    const hidden=rolls.length-20;
+    const dice=show.map(r=>`<div class="die ${r>=thresh?'ok':'no'}">${r}<div class="die-pip">${r>=thresh?'HIT':'—'}</div></div>`).join('');
+    const overflow=hidden>0?`<div class="dice-overflow">+${hidden} more dice rolled off-screen — ${rolls.filter(r=>r>=thresh).length} total hits from all ${rolls.length}D40 rolled</div>`:'';
+    const miss=rolls.length-succ;
+    return `<div class="dice-row">${dice}</div>
+    ${overflow}
+    <div class="hits-summary"><b>${succ}</b> hit${succ!==1?'s':''} scored <span class="miss">(${miss} miss${miss!==1?'es':''})</span></div>`;
+  }
+
+  // ── Casualty block per side ──────────────────────────────────────────
+  function casBlock(wins,draws,lost,total,casPct,exch,base,varRoll,name){
+    // All values from casualties() — zero recomputation
+    const remain   = Math.max(0, total - lost);
+    const exchPct  = Math.round(exch * 100);
+    const basePct  = Math.round(base * 100);
+    const varFactor= (varRoll / 7.0).toFixed(2);
+    let cls = 'cas-d';
+    if(wins)          cls = 'cas-w';
+    if(!wins&&!draws) cls = 'cas-l';
+    const sizeNote = exch < 0.25
+      ? `Enemy effective strength far below yours — they could only reach a fraction of your lines.`
+      : exch < 0.70
+      ? `Enemy had less effective strength — your casualties are proportionally reduced.`
+      : `Comparable effective strengths — full base rate applies.`;
+    return `<div class="cas-block ${cls}">
+      <span class="cas-num">${lost.toLocaleString()} men</span> — ${(casPct*100).toFixed(1)}% of force
+      <div class="cas-formula">
+        ${basePct}% base &times; ${exchPct}% exchange &times; ${varFactor} roll (2D6: ${varRoll}) = <b>${(casPct*100).toFixed(1)}%</b>
+      </div>
+      <span class="cas-expl">${sizeNote} ${remain.toLocaleString()} remain.</span>
+    </div>`;
+  }
+
+  // ── Per-side block ───────────────────────────────────────────────────
+  function sideBlock(name,s,rolls,succ,thresh,net,raw,adv,advTxt,rp,sizeBonus,sizeLbl,martial,lost,casPct,exch,base,varRoll,wins,isDrawSide,sideCls,icon){
+    const aRaw=martialBonus(martial)+adv+rp+sizeBonus;
+    return `<div class="side ${sideCls}">
+      <div class="side-title">${icon} ${name}</div>
+
+      <div class="step-label">Step 1 — <span>Army Strength → Dice Pool</span></div>
+      ${troopTable(s)}
+
+      <div class="step-label">Step 2 — <span>Modifiers → Threshold</span></div>
+      ${modChain(martial,adv,advTxt,rp,sizeBonus,sizeLbl,net,raw)}
+
+      <div class="step-label">Step 3 — <span>The Roll (${rolls.length}D40, need ${thresh}+ per die)</span></div>
+      ${diceBlock(rolls,thresh,succ)}
+
+      ${casBlock(wins,!aWins&&!dWins,lost,s.total,casPct,exch,base,varRoll,name)}
+    </div>`;
+  }
+
+  // ── Outcome sentence ─────────────────────────────────────────────────
+  function outcomeSentence(){
+    if(absM>=4) return `${winner} <b>${outVerb}</b> ${loser}. A clear and dominant result — the margin of ${absM} hits left no room for doubt.`;
+    if(absM>=2) return `${winner} <b>${outVerb}</b> ${loser} by a margin of ${absM} hits. A meaningful win with room for the defeated to withdraw.`;
+    if(absM===1) return `${winner} edged ${loser} by a single hit. The outcome could have gone either way — both sides suffered near-equal losses.`;
+    return `Neither side could break the other. ${aName} scored ${aSucc} hit${aSucc!==1?'s':''}, ${dName} scored ${dSucc} — a dead heat. The field holds.`;
+  }
+
+  // ── Casualty explanation sentence ───────────────────────────────────
+  function casSentence(){
+    // Uses values from casualties() via closure — single source of truth
+    let parts=[];
+    if(aExch<0.25) parts.push(`${aName}'s superior effective strength meant ${dName} could barely reach their lines.`);
+    if(bExch<0.25) parts.push(`${dName}'s superior effective strength meant ${aName} could barely reach their lines.`);
+    if(sizeRM.modA>0||sizeRM.modB>0) parts.push(`${sizeRM.label} gave the larger force a numbers advantage on casualties.`);
+    if(aRoll<=4||bRoll<=4){
+      const lucky=aRoll<=4?aName:dName;
+      parts.push(`${lucky}'s 2D6 casualty roll was fortunate — their losses came in on the low end.`);
+    }
+    if(aRoll>=10||bRoll>=10){
+      const harsh=aRoll>=10?aName:dName;
+      parts.push(`${harsh}'s 2D6 casualty roll was harsh — their losses ran higher than the margin alone would suggest.`);
+    }
+    return parts.join(' ');
+  }
+
+  // ── Assemble full result HTML ────────────────────────────────────────
+  const ts=new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const aAdvLabel=aAdvTxt; const dAdvLabel=dAdvTxt;
+  const aRawVal=martialBonus(aMartial)+aAdv+aRp+sizeRM.modA;
+  const dRawVal=martialBonus(dMartial)+dAdv+dRp+sizeRM.modB;
+
+  const resultHTML=`
+<div class="battle-header">
+  <div class="battle-vs">
+    <span class="att-name">⚔ ${aName}</span>
+    <span class="vs-sep">vs</span>
+    <span class="def-name">🛡 ${dName}</span>
+  </div>
+  <div class="battle-ts">${ts}</div>
+</div>
+
+<div class="sides-wrap">
+  ${sideBlock(aName,aS,aRolls,aSucc,aThresh,aNet,aRawVal,aAdv,aAdvLabel,aRp,sizeRM.modA,sizeRM.label,aMartial,aLost,aCas,aExch,aBase,aRoll,aWins,!aWins&&!dWins,'s-att','⚔')}
+  ${sideBlock(dName,dS,dRolls,dSucc,dThresh,dNet,dRawVal,dAdv,dAdvLabel,dRp,sizeRM.modB,sizeRM.label,dMartial,dLost,bCas,bExch,bBase,bRoll,dWins,!aWins&&!dWins,'s-def','🛡')}
+</div>
+
+<div class="outcome-wrap">
+  <div class="outcome-banner ${cls}">
+    ${outcome}${winner?' — '+winner+' wins':''}
+    <span class="outcome-sub">${aName} ${aSucc} hit${aSucc!==1?'s':''} · ${dName} ${dSucc} hit${dSucc!==1?'s':''} · Margin ${absM}</span>
+  </div>
+</div>
+
+<div class="cas-summary">
+  <div class="cas-sum-box">
+    <div class="cas-sum-label">⚔ ${aName}</div>
+    <div class="cas-sum-num">${aLost.toLocaleString()} <span class="cas-sum-pct">(${(aCas*100).toFixed(1)}%)</span></div>
+    <div class="cas-sum-remain">${aRemain.toLocaleString()} of ${aS.total.toLocaleString()} men remain</div>
+    <div class="cas-sum-why">
+      <b>How calculated:</b> ${Math.round(aBase*100)}% base (margin ${casAbsM}) &times; ${Math.round(aExch*100)}% exchange (size ratio) &times; ${(aVar).toFixed(2)} variance (2D6 rolled ${aRoll}) = <b>${(aCas*100).toFixed(1)}%</b>
+      <br>${aExch<0.25?'Enemy effective strength far below yours — they could barely touch your lines.':aExch<0.70?'Enemy had lower effective strength — your losses reduced proportionally.':'Comparable effective strengths — full base rate applies.'}
+    </div>
+  </div>
+  <div class="cas-sum-box">
+    <div class="cas-sum-label">🛡 ${dName}</div>
+    <div class="cas-sum-num">${dLost.toLocaleString()} <span class="cas-sum-pct">(${(bCas*100).toFixed(1)}%)</span></div>
+    <div class="cas-sum-remain">${dRemain.toLocaleString()} of ${dS.total.toLocaleString()} men remain</div>
+    <div class="cas-sum-why">
+      <b>How calculated:</b> ${Math.round(bBase*100)}% base (margin ${casAbsM}) &times; ${Math.round(bExch*100)}% exchange (size ratio) &times; ${(bVar).toFixed(2)} variance (2D6 rolled ${bRoll}) = <b>${(bCas*100).toFixed(1)}%</b>
+      <br>${bExch<0.25?'Enemy effective strength far below yours — they could barely touch your lines.':bExch<0.70?'Enemy had lower effective strength — your losses reduced proportionally.':'Comparable effective strengths — full base rate applies.'}
+    </div>
+  </div>
+</div>
+
+<div style="padding:12px 16px;background:#0e0904;border:1px solid #2a1e0a;border-top:none;font-size:.78rem;color:#6a5528;line-height:1.7;">
+  ${outcomeSentence()} ${casSentence()}
+</div>
+
+<div class="pc-section">
+  <div class="pc-header">⚠ Commander Personal Risk</div>
+  <div class="pc-grid">
+    ${renderPC(aName,aPC,aWins,aPCResult)}
+    ${renderPC(dName,dPC,dWins,dPCResult)}
+  </div>
+</div>
+
+${(aRoutResult||dRoutResult)?`
+<div class="rout-section">
+  <div class="rout-section-hdr">&#9889; Rout Checks</div>
+  ${aRoutResult ? renderRoutCheck(aName, aCas, aRoutResult) : ''}
+  ${dRoutResult ? renderRoutCheck(dName, bCas, dRoutResult) : ''}
+</div>`:''}
+
+${doPhase2?`
+<div class="phase2-section">
+  <div class="phase2-hdr">&#9876; PHASE 2 &mdash; The Battle Continues (surviving forces re-engage)</div>
+  <div class="phase2-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="side-panel sp-att">
+        <div class="side-name">&#9876; ${aName} <span class="side-role">Phase 2</span></div>
+        <div style="font-size:.75rem;color:#8a7050;margin-bottom:6px;">${p2.aP2.total.toLocaleString()} men &middot; Eff.Str ${p2.aP2.eff.toLocaleString()} &middot; ${p2.aP2.dice}D40</div>
+        <div class="step-chip chip-roll">Phase 2 Roll &mdash; ${p2.aR2.length}D40, need ${p2.aT2}+</div>
+        <div class="dice-row">${p2.aR2.slice(0,20).map(r=>'<div class="die '+(r>=p2.aT2?'ok':'no')+'">'+r+'<div class="die-pip">'+(r>=p2.aT2?'HIT':'miss')+'</div></div>').join('')}${p2.aR2.length>20?'<div class="dice-overflow">+'+( p2.aR2.length-20)+' more</div>':''}</div>
+        <div class="hits-summary ${p2.aS2/p2.aR2.length>0.5?'hits-ok':'hits-low'}"><div><div class="hits-count">${p2.aS2} / ${p2.aR2.length}</div><div class="hits-detail">hits</div></div></div>
+        ${casBlock(p2.aW2,!p2.aW2&&!p2.dW2,p2.aL2,p2.aP2.total,p2.cas2.aCas,p2.cas2.aExch,p2.cas2.aBase,p2.cas2.aRoll,aName)}
+        ${p2.aRout2?renderRoutCheck(aName,p2.cas2.aCas,p2.aRout2):''}
+      </div>
+      <div class="side-panel sp-def">
+        <div class="side-name">&#128737; ${dName} <span class="side-role">Phase 2</span></div>
+        <div style="font-size:.75rem;color:#8a7050;margin-bottom:6px;">${p2.dP2.total.toLocaleString()} men &middot; Eff.Str ${p2.dP2.eff.toLocaleString()} &middot; ${p2.dP2.dice}D40</div>
+        <div class="step-chip chip-roll">Phase 2 Roll &mdash; ${p2.dR2.length}D40, need ${p2.dT2}+</div>
+        <div class="dice-row">${p2.dR2.slice(0,20).map(r=>'<div class="die '+(r>=p2.dT2?'ok':'no')+'">'+r+'<div class="die-pip">'+(r>=p2.dT2?'HIT':'miss')+'</div></div>').join('')}${p2.dR2.length>20?'<div class="dice-overflow">+'+( p2.dR2.length-20)+' more</div>':''}</div>
+        <div class="hits-summary ${p2.dS2/p2.dR2.length>0.5?'hits-ok':'hits-low'}"><div><div class="hits-count">${p2.dS2} / ${p2.dR2.length}</div><div class="hits-detail">hits</div></div></div>
+        ${casBlock(p2.dW2,!p2.aW2&&!p2.dW2,p2.dL2,p2.dP2.total,p2.cas2.bCas,p2.cas2.bExch,p2.cas2.bBase,p2.cas2.bRoll,dName)}
+        ${p2.dRout2?renderRoutCheck(dName,p2.cas2.bCas,p2.dRout2):''}
+      </div>
+    </div>
+    <div class="phase-summary ${p2.cls2}">${p2.oc2}${p2.winner2?' &mdash; '+p2.winner2+' wins':''} &nbsp;&middot;&nbsp; ${p2.aS2} vs ${p2.dS2} hits &middot; margin ${p2.absM2}</div>
+  </div>
+</div>`:''}
+
+<div class="total-cas-section">
+  <div class="total-cas-hdr">Final Battle Totals</div>
+  <div class="total-cas-grid">
+    <div class="total-cas-box">
+      <div class="total-cas-name">${aName}</div>
+      <div class="total-cas-num">${aTotalLost.toLocaleString()} <span class="total-cas-pct">lost (${(aTotalLost/aS.total*100).toFixed(1)}%)</span></div>
+      <div class="total-cas-remain">${aFinalRemain.toLocaleString()} of ${aS.total.toLocaleString()} men remain</div>
+    </div>
+    <div class="total-cas-box">
+      <div class="total-cas-name">${dName}</div>
+      <div class="total-cas-num">${dTotalLost.toLocaleString()} <span class="total-cas-pct">lost (${(dTotalLost/dS.total*100).toFixed(1)}%)</span></div>
+      <div class="total-cas-remain">${dFinalRemain.toLocaleString()} of ${dS.total.toLocaleString()} men remain</div>
+    </div>
+  </div>
+</div>`;
+
+  document.getElementById('engine').style.display='block';
+  document.getElementById('result-block').innerHTML=resultHTML;
+  document.getElementById('result-block').scrollIntoView({behavior:'smooth'});
+
+  // ── Discord output ───────────────────────────────────────────────────
+  const aMB=martialBonus(aMartial), dMB=martialBonus(dMartial);
+  const modBreakA=[aMB?`Martial +${aMB}`:'',aAdv?`Att/Def ${aAdv>0?'+':''}${aAdv}`:'',aRp?`RP +${aRp}`:'',sizeRM.modA?`Numbers +${sizeRM.modA}`:''].filter(Boolean).join(' · ')||'No bonuses';
+  const modBreakD=[dMB?`Martial +${dMB}`:'',dAdv?`Att/Def ${dAdv>0?'+':''}${dAdv}`:'',dRp?`RP +${dRp}`:'',sizeRM.modB?`Numbers +${sizeRM.modB}`:''].filter(Boolean).join(' · ')||'No bonuses';
+
+  const log=[
+`╔═══════════════════════════════════════════════════════╗`,
+`║         ⚔  BATTLE REPORT  ·  Universal Realms 1066   ║`,
+`╚═══════════════════════════════════════════════════════╝`,
+`${aName}  vs  ${dName}`,
+`${ts}`,
+``,
+`── ATTACKER · ${aName} ──────────────────────────────────`,
+`  Culture:    ${aS.C.name}`,
+`  Force:      ${aS.total.toLocaleString()} men  ·  Eff.Str ${aS.eff.toLocaleString()} (for casualties)`,
+`  Dice Pool:  ${BASE_DICE} base + ${aS.troopDice} from troops = ${aS.dice}D40`,
+`  Modifiers:  ${modBreakA}`,
+`  Net Mod:    ${aNet>=0?'+':''}${aNet}  →  Threshold ${aThresh}+ to score a hit`,
+`  Rolls [${aRolls.length}D40]: ${aRolls.join(', ')}`,
+`  Result:     ${aSucc} hit${aSucc!==1?'s':''} scored`,
+``,
+`── DEFENDER · ${dName} ──────────────────────────────────`,
+`  Culture:    ${dS.C.name}`,
+`  Force:      ${dS.total.toLocaleString()} men  ·  Eff.Str ${dS.eff.toLocaleString()} (for casualties)`,
+`  Dice Pool:  ${BASE_DICE} base + ${dS.troopDice} from troops = ${dS.dice}D40`,
+`  Modifiers:  ${modBreakD}`,
+`  Net Mod:    ${dNet>=0?'+':''}${dNet}  →  Threshold ${dThresh}+ to score a hit`,
+`  Rolls [${dRolls.length}D40]: ${dRolls.join(', ')}`,
+`  Result:     ${dSucc} hit${dSucc!==1?'s':''} scored`,
+``,
+`── OUTCOME ─────────────────────────────────────────────`,
+`  ${outcome}${winner?' — '+winner+' wins':''}`,
+`  ${aName} ${aSucc} hits  ·  ${dName} ${dSucc} hits  ·  Margin ${absM}`,
+``,
+`── CASUALTIES ──────────────────────────────────────────`,
+`  ${aName}:  ${aLost.toLocaleString()} men lost  ·  ${(aCas*100).toFixed(1)}%  ·  ${aRemain.toLocaleString()} remain`,
+`    formula: ${Math.round(aBase*100)}% base × ${Math.round(aExch*100)}% exchange × ${aVar.toFixed(2)} roll (2D6:${aRoll}) = ${(aCas*100).toFixed(1)}%`,
+`  ${dName}:  ${dLost.toLocaleString()} men lost  ·  ${(bCas*100).toFixed(1)}%  ·  ${dRemain.toLocaleString()} remain`,
+`    formula: ${Math.round(bBase*100)}% base × ${Math.round(bExch*100)}% exchange × ${bVar.toFixed(2)} roll (2D6:${bRoll}) = ${(bCas*100).toFixed(1)}%`,
+sizeRM.label?`  Numbers:   ${sizeRM.label} — applied to ${aS.eff>=dS.eff?aName:dName}`:'',
+``,
+`  ${outcomeSentence()}`,
+`════════════════════════════════════════════════════════`,
+...(aRoutResult||dRoutResult?[
+``,
+`── ROUT CHECKS ─────────────────────────────────────────`,
+aRoutResult?`  ${aName}: ${(aCas*100).toFixed(1)}% cas → DC ${aRoutResult.dc} | Rolled ${aRoutResult.roll}+${aRoutResult.martialMod}=${aRoutResult.total} → ${aRoutResult.routed?'ROUTED'+( aRoutResult.pursuitLost?' (+'+aRoutResult.pursuitLost+' pursuit cas)':''):'HOLDS'}`:undefined,
+dRoutResult?`  ${dName}: ${(bCas*100).toFixed(1)}% cas → DC ${dRoutResult.dc} | Rolled ${dRoutResult.roll}+${dRoutResult.martialMod}=${dRoutResult.total} → ${dRoutResult.routed?'ROUTED'+(dRoutResult.pursuitLost?' (+'+dRoutResult.pursuitLost+' pursuit cas)':''):'HOLDS'}`:undefined,
+]:[]),
+...(doPhase2?[
+``,
+`── PHASE 2 ─────────────────────────────────────────────`,
+`  ${aName}: ${p2.aP2.total.toLocaleString()} men · ${p2.aP2.dice}D40 · threshold ${p2.aT2}+`,
+`  Rolls [${p2.aR2.length}D40]: ${p2.aR2.join(', ')} → ${p2.aS2} hits`,
+`  Casualties: ${p2.aL2.toLocaleString()} (${(p2.cas2.aCas*100).toFixed(1)}%) · ${p2.aRemP2.toLocaleString()} remain`,
+p2.aRout2?`  Rout check: DC ${p2.aRout2.dc} | Roll ${p2.aRout2.roll}+${p2.aRout2.martialMod}=${p2.aRout2.total} → ${p2.aRout2.routed?'ROUTED':'HOLDS'}`:undefined,
+`  ${dName}: ${p2.dP2.total.toLocaleString()} men · ${p2.dP2.dice}D40 · threshold ${p2.dT2}+`,
+`  Rolls [${p2.dR2.length}D40]: ${p2.dR2.join(', ')} → ${p2.dS2} hits`,
+`  Casualties: ${p2.dL2.toLocaleString()} (${(p2.cas2.bCas*100).toFixed(1)}%) · ${p2.dRemP2.toLocaleString()} remain`,
+p2.dRout2?`  Rout check: DC ${p2.dRout2.dc} | Roll ${p2.dRout2.roll}+${p2.dRout2.martialMod}=${p2.dRout2.total} → ${p2.dRout2.routed?'ROUTED':'HOLDS'}`:undefined,
+`  Phase 2 result: ${p2.oc2}${p2.winner2?' — '+p2.winner2+' wins':''}  (${p2.aS2} vs ${p2.dS2} hits)`,
+]:[]),
+``,
+`── FINAL TOTALS ────────────────────────────────────────`,
+`  ${aName}: ${aTotalLost.toLocaleString()} total lost (${(aTotalLost/aS.total*100).toFixed(1)}%) · ${aFinalRemain.toLocaleString()} remain`,
+`  ${dName}: ${dTotalLost.toLocaleString()} total lost (${(dTotalLost/dS.total*100).toFixed(1)}%) · ${dFinalRemain.toLocaleString()} remain`,
+`════════════════════════════════════════════════════════`,
+``,
+`── COMMANDER PERSONAL RISK ─────────────────────────────`,
+`  ${aName} (PC ${aPC} — ${pcTier(aPC).label}): ${aPCResult.exposed?aPCResult.outcome+' | Roll '+aPCResult.roll+(aPCResult.survMod!==0?'+'+(aPCResult.survMod>=0?'+':'')+aPCResult.survMod+'='+aPCResult.total:'')+'  →  '+aPCResult.severity:'Not exposed this battle ('+Math.round(aPCResult.exposureChance*100)+'% chance)'}`,
+`  ${dName} (PC ${dPC} — ${pcTier(dPC).label}): ${dPCResult.exposed?dPCResult.outcome+' | Roll '+dPCResult.roll+(dPCResult.survMod!==0?'+'+(dPCResult.survMod>=0?'+':'')+dPCResult.survMod+'='+dPCResult.total:'')+'  →  '+dPCResult.severity:'Not exposed this battle ('+Math.round(dPCResult.exposureChance*100)+'% chance)'}`,
+`════════════════════════════════════════════════════════`,
+  ].filter(l=>l!==undefined&&l!==null).join('\n');
+
+  document.getElementById('discord-out').textContent=log;
+  document.getElementById('report-section').style.display='block';
+}
+
+
+function copyOut(){
+  const t=document.getElementById('discord-out').textContent;
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(t).then(()=>{
+      const b=document.querySelector('.copybtn');
+      b.textContent='✅ Copied!';
+      setTimeout(()=>b.textContent='📋 Copy to Discord',2400);
+    });
+  } else {
+    const ta=document.createElement('textarea');
+    ta.value=t;ta.style.cssText='position:fixed;opacity:0;';
+    document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    const b=document.querySelector('.copybtn');
+    b.textContent='✅ Copied!';setTimeout(()=>b.textContent='📋 Copy to Discord',2400);
+  }
+}
+
+upd('a');upd('d');
+</script>
+<script src="/js/ur-auth.js"></script>
+</body>
+</html>

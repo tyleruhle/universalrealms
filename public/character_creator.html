@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Universal Realms 1066 — Character Creator</title>
+<style>
+:root {
+  /* ── UNIVERSAL REALMS MASTER TOKENS ── */
+  --bg-void:        #0e0a04;
+  --bg-dark:        #1a1208;
+  --bg-card:        #150e04;
+  --bg-input:       #0a0600;
+  --parch:          #f5edd8;
+  --parch-mid:      #ede0c4;
+  --parch-dark:     #d4c49a;
+  --parch-deep:     #e6d9b8;
+  --ink:            #1e1a14;
+  --ink-soft:       #4a3f2f;
+  --ink-faint:      #8a7a5c;
+  --text-on-dark:   #e8d5a3;
+  --text-gold-dark: #c8a84c;
+  --text-muted-dark:#7a6035;
+  --text-dim-dark:  #4a3a18;
+  --gold:           #b8860b;
+  --gold-bright:    #d4a017;
+  --gold-dim:       #7a5a08;
+  --gold-pale:      rgba(184,134,11,0.10);
+  --gold-border:    rgba(184,134,11,0.28);
+  --victory:        #1a4a2a;
+  --victory-lt:     #3a8a4a;
+  --victory-pale:   #e0f0e4;
+  --blood:          #7a1a1a;
+  --blood-lt:       #c04040;
+  --blood-pale:     #f5e0e0;
+  --steel:          #2a3a4a;
+  --steel-lt:       #4a6a8a;
+  --border-dark:    #2a1e0a;
+  --border-dark-2:  #3a2a0a;
+  --font-display:   'Cinzel', 'Palatino Linotype', serif;
+  --font-body:      'EB Garamond', 'Crimson Text', Georgia, serif;
+  --font-mono:      'JetBrains Mono', 'Consolas', monospace;
+  --shadow-dark:    0 4px 24px rgba(0,0,0,0.5);
+  --shadow-light:   0 4px 24px rgba(26,14,5,0.18);
+  --radius-sm:      3px;
+  --radius-md:      5px;
+  --radius-lg:      7px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-body);background:#1a1208;min-height:100vh;color:#e8d5a3;position:relative;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:0;}
+#app{max-width:860px;margin:0 auto;padding:24px 14px 80px;position:relative;z-index:1;}
+
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 0 20px;border-bottom:2px solid #8b6914;margin-bottom:20px;text-align:center;}
+.hdr-sword{font-size:26px;color:#c8a838;}
+.hdr-title{font-family:'Cinzel',serif;font-size:clamp(18px,5vw,32px);font-weight:900;letter-spacing:.22em;color:#c8a838;text-shadow:0 2px 8px rgba(200,168,56,.4);}
+.hdr-sub{margin:4px 0 0;font-size:11px;color:#a08848;letter-spacing:.15em;text-transform:uppercase;}
+
+/* Steps */
+.steps{display:flex;margin-bottom:20px;}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;border-bottom:2px solid #3a2c10;opacity:.45;transition:all .2s;}
+.step.active{border-bottom-color:#c8a838;opacity:1;}
+.step.done{border-bottom-color:#27ae60;opacity:.8;}
+.step-num{width:24px;height:24px;border-radius:50%;border:1px solid #3a2c10;display:flex;align-items:center;justify-content:center;font-size:11px;color:#5a4020;font-weight:bold;}
+.step.active .step-num{border-color:#c8a838;color:#c8a838;background:rgba(200,168,56,.1);}
+.step.done .step-num{border-color:#27ae60;color:#27ae60;background:rgba(39,174,96,.1);}
+.step-label{font-size:10px;letter-spacing:.05em;text-transform:uppercase;}
+
+/* Card */
+.card{background:rgba(30,20,8,.85);border:1px solid #8b6914;border-radius:4px;padding:22px;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.5);}
+.card-title{font-size:16px;color:#c8a838;margin:0 0 6px;border-bottom:1px solid #8b6914;padding-bottom:10px;letter-spacing:.1em;text-transform:uppercase;}
+.step-desc{font-size:12px;color:#a08848;margin:0 0 16px;line-height:1.6;}
+
+/* Form elements */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:4px;}
+.flabel{font-size:10px;color:#a08848;text-transform:uppercase;letter-spacing:.1em;}
+input[type=text]{background:rgba(10,8,4,.7);border:1px solid #6b5214;border-radius:3px;color:#e8d5a3;padding:10px 12px;font-size:15px;font-family:inherit;outline:none;width:100%;}
+input[type=text]:focus{border-color:#c8a838;}
+input.err{border-color:#c0392b;}
+.err-text{font-size:10px;color:#e74c3c;margin-top:2px;}
+
+/* Info box */
+.info-box{background:rgba(139,105,20,.1);border:1px solid #6b5214;border-radius:3px;padding:11px 14px;display:flex;flex-direction:column;gap:5px;}
+.info-row{display:flex;gap:8px;font-size:12px;line-height:1.6;flex-wrap:wrap;}
+
+/* Buttons */
+.btn-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+.btn-primary{background:linear-gradient(135deg,#8b6914,#c8a838,#8b6914);border:none;border-radius:3px;color:#1a1208;font-family:inherit;font-size:13px;font-weight:bold;padding:12px 22px;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 2px 12px rgba(200,168,56,.3);}
+.btn-primary:hover{filter:brightness(1.1);}
+.btn-secondary{background:transparent;border:1px solid #8b6914;border-radius:3px;color:#c8a838;font-family:inherit;font-size:12px;padding:10px 16px;cursor:pointer;}
+.btn-secondary:hover{background:rgba(139,105,20,.15);}
+.btn-copied{background:rgba(39,174,96,.15)!important;border-color:#27ae60!important;color:#27ae60!important;}
+
+/* Faction grid */
+.faction-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:4px;}
+.faction-btn{background:rgba(10,8,4,.6);border:1px solid #6b5214;border-radius:3px;color:#c8b070;padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit;transition:all .15s;text-align:center;width:100%;}
+.faction-btn:hover,.faction-btn.active{background:rgba(139,105,20,.3);border-color:#c8a838;color:#f0d060;box-shadow:0 0 8px rgba(200,168,56,.25);}
+.faction-icon{font-size:20px;}
+.faction-label{font-size:12px;font-weight:bold;}
+.faction-rank{font-size:10px;opacity:.65;}
+
+/* Archetype grid */
+.arch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:7px;}
+.arch-btn{background:rgba(10,8,4,.6);border:1px solid #6b5214;border-radius:3px;color:#c8b070;padding:10px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit;transition:all .15s;text-align:center;width:100%;}
+.arch-btn:hover,.arch-btn.active{background:rgba(139,105,20,.3);border-color:#c8a838;color:#f0d060;box-shadow:0 0 8px rgba(200,168,56,.25);transform:translateY(-1px);}
+.arch-icon{font-size:22px;}
+.arch-name{font-size:11px;font-weight:bold;line-height:1.3;}
+.arch-primary{font-size:9px;opacity:.6;}
+
+/* Arch detail */
+.arch-detail{margin-top:14px;}
+.arch-detail-hdr{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.arch-detail-name{font-size:15px;font-weight:bold;color:#c8a838;}
+.arch-detail-bg{font-size:11px;color:#a08848;margin-top:2px;}
+.arch-flavor{margin:0 0 12px;font-size:12px;color:#8b7355;font-style:italic;line-height:1.6;border-left:2px solid #3a2c10;padding-left:9px;}
+.arch-bonus-row{display:flex;gap:16px;flex-wrap:wrap;}
+.arch-bonus-block{display:flex;flex-direction:column;gap:4px;min-width:100px;}
+.arch-bonus-label{font-size:9px;color:#7a6030;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
+.arch-bonus-line{font-size:12px;font-weight:bold;}
+
+/* Culture grid */
+.culture-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:6px;margin-top:4px;}
+.culture-btn{background:rgba(10,8,4,.6);border:1px solid #6b5214;border-radius:3px;color:#c8b070;padding:7px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;font-family:inherit;transition:all .15s;width:100%;}
+.culture-btn:hover,.culture-btn.active{background:rgba(139,105,20,.3);border-color:#c8a838;color:#f0d060;box-shadow:0 0 8px rgba(200,168,56,.25);transform:translateY(-1px);}
+.culture-name{font-size:11px;font-weight:bold;}
+.culture-region{font-size:9px;opacity:.6;margin-top:2px;}
+
+/* Dice animation */
+.dice-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+.dice-stat-box{background:rgba(10,8,4,.6);border:1px solid #3a2c10;border-radius:3px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.dice-row{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:4px 0;}
+.die{width:26px;height:26px;border:1px solid #8b6914;border-radius:3px;background:rgba(139,105,20,.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:bold;color:#c8a838;}
+.rolling-label{font-size:16px;color:#c8a838;margin:0 0 6px;border-bottom:1px solid #8b6914;padding-bottom:10px;letter-spacing:.1em;}
+
+/* Result sheet */
+.result-card{background:rgba(22,14,4,.95);border:2px solid #c8a838;border-radius:4px;padding:24px;box-shadow:0 0 40px rgba(200,168,56,.2);}
+.result-hdr{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:18px;text-align:center;}
+.wax{font-size:24px;color:#c8a838;}
+.char-name{font-family:'Cinzel',serif;font-size:clamp(20px,5vw,30px);color:#f0d878;margin:0;text-shadow:0 2px 8px rgba(240,216,120,.4);}
+.char-sub{margin:3px 0 2px;font-size:11px;color:#a08848;letter-spacing:.12em;text-transform:uppercase;}
+.char-faction{margin:0;font-size:12px;color:#c8a838;}
+.arch-banner{display:flex;align-items:flex-start;background:rgba(139,105,20,.08);border:1px solid #3a2c10;border-radius:3px;padding:12px 14px;margin-bottom:4px;gap:12px;}
+.arch-banner-name{font-size:14px;font-weight:bold;color:#c8a838;margin-bottom:4px;}
+.arch-banner-flavor{margin:0;font-size:12px;color:#8b7355;font-style:italic;line-height:1.6;}
+
+/* Section headings */
+.sec-head{font-size:10px;color:#8b6914;letter-spacing:.18em;text-transform:uppercase;margin:20px 0 9px;border-top:1px solid #3a2c10;padding-top:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sec-note{font-size:9px;color:#5a4020;font-weight:normal;letter-spacing:0;text-transform:none;}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+.stat-card{background:rgba(10,8,4,.6);border:1px solid #3a2c10;border-radius:3px;padding:12px 10px;display:flex;flex-direction:column;gap:3px;}
+.stat-card-top{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.stat-icon{font-size:16px;}
+.stat-name{font-size:9px;color:#a08848;text-transform:uppercase;letter-spacing:.08em;flex:1;}
+.stat-val{font-size:26px;font-weight:bold;line-height:1;}
+.stat-dice-row{display:flex;gap:3px;flex-wrap:wrap;align-items:center;}
+.stat-die{width:20px;height:20px;border:1px solid #6b5214;border-radius:2px;background:rgba(139,105,20,.1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;color:#c8a838;}
+.arch-die{background:rgba(200,168,56,.15)!important;color:#c8a838!important;border-color:#8b6914!important;}
+.stat-bar{width:100%;height:3px;background:#2a1e08;border-radius:2px;overflow:hidden;margin-top:4px;}
+.stat-fill{height:100%;border-radius:2px;}
+.stat-footer{display:flex;justify-content:space-between;align-items:center;margin-top:2px;}
+.stat-range{font-size:9px;font-weight:bold;}
+.stat-bonus-lbl{font-size:9px;}
+.stat-bonus-desc{font-size:9px;text-align:center;margin-top:2px;line-height:1.3;}
+
+/* Roll breakdown */
+.roll-breakdown{background:rgba(10,8,4,.6);border:1px solid #3a2c10;border-radius:3px;padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
+.rb-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.rb-stat{font-size:12px;font-weight:bold;width:110px;flex-shrink:0;}
+.rb-dice{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:11px;}
+
+/* Combat */
+.combat-box{background:rgba(10,8,4,.6);border:1px solid #6b1414;border-radius:3px;padding:14px 16px;display:flex;align-items:flex-start;gap:16px;}
+.combat-num{font-size:44px;font-weight:bold;color:#c0392b;line-height:1;flex-shrink:0;}
+.combat-pills{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+.pill{background:rgba(10,8,4,.6);border:1px solid #3a2c10;border-radius:3px;padding:4px 10px;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:60px;}
+.pill-label{font-size:10px;color:#7a6030;}
+.pill-val{font-size:16px;font-weight:bold;}
+.combat-event{display:flex;align-items:flex-start;gap:10px;background:rgba(10,8,4,.5);border:1px solid #3a2c10;border-radius:3px;padding:8px 11px;}
+.combat-event-label{font-size:12px;font-weight:bold;color:#7a6030;}
+.combat-event-desc{font-size:11px;color:#8b7355;font-style:italic;margin-top:2px;}
+.combat-tier{margin-top:8px;font-size:11px;}
+
+/* Traits */
+.traits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:11px;}
+.trait-card{background:rgba(10,8,4,.7);border:1px solid;border-radius:4px;padding:13px;display:flex;flex-direction:column;gap:8px;}
+.trait-hdr{display:flex;align-items:center;gap:8px;}
+.trait-name{font-size:13px;font-weight:bold;letter-spacing:.04em;}
+.trait-flavor{margin:0;font-size:11px;color:#8b7355;font-style:italic;line-height:1.6;border-left:2px solid #3a2c10;padding-left:8px;}
+.trait-bonus-wrap{background:rgba(139,105,20,.08);border:1px solid #3a2c10;border-radius:3px;padding:7px 10px;}
+.trait-bonus-label{font-size:8px;color:#7a6030;letter-spacing:.15em;text-transform:uppercase;display:block;margin-bottom:3px;}
+.trait-bonus{margin:0;font-size:11px;line-height:1.6;font-weight:bold;}
+.combat-trait-card{background:rgba(10,8,4,.7);border:1px solid #6b1414;border-radius:4px;padding:13px;display:flex;flex-direction:column;gap:8px;}
+.ct-hdr{display:flex;align-items:center;gap:10px;}
+.ct-name{font-size:14px;font-weight:bold;color:#e8a898;letter-spacing:.04em;}
+.ct-use{font-size:10px;color:#8b4444;margin-top:3px;}
+.ct-locked{background:rgba(10,8,4,.5);border:1px dashed #3a2c10;border-radius:4px;padding:13px;display:flex;align-items:center;gap:11px;opacity:.6;}
+
+/* Culture result */
+.culture-result{background:rgba(10,8,4,.6);border:1px solid #6b5214;border-radius:3px;padding:11px 14px;display:flex;flex-direction:column;gap:5px;}
+.cr-row{display:flex;gap:8px;font-size:12px;line-height:1.5;flex-wrap:wrap;}
+
+/* Growth table */
+.growth-box{background:rgba(10,8,4,.6);border:1px solid #3a2c10;border-radius:3px;padding:12px 14px;}
+.growth-note{font-size:11px;color:#7a6030;font-style:italic;margin-bottom:10px;}
+.growth-row{display:grid;grid-template-columns:80px 1fr 130px;gap:10px;font-size:11px;padding:5px 0;border-bottom:1px solid #2a1e08;}
+
+/* Export footer */
+.export-footer{margin-top:20px;border-top:1px solid #3a2c10;padding-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+@media(max-width:580px){
+  .form-row{grid-template-columns:1fr;}
+  .arch-bonus-row{flex-direction:column;}
+  .combat-box{flex-direction:column;}
+  .growth-row{grid-template-columns:70px 1fr;}
+  .growth-row span:last-child{display:none;}
+}
+
+/* ══ UNIVERSAL REALMS NAV ══ */
+.ur-nav-shell {
+  height: 52px; display: flex; align-items: stretch;
+  background: #1a1208; border-bottom: 1px solid #2a1e0a;
+  position: relative; z-index: 1000; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+}
+.ur-nav-shell::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(184,134,11,0.4) 20%, rgba(184,134,11,0.4) 80%, transparent 100%);
+}
+.ur-logo-btn {
+  padding: 0 20px; display: flex; flex-direction: column;
+  justify-content: center; border-right: 1px solid rgba(255,255,255,0.06);
+  text-decoration: none; flex-shrink: 0; transition: background 0.15s;
+}
+.ur-logo-btn:hover { background: rgba(255,255,255,0.03); }
+.ur-logo-name {
+  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+  color: #f5edd8; letter-spacing: 2.5px; text-transform: uppercase; line-height: 1;
+}
+.ur-logo-tag {
+  font-family: 'EB Garamond', serif; font-size: 9px; color: #b8860b;
+  letter-spacing: 1.5px; margin-top: 3px; font-style: italic; opacity: 0.75;
+}
+.ur-nav-links {
+  display: flex; align-items: stretch; flex: 1;
+  padding: 0 4px; overflow-x: auto;
+}
+.ur-nav-links::-webkit-scrollbar { display: none; }
+.ur-nav-lnk {
+  display: flex; align-items: center; gap: 7px; padding: 0 13px;
+  font-family: 'EB Garamond', Georgia, serif; font-size: 13.5px; font-style: italic;
+  color: #9a8468; text-decoration: none;
+  border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
+}
+.ur-nav-lnk:hover { color: #e8d9bb; background: rgba(255,255,255,0.03); }
+.ur-nav-lnk.cur {
+  color: #d4ab55; border-bottom-color: #c99c3a;
+  font-style: normal; font-weight: 500; background: rgba(184,134,11,0.06);
+}
+.ur-nav-ic { font-size: 10px; opacity: 0.65; }
+.ur-nav-lnk.cur .ur-nav-ic { opacity: 1; }
+.ur-nav-right {
+  display: flex; align-items: center; padding: 0 16px; flex-shrink: 0;
+  border-left: 1px solid rgba(255,255,255,0.06); gap: 10px;
+}
+.ur-tool-tag {
+  font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: 2px;
+  text-transform: uppercase; padding: 4px 12px;
+  border: 1px solid; border-radius: 2px;
+}
+
+/* ── Character Creator — UR Unified Theme ── */
+body {
+  font-family: 'EB Garamond', Georgia, serif !important;
+  background: var(--bg-dark) !important;
+  color: var(--text-on-dark) !important;
+}
+.hdr-title { font-family: var(--font-display) !important; }
+.hdr-sub { font-family: var(--font-display) !important; letter-spacing: 0.15em; }
+.card {
+  background: rgba(21,14,4,0.90) !important;
+  border-color: var(--gold-border) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-dark) !important;
+}
+.card-title { font-family: var(--font-display) !important; color: var(--text-gold-dark) !important; border-color: var(--gold-border) !important; }
+.step-desc { font-family: var(--font-body) !important; font-style: italic; color: var(--text-muted-dark) !important; }
+.flabel { font-family: var(--font-display) !important; letter-spacing: 0.1em; color: var(--text-muted-dark) !important; }
+input[type=text] {
+  font-family: var(--font-body) !important; font-size: 15px;
+  background: rgba(10,8,4,0.7) !important;
+  border-color: rgba(184,134,11,0.25) !important;
+  color: var(--text-on-dark) !important;
+  border-radius: var(--radius-sm) !important;
+}
+input[type=text]:focus { border-color: var(--gold) !important; }
+.btn-primary { font-family: var(--font-display) !important; letter-spacing: 0.08em; border-radius: var(--radius-sm) !important; }
+.btn-secondary { font-family: var(--font-display) !important; border-radius: var(--radius-sm) !important; }
+.faction-btn, .arch-btn, .culture-btn {
+  font-family: var(--font-body) !important;
+  border-radius: var(--radius-sm) !important;
+}
+.faction-label, .arch-name { font-family: var(--font-display) !important; }
+.arch-flavor { font-family: var(--font-body) !important; font-style: italic; border-color: var(--border-dark) !important; }
+.arch-bonus-label { font-family: var(--font-display) !important; letter-spacing: 0.1em; }
+.result-card { border-color: var(--gold) !important; border-radius: var(--radius-sm) !important; box-shadow: 0 0 40px rgba(184,134,11,0.15) !important; }
+
+</style>
+</head>
+<body>
+<div class="ur-nav-shell">
+  <a href="index.html" class="ur-logo-btn">
+    <div class="ur-logo-name">Universal Realms</div>
+    <div class="ur-logo-tag">World Engine</div>
+  </a>
+  <div class="ur-nav-links">
+    <a href="index.html"             class="ur-nav-lnk"><span class="ur-nav-ic">⌂</span>Dashboard</a>
+    <a href="character_creator.html" class="ur-nav-lnk cur"><span class="ur-nav-ic">◉</span>Characters</a>
+    <a href="battle_roller.html"     class="ur-nav-lnk "><span class="ur-nav-ic">⚔</span>Battle</a>
+    <a href="duel_roller.html"       class="ur-nav-lnk "><span class="ur-nav-ic">◈</span>Duel</a>
+    <a href="raid_roller.html"       class="ur-nav-lnk "><span class="ur-nav-ic">⚑</span>Raid</a>
+    <a href="chronicle_map.html"     class="ur-nav-lnk "><span class="ur-nav-ic">⊞</span>Chronicle Map</a>
+  </div>
+  <div class="ur-nav-right">
+    <div class="ur-tool-tag" style="color:#c8a838;border-color:rgba(200,168,56,0.30);background:rgba(200,168,56,0.30)">Character Creator</div>
+    <div id="ur-auth-nav"></div>
+  </div>
+</div>
+<!-- UNIVERSAL REALMS NAV SHELL -->
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+:root{
+  --ink-800:#2a1c0d;--ink-700:#3d2b14;
+  --parch-100:#fdf8ef;--parch-200:#f5edd8;--parch-300:#ecdcc0;
+  --gold-300:#d4ab55;--gold-400:#c99c3a;--gold-500:#b8892a;
+  --gold-border:rgba(184,137,42,0.28);--gold-100:rgba(184,137,42,0.10);
+  --text-muted:#8a7055;--border-mid:rgba(142,108,58,0.24);
+  --font-display:'Cinzel',serif;--font-body:'EB Garamond',Georgia,serif;
+}
+.ur-nav{
+  display:flex;align-items:stretch;height:50px;
+  background:var(--ink-800);border-bottom:1px solid var(--ink-700);
+  position:sticky;top:0;z-index:1000;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+.ur-nav::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,137,42,0.35) 20%,rgba(184,137,42,0.35) 80%,transparent);
+  pointer-events:none;
+}
+.ur-logo{
+  padding:0 20px;display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid rgba(255,255,255,0.06);text-decoration:none;
+  flex-shrink:0;transition:background 0.15s;
+}
+.ur-logo:hover{background:rgba(255,255,255,0.03);}
+.ur-logo-mark{
+  font-family:var(--font-display);font-size:12px;font-weight:600;
+  color:#f5edd8;letter-spacing:2.5px;text-transform:uppercase;line-height:1;
+}
+.ur-logo-sub{
+  font-family:var(--font-body);font-size:9px;color:var(--gold-500);
+  letter-spacing:1.5px;margin-top:3px;font-style:italic;opacity:0.7;
+}
+.ur-nav-links{display:flex;align-items:stretch;flex:1;padding:0 4px;overflow-x:auto;}
+.ur-nav-links::-webkit-scrollbar{display:none;}
+.ur-nav-link{
+  display:flex;align-items:center;gap:6px;padding:0 14px;
+  font-family:var(--font-body);font-size:13px;font-style:italic;
+  color:#9a8468;text-decoration:none;border-bottom:2px solid transparent;
+  transition:all 0.15s;white-space:nowrap;
+}
+.ur-nav-link:hover{color:#e8d9bb;background:rgba(255,255,255,0.03);}
+.ur-nav-link.active{
+  color:var(--gold-300);border-bottom-color:var(--gold-400);
+  font-style:normal;font-weight:500;background:rgba(184,137,42,0.06);
+}
+.ur-nav-icon{font-size:10px;opacity:0.7;}
+.ur-nav-link.active .ur-nav-icon{opacity:1;}
+.ur-nav-right{
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.06);
+}
+.ur-home-btn{
+  font-family:var(--font-display);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold-400);text-decoration:none;
+  padding:6px 14px;border:1px solid var(--gold-border);border-radius:2px;
+  background:rgba(184,137,42,0.08);transition:all 0.15s;white-space:nowrap;
+}
+.ur-home-btn:hover{background:rgba(184,137,42,0.15);color:var(--gold-300);}
+</style>
+
+<script>
+  (function(){
+    var el = document.getElementById('nav-chars');
+    if (el) el.classList.add('active');
+  })();
+</script>
+
+<div id="app">
+  <header class="hdr">
+    <span class="hdr-sword">⚔</span>
+    <div>
+      <div class="hdr-title">UNIVERSAL REALMS</div>
+      <p class="hdr-sub">Anno Domini 1066 — Character Creation</p>
+    </div>
+    <span class="hdr-sword">⚔</span>
+  </header>
+  <div class="steps" id="steps"></div>
+  <div id="view"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATA (ported from character-creator.jsx)
+// ══════════════════════════════════════════════════════════════
+
+const STAT_KEYS = ["Martial","Stewardship","Diplomacy","Intrigue","Learning"];
+const STAT_ICONS = {Martial:"⚔",Stewardship:"⚖",Diplomacy:"🕊",Intrigue:"🗡",Learning:"📜"};
+const STAT_COLORS = {Martial:"#c0392b",Stewardship:"#d4a017",Diplomacy:"#2980b9",Intrigue:"#8e44ad",Learning:"#27ae60"};
+const STAT_CAP = 18, HARD_CAP = 25;
+
+function statBonus(stat, v) {
+  if (stat==="Martial")     return v>=25?{mod:"+4",label:"+4 to battle rolls"}:v>=20?{mod:"+3",label:"+3 to battle rolls"}:v>=15?{mod:"+2",label:"+2 to battle rolls"}:v>=10?{mod:"+1",label:"+1 to battle rolls"}:{mod:"—",label:"No bonus"};
+  if (stat==="Diplomacy")   return v>=25?{mod:"+4",label:"+4 to diplomacy rolls"}:v>=20?{mod:"+3",label:"+3 to diplomacy rolls"}:v>=15?{mod:"+2",label:"+2 to diplomacy rolls"}:v>=10?{mod:"+1",label:"+1 to diplomacy rolls"}:{mod:"—",label:"No bonus"};
+  if (stat==="Intrigue")    return v>=25?{mod:"+4",label:"+4 to espionage/assassination"}:v>=20?{mod:"+3",label:"+3 to espionage/assassination"}:v>=15?{mod:"+2",label:"+2 to espionage/assassination"}:v>=10?{mod:"+1",label:"+1 to espionage/assassination"}:{mod:"—",label:"No bonus"};
+  if (stat==="Stewardship") return v>=25?{mod:"+4",label:"+4 economy, +40% income"}:v>=20?{mod:"+3",label:"+3 economy, +30% income"}:v>=15?{mod:"+2",label:"+2 economy, +20% income"}:v>=10?{mod:"+1",label:"+1 economy, +10% income"}:{mod:"—",label:"No bonus"};
+  if (stat==="Learning")    return v>=25?{mod:"+4",label:"+4 religious/scholarly/tech"}:v>=20?{mod:"+3",label:"+3 religious/scholarly/tech"}:v>=15?{mod:"+2",label:"+2 religious/scholarly/tech"}:v>=10?{mod:"+1",label:"+1 religious/scholarly/tech"}:{mod:"—",label:"No bonus"};
+  return {mod:"—",label:"No bonus"};
+}
+function statRange(v) {
+  if(v>=25) return {label:"Pinnacle",color:"#f0d060"};
+  if(v>=20) return {label:"Legendary",color:"#e8a040"};
+  if(v>=15) return {label:"Gifted",color:"#27ae60"};
+  if(v>=10) return {label:"Competent",color:"#2980b9"};
+  if(v>=6)  return {label:"Below Avg",color:"#a08848"};
+  return {label:"Weakness",color:"#c0392b"};
+}
+
+const ARCHETYPES = [
+  {id:"warlord",      name:"The Warlord",       icon:"⚔",  bonuses:{Martial:3},                      pc:12, primary:"Martial",      bg:"Raised in campaign. Knows war from childhood.",     flavor:"They have never known a home that wasn't a fortress or a field. War is not something that happens to them — it is something they make happen."},
+  {id:"knight",       name:"The Knight",         icon:"🏇", bonuses:{Martial:2,Intrigue:1},           pc:14, primary:"Martial",      bg:"Tournament trained. Skilled fighter, reads enemies.", flavor:"The lists taught them how to read a man before the charge lands. What they study in the arena, they apply in the council chamber."},
+  {id:"border_lord",  name:"The Border Lord",    icon:"🗺", bonuses:{Martial:2,Stewardship:2},        pc:10, primary:"Martial",      bg:"Ran a frontier. Fights and administers equally.",    flavor:"The border is a place where the sword and the ledger must both be sharp. They learned to hold ground and count grain in the same breath."},
+  {id:"crusader",     name:"The Crusader",        icon:"🛡", bonuses:{Martial:2,Learning:2},           pc:12, primary:"Martial",      bg:"Holy war veteran. Faith and sword in equal measure.", flavor:"They have fought in the name of God and studied what they fought for. The Psalms and the siege manual sit side by side on their shelf."},
+  {id:"raider",       name:"The Raider",          icon:"🪓", bonuses:{Martial:2,Intrigue:2},           pc:13, primary:"Martial",      bg:"Born to raid. Fast, brutal, unpredictable.",          flavor:"They did not learn war in a keep or a tournament yard. They learned it on fast boats and burning villages, where hesitation is death."},
+  {id:"siege_eng",    name:"The Siege Engineer",  icon:"🪨", bonuses:{Martial:2,Stewardship:1,Learning:1}, pc:8, primary:"Martial", bg:"Built walls and broke them. The mathematics of violence.", flavor:"They see every fortress as a problem waiting to be solved. Given time, timber, and men, they have never met a wall they could not bring down."},
+  {id:"cav_lord",     name:"The Cavalry Lord",    icon:"🐴", bonuses:{Martial:3,Diplomacy:1},          pc:11, primary:"Martial",      bg:"Born to the saddle. Commands mounted forces.",        flavor:"In the saddle they are a different creature entirely — faster, more dangerous, impossible to pin. On foot they are merely dangerous."},
+  {id:"courtier",     name:"The Courtier",        icon:"👑", bonuses:{Diplomacy:3},                    pc:6,  primary:"Diplomacy",   bg:"Raised at a great court. Silver-tongued.",             flavor:"Courts are their native terrain — whispered alliances, strategic marriages, the smile that conceals the knife. They have never needed a sword."},
+  {id:"merch_prince", name:"The Merchant Prince", icon:"💰", bonuses:{Diplomacy:2,Stewardship:2},      pc:6,  primary:"Diplomacy",   bg:"Trade networks and foreign contacts.",                 flavor:"Every foreign tongue they speak is a trade route. Every ally they cultivate is an investment. The world is a ledger of favors and debts."},
+  {id:"diplomat",     name:"The Diplomat",        icon:"🕊", bonuses:{Diplomacy:3,Learning:1},         pc:6,  primary:"Diplomacy",   bg:"Treaty negotiator. Knows canon law and custom.",       flavor:"They have brokered peace between men who wanted blood. They know the exact article of canon law that turns a war into a negotiation."},
+  {id:"herald",       name:"The Herald",          icon:"📯", bonuses:{Diplomacy:2,Learning:2},         pc:5,  primary:"Diplomacy",   bg:"Envoy between great houses. Knows every court.",       flavor:"They have ridden into enemy camps under a flag of truce and left with more than they arrived with. Words are their currency and they are never poor."},
+  {id:"matchmaker",   name:"The Match-Maker",     icon:"💍", bonuses:{Diplomacy:2,Intrigue:2},         pc:5,  primary:"Diplomacy",   bg:"Arranged noble marriages. Knows bloodlines.",          flavor:"They see every unmarried noble as an opportunity and every alliance as a chain of future obligations. They have never wasted a daughter."},
+  {id:"admin",        name:"The Administrator",   icon:"📋", bonuses:{Stewardship:3,Learning:1},       pc:6,  primary:"Stewardship", bg:"Ran estates before knowing war. Economy is the battlefield.", flavor:"The harvest yield and the garrison strength are the same equation to them. They have run provinces while others ran armies — and they have won."},
+  {id:"trader",       name:"The Trader",          icon:"⚖",  bonuses:{Stewardship:2,Diplomacy:2},      pc:6,  primary:"Stewardship", bg:"Merchant background. Reads people and ledgers.",       flavor:"Every market taught them something about human nature. Every negotiation sharpened their sense of when a man is lying about his price."},
+  {id:"quartermaster",name:"The Quartermaster",   icon:"🧱", bonuses:{Stewardship:3,Martial:1},        pc:7,  primary:"Stewardship", bg:"Supplied armies in the field. Logistics wins wars.",   flavor:"They have watched brilliant generals lose wars because they ran out of grain in October. They have never run out of grain in October."},
+  {id:"harbor",       name:"The Harbor Master",   icon:"⚓", bonuses:{Stewardship:2,Diplomacy:1,Learning:1}, pc:5, primary:"Stewardship", bg:"Ran a major port. Trade, ships, foreign relations.", flavor:"Every ship that entered their harbor was an intelligence report. They know what moves, what it costs, and who profits from keeping it moving."},
+  {id:"schemer",      name:"The Schemer",         icon:"🕸", bonuses:{Intrigue:3},                     pc:8,  primary:"Intrigue",    bg:"Forger, poisoner, assassin's sponsor.",                flavor:"They have never needed to be in the room when things happen. They arrange events from a distance, through intermediaries, through information."},
+  {id:"spymaster",    name:"The Spymaster",       icon:"🌑", bonuses:{Intrigue:2,Diplomacy:2},         pc:8,  primary:"Intrigue",    bg:"Intelligence networks. Knows everyone's secrets.",     flavor:"They built a network before they built a reputation. Everyone who matters owes them something — or fears them."},
+  {id:"assassin",     name:"The Assassin",        icon:"🗡", bonuses:{Intrigue:2},                     pc:16, primary:"Intrigue",    bg:"Trained killer. Exceptional personal combat.",         flavor:"What they know about politics they learned from studying who to remove and when. Every other skill is subordinate to the one they were made for."},
+  {id:"blackmailer",  name:"The Blackmailer",     icon:"🖋", bonuses:{Intrigue:2,Stewardship:2},       pc:6,  primary:"Intrigue",    bg:"Collected debts and secrets in equal measure.",        flavor:"They never need to threaten anyone directly. The documents exist. The witnesses are available. Everyone who has dealt with them knows this."},
+  {id:"cleric",       name:"The Cleric",          icon:"✝",  bonuses:{Learning:3,Diplomacy:1},         pc:4,  primary:"Learning",    bg:"Church education. Canon law, Latin, church politics.", flavor:"The Church gave them the keys to every door — Latin opens archives, canon law opens courts, and faith opens hearts. They never needed a sword."},
+  {id:"scholar",      name:"The Scholar",         icon:"📚", bonuses:{Learning:3,Stewardship:1},       pc:4,  primary:"Learning",    bg:"University trained. Greek texts, engineering.",         flavor:"They have read things most lords cannot imagine exist. Engineering, geometry, Arabic astronomy. Knowledge is a force multiplier."},
+  {id:"physician",    name:"The Physician",       icon:"⚕",  bonuses:{Learning:2,Intrigue:2},          pc:6,  primary:"Learning",    bg:"Medical knowledge. Useful in plagues.",                flavor:"They know the body — its humors, its weaknesses, what heals it and what ends it. That knowledge has uses in peacetime and more interesting uses in war."},
+  {id:"inquisitor",   name:"The Inquisitor",      icon:"🔎", bonuses:{Learning:2,Intrigue:2},          pc:7,  primary:"Learning",    bg:"Church investigator. Hunts heretics and forged claims.", flavor:"They have been trained to find the truth in whatever form it takes — in testimony, in texts, in the small inconsistencies that liars always leave behind."},
+  {id:"astronomer",   name:"The Astronomer",      icon:"🔭", bonuses:{Learning:3,Stewardship:1},       pc:4,  primary:"Learning",    bg:"Star-reader, calendar-keeper, advisor to kings.",      flavor:"They know when to plant, when to march, when the tides favor a crossing and when they do not. Kings pay well for this kind of certainty."},
+];
+
+const TRAITS = {
+  Martial:[
+    {id:"iron_const",   name:"Iron Constitution",  icon:"🛡", flavor:"Hardship forged this body before they ever held a sword.",                       bonus:"+1 to all personal combat rolls."},
+    {id:"warlords_eye", name:"Warlord's Eye",       icon:"👁", flavor:"Even as a child they could read a field — where the weakness was, where the line would break.", bonus:"+1 to battle rolls when commanding an army."},
+    {id:"drilled",      name:"Drilled from Birth",  icon:"⚔",  flavor:"Sword drill at dawn, lance practice at dusk. War before letters.",              bonus:"+2 to personal combat rolls in duels."},
+    {id:"fear_god",     name:"Fear of God",         icon:"✝",  flavor:"They fight because God placed a sword in their hand.",                            bonus:"+1 to all battle rolls when defending own territory."},
+    {id:"hunter_born",  name:"Hunter Born",         icon:"🏹", flavor:"Forests and marshes hold no fear — terrain is a language they read fluently.",    bonus:"+2 to battle rolls in forest, marsh, or rough terrain."},
+    {id:"siege_sense",  name:"Siege Sense",         icon:"🏰", flavor:"They spent years watching walls fall and walls hold. They know the difference.",  bonus:"+1 to siege attack rolls."},
+    {id:"shield_train", name:"Shield Trained",      icon:"🛡", flavor:"Hours behind a shield taught them something most fighters never learn: how to wait.", bonus:"+1 to personal combat rolls when defending in a duel."},
+    {id:"cav_bred",     name:"Cavalry Bred",        icon:"🐴", flavor:"Raised with horses before they could walk properly. The saddle is home.",         bonus:"+1 to battle rolls when leading a cavalry-dominant force."},
+    {id:"tireless",     name:"Tireless Soldier",    icon:"🥾", flavor:"They can march further and fight longer than anyone expects.",                    bonus:"+1 to battle rolls in engagements past the first round."},
+  ],
+  Stewardship:[
+    {id:"ledger_mind",  name:"Ledger Mind",         icon:"📊", flavor:"Numbers came naturally — taxes, yields, debts. A holding's health read in an afternoon.", bonus:"+1 to all economy and tax-collection rolls."},
+    {id:"harvest",      name:"Harvest Sense",       icon:"🌾", flavor:"Raised among fields and mills — they understand the rhythms that keep armies fed.", bonus:"+1 to all Stewardship rolls involving food and supply."},
+    {id:"iron_purse",   name:"Iron Purse",          icon:"💰", flavor:"A lord who cannot account for every coin is already a lord in debt.",             bonus:"+1 to Stewardship rolls involving treasury management."},
+    {id:"builder",      name:"Master Builder",      icon:"🏗",  flavor:"They apprenticed under engineers. They know how walls rise and why they fall.",   bonus:"+1 to all construction and building rolls."},
+    {id:"trade_inst",   name:"Trade Instinct",      icon:"⚖",  flavor:"A childhood in markets gave them a nose for value and who was cheating whom.",    bonus:"+1 to all trade and market Stewardship rolls."},
+    {id:"supply",       name:"Supply Runner",       icon:"🛒", flavor:"They know how to move goods through difficult country under difficult conditions.", bonus:"+1 to Stewardship rolls for supplying armies in the field."},
+    {id:"estate",       name:"Estate Born",         icon:"🌻", flavor:"They grew up managing a small estate and learned every detail of how one runs.",   bonus:"+1 to Stewardship rolls for managing settlements."},
+    {id:"coin",         name:"Coin Counter",        icon:"🪙", flavor:"They can spot a debased coin at ten paces and a dishonest ledger in five minutes.", bonus:"+1 to Stewardship rolls when detecting financial fraud."},
+    {id:"road",         name:"Road Builder",        icon:"🛤",  flavor:"They think about movement — how armies march, how goods flow, how provinces connect.", bonus:"+1 to Stewardship rolls for infrastructure projects."},
+  ],
+  Diplomacy:[
+    {id:"silver",       name:"Silver Tongue",       icon:"🗣", flavor:"Words come to them like water — smooth, persistent, wearing down the hardest stone.", bonus:"+1 to all diplomacy rolls."},
+    {id:"noble_bear",   name:"Noble Bearing",       icon:"👑", flavor:"Their bearing commands rooms. Greater men take notice.",                           bonus:"+1 to diplomacy rolls when negotiating with equal or higher rank."},
+    {id:"peacemaker",   name:"Peacemaker",          icon:"🕊", flavor:"Even as a child they found the middle ground — the truce that held.",              bonus:"+1 to diplomacy rolls when proposing or mediating a truce."},
+    {id:"feast_lord",   name:"Feast Lord",          icon:"🍷", flavor:"Full bellies and good wine open doors that siege engines cannot.",                 bonus:"+1 to diplomacy rolls made at or following a hosted feast."},
+    {id:"courtly",      name:"Courtly Grace",       icon:"🎭", flavor:"Courts, councils, ceremonies — they move through them as if born to the marble floor.", bonus:"+1 to diplomacy rolls in formal court or council settings."},
+    {id:"trusted",      name:"Trusted Face",        icon:"🤝", flavor:"Something about them invites confidence. They are not necessarily honest — just convincing.", bonus:"+1 to diplomacy rolls when making a first approach to a new faction."},
+    {id:"marriage",     name:"Marriage Minded",     icon:"💍", flavor:"They understand dynastic politics at an instinctive level.",                      bonus:"+2 to diplomacy rolls involving marriage proposals."},
+    {id:"crowd",        name:"Crowd Speaker",       icon:"📣", flavor:"They can address a crowd and make every person in it feel spoken to personally.",   bonus:"+1 to diplomacy rolls when addressing large groups."},
+    {id:"oath",         name:"Oath Keeper",         icon:"📜", flavor:"They have never broken a sworn oath. The reputation precedes them.",               bonus:"+1 to diplomacy rolls when calling in a sworn alliance or favor."},
+  ],
+  Intrigue:[
+    {id:"shadow",       name:"Shadow Walker",       icon:"🌑", flavor:"They learned young to move unseen — through halls, crowds, the spaces between loyalties.", bonus:"+1 to all espionage rolls."},
+    {id:"forger",       name:"Forger's Hand",       icon:"🖋", flavor:"Scripts, seals, signatures — their eye for imitation was not for noble purposes.", bonus:"+2 to Intrigue rolls when forging documents or fabricating claims."},
+    {id:"poison",       name:"Poison Lore",         icon:"🧪", flavor:"Someone taught this character which plants kill quietly.",                          bonus:"+2 to assassination attempt rolls."},
+    {id:"web",          name:"Web Weaver",          icon:"🕸", flavor:"Even in childhood they collected secrets — favors, overheard words, accumulated debts.", bonus:"+1 to Intrigue rolls when running or expanding a spy network."},
+    {id:"iron_mask",    name:"Iron Mask",           icon:"🎭", flavor:"No one has ever read this face. All have tried. All have failed.",                 bonus:"+1 to Intrigue rolls involving deception or misdirection."},
+    {id:"pick",         name:"Light Fingers",       icon:"🤏", flavor:"They learned early that information is everywhere — in pockets, desks, unlocked rooms.", bonus:"+1 to Intrigue rolls when stealing documents or intercepting messages."},
+    {id:"backstab",     name:"Backstabber",         icon:"🗡", flavor:"They do not fight fair and they have never pretended otherwise.",                   bonus:"+1 to personal combat rolls when attacking an unsuspecting target."},
+    {id:"rumor",        name:"Rumor Monger",        icon:"👂", flavor:"They know exactly how fast a well-placed lie travels and where it ends up.",        bonus:"+1 to Intrigue rolls when spreading false information."},
+    {id:"patient",      name:"Patient Planner",     icon:"⏳", flavor:"They think in seasons, not days. The trap was laid months ago.",                   bonus:"+1 to Intrigue rolls for schemes that span more than one season."},
+  ],
+  Learning:[
+    {id:"scholar_gift", name:"Scholar's Gift",      icon:"📚", flavor:"Letters came early, languages faster. They had read more than most lords by fifteen.", bonus:"+1 to all scholarly and research rolls."},
+    {id:"physician",    name:"Physician's Touch",   icon:"⚕",  flavor:"They studied the body — bones, humors, wounds. Useful when war is permanent.",   bonus:"+1 to Learning rolls involving medicine, wounds, or disease."},
+    {id:"canonist",     name:"The Canonist",        icon:"📖", flavor:"Canon law, papal decrees — they know which verse to cite to which priest.",        bonus:"+2 to Learning rolls involving church law or papal matters."},
+    {id:"nat_phil",     name:"Natural Philosopher", icon:"🔭", flavor:"Stars, tides, siege angles — they see patterns and bend them to advantage.",       bonus:"+1 to Learning rolls involving engineering or natural science."},
+    {id:"linguist",     name:"Linguist",            icon:"🌍", flavor:"Latin, Arabic, Norse, Greek — language is the first bridge and the first weapon.",  bonus:"+1 to all Diplomacy rolls with foreign cultures."},
+    {id:"cartog",       name:"Cartographer",        icon:"🗺", flavor:"They have studied more maps than most men have seen. They know where things are.",  bonus:"+1 to Learning rolls involving navigation or campaign planning."},
+    {id:"theol",        name:"Theologian",          icon:"✝",  flavor:"They have read the arguments on both sides of every schism. Faith is a tool.",     bonus:"+1 to Diplomacy rolls with religious factions."},
+    {id:"code",         name:"Code Breaker",        icon:"🔑", flavor:"Ciphers, patterns, hidden meanings — their mind finds structure in apparent chaos.", bonus:"+1 to Intrigue rolls when decoding intercepted messages."},
+    {id:"mil_hist",     name:"Military Historian",  icon:"📜", flavor:"They have read every battle account they could find. Theory and practice meet.",    bonus:"+1 to battle rolls when facing a tactically familiar situation (mod discretion)."},
+  ],
+};
+
+const COMBAT_TRAITS = [
+  {id:"shield_anchor", name:"Shield Wall Anchor", icon:"🛡", flavor:"Where others step back, this one plants their feet. Lines hold because they hold first.", bonus:"All friendly battle dice in a defensive formation gain +1. Holding the defender role for 2+ consecutive turns adds a further +1 (stacks once). Immune to forced-retreat on a Narrow Victory.", use:"Defensive battles and prolonged sieges"},
+  {id:"cav_master",    name:"Cavalry Master",     icon:"🐴", flavor:"Horse and rider became one thing. The charge does not break — it transforms.",             bonus:"Cavalry-led charges grant +1 to all battle dice in the opening round. Cavalry pursuit after a rout adds 5% additional casualties. Army movement −1 in-game day when cavalry-dominant.", use:"Open-field offensives and pursuit"},
+  {id:"siege_break",   name:"Siege Breaker",      icon:"🪨", flavor:"Walls are a problem of patience and geometry. They learned both before they learned mercy.", bonus:"Siege attack rolls gain +1. Siege engines under their command deal +3 total (instead of +2). Attacker attrition reduced 25% during their command.", use:"Assault operations and fortification reduction"},
+  {id:"duelist",       name:"Duelist",            icon:"⚔",  flavor:"They have won more single combats than most men fight in a lifetime. The body remembers.", bonus:"+3 to personal combat rolls in duels, assassination defense, and heroic assault. Once per duel, may force a re-roll on the opponent's highest die.", use:"Duels, assassination defense and front-line heroics"},
+  {id:"ghost",         name:"Ghost of the Field", icon:"🌑", flavor:"They move armies the way a shadow moves — without announcement, without warning, then present.", bonus:"Ambush DC reduced from 12 to 9. Hidden forces 1-in-6 less likely to be detected. Army movement in forest/marsh costs 1 fewer in-game day.", use:"Ambushes, flanking and covert advance"},
+];
+
+const COMBAT_EVENTS = [
+  {roll:1,bonus:0,icon:"🌾",label:"Uneventful Upbringing",  desc:"No noteworthy combat experience. The archetype's training is the whole story."},
+  {roll:2,bonus:0,icon:"🌾",label:"Uneventful Upbringing",  desc:"No noteworthy combat experience. The archetype's training is the whole story."},
+  {roll:3,bonus:1,icon:"🐗",label:"Hunting Accident",        desc:"A boar, a cornered wolf, a riding fall that could have killed them. They learned something about pain — and about getting back up."},
+  {roll:4,bonus:1,icon:"🥊",label:"Formative Brawl",         desc:"A street fight, a tavern confrontation, a boundary dispute that turned bloody. Not training — but real."},
+  {roll:5,bonus:2,icon:"⚔", label:"Border Skirmish",         desc:"A raid, a bandit attack, a night alarm on the frontier. They fought before they were ready and came out the other side."},
+  {roll:6,bonus:3,icon:"🔥",label:"Survived Serious Violence",desc:"Ambush, siege, a battle they had no business being in. Whatever happened, they are harder for it — and they carry the scars to prove it."},
+];
+
+const FACTIONS = [
+  {id:"noble_house",     icon:"🏰",label:"Noble House",     rank:"Baron / Count",     gold:"200–400",  army:"500–2,000 levies",   desc:"Land, levies, and loyalty define your power."},
+  {id:"military_order",  icon:"⚔", label:"Military Order",  rank:"Commander",         gold:"150–300",  army:"200–800 elite",       desc:"Small but elite. Your soldiers are worth three ordinary levies."},
+  {id:"merchant_house",  icon:"💰",label:"Merchant House",  rank:"Master Merchant",   gold:"500–1,000",army:"0–100 guards",        desc:"Trade routes, ports, and markets are your battlefield."},
+  {id:"religious_order", icon:"✝", label:"Religious Order", rank:"Bishop / Abbot",    gold:"300–500",  army:"0 (influence only)",  desc:"No army, but the Pope's ear. Influence and spiritual authority."},
+  {id:"city_state",      icon:"🏛", label:"City-State",      rank:"Podesta / Consul",  gold:"400–700",  army:"300–1,500 militia",   desc:"Trade and walls defend what diplomacy and gold cannot."},
+];
+
+const CULTURES = [
+  {id:"anglo",    label:"Anglo-Saxon",       region:"England",         bonuses:"+1 Levy, +1 Logistics",                   combat:"+1 shieldwall defense on prepared positions",           context:"War of succession — three claimants contest the throne"},
+  {id:"norman",   label:"Norman",            region:"Normandy",        bonuses:"+2 Cavalry, +1 Siege",                    combat:"+2 cavalry charge (first charge) on open ground",       context:"Duke William assembles his invasion fleet"},
+  {id:"scandi",   label:"Scandinavian",      region:"Norway/Denmark",  bonuses:"+3 Naval, +2 Raid",                       combat:"+3 naval combat, +1 raid. Fearless in shore assaults",  context:"Hardrada campaigns in the north. Longships on the Humber"},
+  {id:"german",   label:"German",            region:"Holy Roman Empire",bonuses:"+2 Heavy Infantry",                      combat:"Disciplined heavy infantry hold ground in open battle",  context:"Henry IV feuds with Pope Gregory VII"},
+  {id:"french",   label:"French",            region:"France",          bonuses:"+1 Diplomacy, +1 Naval",                  combat:"No specific cultural combat note",                       context:"King Philip I watches Normandy — and waits"},
+  {id:"iberian",  label:"Iberian",           region:"Iberia",          bonuses:"+1 Cavalry, Reconquista bonus",           combat:"Reconquista veterans fight with conviction on home soil",context:"The Reconquista grinds on. Moors and Christians share a frontier"},
+  {id:"byz",      label:"Byzantine",         region:"Byzantine Empire", bonuses:"+2 Intrigue, +1 Diplomacy",             combat:"+2 counter-attack after feigned retreat. Greek Fire: +2 naval",context:"Manzikert's aftermath. Seljuk pressure mounts"},
+  {id:"celtic",   label:"Celtic",            region:"Scotland/Ireland", bonuses:"+2 Raid, +1 Guerrilla",                 combat:"+2 guerrilla in hills/forests. +1 raid",                 context:"English succession chaos creates opportunity"},
+  {id:"italian",  label:"Italian",           region:"Italy (North)",   bonuses:"+2 Trade, +1 Diplomacy",                 combat:"No specific cultural combat note",                       context:"Pope Alexander II watches the HRE. City-states grow rich"},
+  {id:"rus",      label:"Rus / Norse-Slavic",region:"Kievan Rus",      bonuses:"+1 Infantry, +2 Trade (Varangian route)", combat:"+1 heavy infantry. +2 in forest terrain (taiga)",        context:"Yaroslavichi coalition fractures. Cumans raid from the south"},
+  {id:"steppe",   label:"Steppe / Nomadic",  region:"Cuman Steppe",    bonuses:"+3 Cavalry, +2 Raid",                    combat:"+2 cavalry pursuit. +3 raid. Cannot be besieged in open steppe", context:"Dominant steppe power. Raids Rus and Byzantium annually"},
+  {id:"caucas",   label:"Georgian/Armenian", region:"Caucasus",        bonuses:"+2 Mountain combat, +1 Cavalry",          combat:"+2 mountain combat. Negates enemy cavalry in highlands", context:"King Bagrat IV holds off Seljuk pressure"},
+  {id:"arab",     label:"Arab / Bedouin",    region:"Arabia",          bonuses:"+2 Cavalry (desert), Pilgrimage income",  combat:"+2 in desert/hot terrain. Excellent light cavalry",      context:"Fatimid, Abbasid, and Seljuk all claim authority"},
+  {id:"persian",  label:"Seljuk / Persian",  region:"Persia",          bonuses:"+2 Cavalry, +1 Admin, Silk Road income",  combat:"+2 cavalry (composite bow). +1 in desert/steppe",        context:"Richest eastern region. Persian administrators keep the empire running"},
+  {id:"fatimid",  label:"Egyptian / Fatimid",region:"Egypt",           bonuses:"+1 Naval (Mediterranean), +2 Trade",      combat:"+1 naval (Mediterranean). Sudanese/Turkish mercs give flexibility", context:"Cairo fabulously wealthy. The Vizier holds real power"},
+  {id:"berber",   label:"Berber / Almoravid",region:"North Africa",    bonuses:"+2 Coastal Raid, +1 Desert combat",       combat:"+2 coastal raid. +1 desert combat. Ships at half travel time", context:"Almoravid empire rising. Will invade Iberia within 5 years"},
+];
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let S = {
+  step:1,
+  firstName:"", familyName:"", faction:"", archetype:"", culture:"",
+  result:null, rolling:false, diceAnim:{},
+  errors:{}, copied:false, saved:false
+};
+
+
+// ── Simple helpers to avoid spread in HTML attributes ──────────
+function pick(field, val){
+  const upd = {[field]: val, errors: Object.assign({}, S.errors)};
+  upd.errors[field] = '';
+  setState(upd);
+}
+function hover(field, val){ /* no-op: hover no longer triggers re-render */ }
+function setField(field, val){
+  const upd = {[field]: val, errors: Object.assign({}, S.errors)};
+  upd.errors[field] = '';
+  setState(upd);
+}
+
+function setState(upd){ Object.assign(S,upd); render(); }
+
+// ══════════════════════════════════════════════════════════════
+// GENERATION
+// ══════════════════════════════════════════════════════════════
+function roll4d4(){ const d=[1,2,3,4].map(()=>Math.floor(Math.random()*4)+1); return {dice:d,total:d.reduce((a,b)=>a+b,0)}; }
+function d6(){ return Math.floor(Math.random()*6)+1; }
+function pickTwo(pool){ const c=[...pool]; const out=[]; while(out.length<2&&c.length>0){ const i=Math.floor(Math.random()*c.length); out.push(c.splice(i,1)[0]); } return out; }
+
+function generate(archId, cultId, factId){
+  const arch = ARCHETYPES.find(a=>a.id===archId);
+  const rolls={}, stats={}, capped={};
+  STAT_KEYS.forEach(k=>{
+    const r=roll4d4(); rolls[k]=r;
+    const raw=r.total+(arch.bonuses[k]||0);
+    capped[k]=raw>STAT_CAP; stats[k]=Math.min(STAT_CAP,raw);
+  });
+  const combatRoll=d6();
+  const combatEvent=COMBAT_EVENTS.find(e=>e.roll===combatRoll);
+  const pc=Math.min(20,arch.pc+combatEvent.bonus);
+  const traitStat=arch.primary;
+  const traits=pickTwo(TRAITS[traitStat]);
+  const combatTrait=(stats.Martial>10||pc>10)?COMBAT_TRAITS[Math.floor(Math.random()*COMBAT_TRAITS.length)]:null;
+  const cultureData=CULTURES.find(c=>c.id===cultId);
+  const factionData=FACTIONS.find(f=>f.id===factId);
+  return {arch,rolls,stats,capped,pc,combatEvent,traitStat,traits,combatTrait,cultureData,factionData};
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXPORT TEXT
+// ══════════════════════════════════════════════════════════════
+function buildExport(r){
+  const lines=[
+    "===========================================",
+    "  UNIVERSAL REALMS: ANNO DOMINI 1066",
+    "  CHARACTER SHEET",
+    "===========================================",
+    "  Name:      "+S.firstName+" "+S.familyName,
+    "  Archetype: "+r.arch.name+" — "+r.arch.bg,
+    "  Culture:   "+r.cultureData.label+" ("+r.cultureData.region+")",
+    "  Faction:   "+r.factionData.label+" — "+r.factionData.rank,
+    "",
+    "  -- STATS (4d4 roll + archetype bonus) --------",
+    ...STAT_KEYS.map(k=>{
+      const ab=r.arch.bonuses[k]||0;
+      const b=statBonus(k,r.stats[k]);
+      return "  "+k.padEnd(13)+" "+r.stats[k]+"  (rolled "+r.rolls[k].total+(ab>0?" +"+ab+" archetype":"")+(r.capped[k]?" — capped at 18":"")+")  "+b.label;
+    }),
+    "  Personal Combat  "+r.pc+"  ("+r.arch.pc+" archetype"+(r.combatEvent.bonus>0?" + "+r.combatEvent.bonus+" "+r.combatEvent.label:"")+")  |  "+(r.pc>=16?"ELITE — +2 battle survival, +4 duel, heroic roll inspires troops":r.pc>=10?"AVERAGE — no modifier, standard wound risk":"POOR — −1 battle survival, high wound risk"),
+    "",
+    "  -- CHILDHOOD TRAITS ("+r.traitStat+" pool) ----------",
+    ...r.traits.map(t=>"  "+t.icon+" "+t.name+"\n    "+t.bonus),
+    "",
+    "  -- COMBAT TRAIT ---------------------------",
+    r.combatTrait?(r.combatTrait.icon+" "+r.combatTrait.name+"\n    "+r.combatTrait.bonus):"  Not unlocked (Martial ≤10 and Personal Combat ≤10)",
+    "",
+    "  -- CULTURAL BONUSES -----------------------",
+    "  Regional: "+r.cultureData.bonuses,
+    "  Combat:   "+r.cultureData.combat,
+    "",
+    "===========================================",
+    "  Submit via #character-actions",
+    "===========================================",
+  ];
+  return lines.join("\n");
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER HELPERS
+// ══════════════════════════════════════════════════════════════
+function h(tag,cls,html,attrs=""){
+  return `<${tag} class="${cls}" ${attrs}>${html}</${tag}>`;
+}
+function btn(label,cls,onclick){
+  return `<button class="${cls}" onclick="${onclick}">${label}</button>`;
+}
+function errMsg(key){ return S.errors[key]?`<span class="err-text">${S.errors[key]}</span>`:""; }
+
+// ══════════════════════════════════════════════════════════════
+// VIEWS
+// ══════════════════════════════════════════════════════════════
+function viewStep1(){
+  const sel=FACTIONS.find(f=>f.id===S.faction);
+  return `
+    <div class="card">
+      <div class="card-title">Step 1 — Identity</div>
+      <div class="form-row">
+        <div class="field">
+          <label class="flabel">First Name</label>
+          <input type="text" class="${S.errors.firstName?'err':''}" value="${S.firstName}" onchange="setField('firstName',this.value)" placeholder="e.g. Aldric, Mathilde, Harald…">
+          ${errMsg('firstName')}
+        </div>
+        <div class="field">
+          <label class="flabel">Family / House Name</label>
+          <input type="text" class="${S.errors.familyName?'err':''}" value="${S.familyName}" onchange="setField('familyName',this.value)" placeholder="e.g. of Wessex, de Vere, Eriksson…">
+          ${errMsg('familyName')}
+        </div>
+      </div>
+      <label class="flabel" style="margin-bottom:6px;display:block;">Faction Type</label>
+      <div class="faction-grid">
+        ${FACTIONS.map(f=>`
+          <button class="faction-btn ${S.faction===f.id?'active':''}" onclick="pick('faction','${f.id}')">
+            <span class="faction-icon">${f.icon}</span>
+            <span class="faction-label">${f.label}</span>
+            <span class="faction-rank">${f.rank}</span>
+          </button>`).join('')}
+      </div>
+      ${errMsg('faction')}
+      ${sel?`<div class="info-box" style="margin-top:12px;">
+        <div class="info-row"><strong>Starting Rank:</strong><span>${sel.rank}</span></div>
+        <div class="info-row"><strong>Starting Gold:</strong><span>${sel.gold}g</span></div>
+        <div class="info-row"><strong>Starting Army:</strong><span>${sel.army}</span></div>
+        <div class="info-row" style="margin-top:4px;"><em style="color:#8b7355;">${sel.desc}</em></div>
+      </div>`:''}
+      <div class="btn-row">${btn('Next — Choose Archetype','btn-primary','goNext()')}</div>
+    </div>`;
+}
+
+function viewStep2(){
+  const prev=ARCHETYPES.find(a=>a.id===S.archetype);
+  const archHtml=ARCHETYPES.map(a=>`
+    <button class="arch-btn ${S.archetype===a.id?'active':''}"
+      onclick="pick('archetype','${a.id}')">
+      
+      <span class="arch-icon">${a.icon}</span>
+      <span class="arch-name">${a.name}</span>
+      <span class="arch-primary">Primary: ${a.primary}</span>
+    </button>`).join('');
+  const prevHtml=prev?`
+    <div class="info-box arch-detail" style="margin-top:14px;">
+      <div class="arch-detail-hdr">
+        <span style="font-size:28px;">${prev.icon}</span>
+        <div><div class="arch-detail-name">${prev.name}</div><div class="arch-detail-bg">${prev.bg}</div></div>
+      </div>
+      <p class="arch-flavor">"${prev.flavor}"</p>
+      <div class="arch-bonus-row">
+        <div class="arch-bonus-block">
+          <div class="arch-bonus-label">Stat Bonuses</div>
+          ${STAT_KEYS.map(k=>prev.bonuses[k]?`<div class="arch-bonus-line" style="color:${STAT_COLORS[k]}">${STAT_ICONS[k]} ${k}: +${prev.bonuses[k]}</div>`:'').join('')}
+        </div>
+        <div class="arch-bonus-block">
+          <div class="arch-bonus-label">Personal Combat</div>
+          <div style="font-size:28px;font-weight:bold;color:#c0392b;line-height:1;">${prev.pc}</div>
+          <div style="font-size:11px;color:#8b4444;margin-top:3px;">Fixed — from background</div>
+        </div>
+        <div class="arch-bonus-block">
+          <div class="arch-bonus-label">Trait Pool</div>
+          <div style="font-size:13px;color:${STAT_COLORS[prev.primary]}">${STAT_ICONS[prev.primary]} ${prev.primary}</div>
+          <div style="font-size:11px;color:#7a6030;margin-top:3px;">2 childhood traits drawn from this pool</div>
+        </div>
+      </div>
+    </div>`:'';
+  return `
+    <div class="card">
+      <div class="card-title">Step 2 — Archetype</div>
+      <p class="step-desc">Your archetype represents your noble upbringing. It adds a fixed bonus to your rolled stats and sets your Personal Combat base. Stats are capped at ${STAT_CAP}. <strong style="color:#c8a838;">Click any archetype to select it and see its details below.</strong></p>
+      <div class="arch-grid">${archHtml}</div>
+      ${errMsg('archetype')}
+      ${prevHtml}
+      <div class="btn-row">
+        ${btn('Back','btn-secondary','goBack()')}
+        ${btn('Next — Choose Culture','btn-primary','goNext()')}
+      </div>
+    </div>`;
+}
+
+function viewStep3(){
+  const prev=CULTURES.find(c=>c.id===S.culture);
+  return `
+    <div class="card">
+      <div class="card-title">Step 3 — Culture</div>
+      <p class="step-desc">Your culture determines regional bonuses, combat traditions, and starting context. <strong style="color:#c8a838;">Click any culture to select it and see its details below.</strong></p>
+      <div class="culture-grid">
+        ${CULTURES.map(c=>`
+          <button class="culture-btn ${S.culture===c.id?'active':''}"
+            onclick="pick('culture','${c.id}')">
+            
+            <span class="culture-name">${c.label}</span>
+            <span class="culture-region">${c.region}</span>
+          </button>`).join('')}
+      </div>
+      ${errMsg('culture')}
+      ${prev?`
+      <div class="info-box" style="margin-top:12px;">
+        <div style="font-size:13px;font-weight:bold;color:#c8a838;margin-bottom:6px;">${prev.label} — ${prev.region}</div>
+        <div class="info-row"><strong>Regional Bonuses:</strong><span>${prev.bonuses}</span></div>
+        <div class="info-row"><strong>Combat Tradition:</strong><span>${prev.combat}</span></div>
+        <div style="margin-top:4px;"><em style="font-size:11px;color:#7a6045;">${prev.context}</em></div>
+      </div>`:''}
+      <div class="btn-row">
+        ${btn('Back','btn-secondary','goBack()')}
+        ${btn('Roll Stats — Generate Character','btn-primary','goNext()')}
+      </div>
+    </div>`;
+}
+
+function viewRolling(){
+  return `
+    <div class="card">
+      <div class="rolling-label">Rolling 4d4 per stat…</div>
+      <div class="dice-grid">
+        ${STAT_KEYS.map(k=>`
+          <div class="dice-stat-box">
+            <span class="stat-icon">${STAT_ICONS[k]}</span>
+            <span style="font-size:9px;color:#a08848;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">${k}</span>
+            <div class="dice-row">
+              ${(S.diceAnim[k]||[1,1,1,1]).map(d=>`<div class="die">${d}</div>`).join('')}
+            </div>
+            <span style="font-size:24px;font-weight:bold;color:${STAT_COLORS[k]};margin-top:4px;">
+              ${S.diceAnim[k]?S.diceAnim[k].reduce((a,b)=>a+b,0):"—"}
+            </span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function viewResult(){
+  const r=S.result;
+  const fn=S.firstName, ln=S.familyName;
+
+  const statsHtml=STAT_KEYS.map(k=>{
+    const ab=r.arch.bonuses[k]||0;
+    const fin=r.stats[k];
+    const bonus=statBonus(k,fin);
+    const range=statRange(fin);
+    const hasB=bonus.mod!=="—";
+    return `
+      <div class="stat-card" style="border-color:${hasB?STAT_COLORS[k]:'#3a2c10'};box-shadow:${hasB?'0 0 10px '+STAT_COLORS[k]+'22':'none'}">
+        <div class="stat-card-top">
+          <span class="stat-icon">${STAT_ICONS[k]}</span>
+          <span class="stat-name">${k}</span>
+          <span class="stat-val" style="color:${STAT_COLORS[k]}">${fin}</span>
+        </div>
+        <div class="stat-dice-row">
+          ${r.rolls[k].dice.map(d=>`<div class="stat-die">${d}</div>`).join('')}
+          ${ab>0?`<div class="stat-die arch-die">+${ab}</div>`:''}
+          ${r.capped[k]?`<span style="font-size:9px;color:#8b4444;margin-left:2px;">capped</span>`:''}
+        </div>
+        <div class="stat-bar"><div class="stat-fill" style="width:${Math.min(fin/25,1)*100}%;background:${STAT_COLORS[k]}"></div></div>
+        <div class="stat-footer">
+          <span class="stat-range" style="color:${range.color}">${range.label}</span>
+          <span class="stat-bonus-lbl" style="color:${hasB?STAT_COLORS[k]:'#555'}">${bonus.mod}</span>
+        </div>
+        ${hasB?`<div class="stat-bonus-desc" style="color:${STAT_COLORS[k]}">${bonus.label}</div>`:''}
+      </div>`;
+  }).join('');
+
+  const rollBreakHtml=STAT_KEYS.map(k=>{
+    const ab=r.arch.bonuses[k]||0;
+    const raw=r.rolls[k].total;
+    return `
+      <div class="rb-row">
+        <span class="rb-stat" style="color:${STAT_COLORS[k]}">${STAT_ICONS[k]} ${k}</span>
+        <div class="rb-dice">
+          ${r.rolls[k].dice.map(d=>`<div class="stat-die">${d}</div>`).join('')}
+          <span style="color:#7a6030;margin:0 4px;">=</span>
+          <strong style="color:#a08848;">${raw}</strong>
+          ${ab>0?`<span style="color:#c8a838;margin-left:4px;">+ ${ab} archetype</span>`:''}
+          ${r.capped[k]?`<span style="color:#8b4444;margin-left:4px;">→ capped at 18</span>`:''}
+          <span style="font-weight:bold;color:${STAT_COLORS[k]};margin-left:8px;">= ${r.stats[k]}</span>
+        </div>
+      </div>`;
+  }).join('');
+
+  const pcTier=r.pc>=16?`<span style="color:#27ae60;font-weight:bold;">Combat 16+ — Elite. +2 battle survival. +4 duel bonus. Heroic rolls inspire troops (+1 next phase die). Low wound risk.</span>`
+    :r.pc>=10?`<span style="color:#e8a080;">Combat 10–15 — Average. No survival modifier. Standard wound risk in battle.</span>`
+    :`<span style="color:#c0392b;font-weight:bold;">Combat 1–9 — Poor. −1 battle survival modifier. High wound risk when exposed in battle.</span>`;
+
+  const traitsHtml=r.traits.map(t=>`
+    <div class="trait-card" style="border-color:${STAT_COLORS[r.traitStat]}66">
+      <div class="trait-hdr">
+        <span style="font-size:20px;">${t.icon}</span>
+        <span class="trait-name" style="color:${STAT_COLORS[r.traitStat]}">${t.name}</span>
+      </div>
+      <p class="trait-flavor">"${t.flavor}"</p>
+      <div class="trait-bonus-wrap">
+        <span class="trait-bonus-label">Bonus</span>
+        <p class="trait-bonus" style="color:${STAT_COLORS[r.traitStat]}">${t.bonus}</p>
+      </div>
+    </div>`).join('');
+
+  const ctHtml=r.combatTrait?`
+    <div class="combat-trait-card">
+      <div class="ct-hdr">
+        <span style="font-size:28px;flex-shrink:0;">${r.combatTrait.icon}</span>
+        <div>
+          <p class="ct-name">${r.combatTrait.name}</p>
+          <p class="ct-use">Best for: ${r.combatTrait.use}</p>
+        </div>
+      </div>
+      <p class="trait-flavor">"${r.combatTrait.flavor}"</p>
+      <div class="trait-bonus-wrap">
+        <span class="trait-bonus-label">Combat Bonus</span>
+        <p class="trait-bonus" style="color:#c0392b;">${r.combatTrait.bonus}</p>
+      </div>
+    </div>`
+    :`<div class="ct-locked"><span style="font-size:24px;">🔒</span><div>
+        <p style="margin:0 0 3px;font-size:12px;font-weight:bold;color:#6b5030;">No Combat Trait Unlocked</p>
+        <p style="margin:0;font-size:11px;color:#5a4020;font-style:italic;">Martial (${r.stats.Martial}) and Personal Combat (${r.pc}) are both 10 or below. Raise either above 10 through play to unlock a trait.</p>
+      </div></div>`;
+
+  const growthRows=[
+    {g:"+1 Martial",    t:"Win a decisive battle as commanding general",           l:"Once per in-game year"},
+    {g:"+1 Diplomacy",  t:"Successfully conclude a major treaty or alliance",      l:"Once per in-game year"},
+    {g:"+1 Stewardship",t:"Province under your administration 2 years uncontested",l:"Once per in-game year"},
+    {g:"+1 Intrigue",   t:"Complete an Intrigue action at DC 16+",                  l:"Once per in-game year"},
+    {g:"+1 Learning",   t:"Complete a scholarly quest or University 4 turns",       l:"Once per in-game year"},
+    {g:"+1 any stat",   t:"Exceptional RP — mod discretion",                        l:"Once per in-game season max"},
+  ].map(row=>`<div class="growth-row"><span style="color:#c8a838;">${row.g}</span><span>${row.t}</span><span style="color:#7a6030;">${row.l}</span></div>`).join('');
+
+  return `
+    <div class="result-card" id="result-card">
+      <div class="result-hdr">
+        <span class="wax">⚜</span>
+        <div>
+          <h2 class="char-name">${fn} ${ln}</h2>
+          <p class="char-sub">${r.arch.name} — ${r.cultureData.label}</p>
+          <p class="char-faction">${r.factionData.icon} ${r.factionData.label} — ${r.factionData.rank}</p>
+        </div>
+        <span class="wax">⚜</span>
+      </div>
+      <div class="arch-banner">
+        <span style="font-size:28px;margin-right:12px;flex-shrink:0;">${r.arch.icon}</span>
+        <div>
+          <div class="arch-banner-name">${r.arch.name}</div>
+          <p class="arch-banner-flavor">"${r.arch.flavor}"</p>
+        </div>
+      </div>
+
+      <div class="sec-head">Stats <span class="sec-note">4d4 roll + archetype bonus, capped at ${STAT_CAP}</span></div>
+      <div class="stats-grid">${statsHtml}</div>
+
+      <div class="sec-head">Roll Breakdown <span class="sec-note">4d4 per stat + archetype bonus</span></div>
+      <div class="roll-breakdown">${rollBreakHtml}</div>
+
+      <div class="sec-head">Personal Combat</div>
+      <div class="combat-box">
+        <div class="combat-num">${r.pc}</div>
+        <div style="flex:1;">
+          <div class="combat-pills">
+            <div class="pill"><span class="pill-label">Archetype</span><span class="pill-val" style="color:#e8d5a3;">${r.arch.pc}</span></div>
+            <span style="color:#5a4020;font-size:14px;">+</span>
+            <div class="pill" style="border-color:${r.combatEvent.bonus>0?'#c0392b':'#3a2c10'}">
+              <span class="pill-label">Background (1d6=${r.combatEvent.roll})</span>
+              <span class="pill-val" style="color:${r.combatEvent.bonus>0?'#c0392b':'#5a4020'}">${r.combatEvent.bonus>0?'+'+r.combatEvent.bonus:'0'}</span>
+            </div>
+            <span style="color:#5a4020;font-size:14px;">=</span>
+            <div class="pill" style="border-color:#8b6914;"><span class="pill-label">Final</span><span class="pill-val" style="color:#c8a838;">${r.pc}</span></div>
+          </div>
+          <div class="combat-event" style="border-color:${r.combatEvent.bonus>0?'#6b1414':'#3a2c10'}">
+            <span style="font-size:18px;flex-shrink:0;">${r.combatEvent.icon}</span>
+            <div>
+              <div class="combat-event-label" style="color:${r.combatEvent.bonus>0?'#e8a898':'#7a6030'}">
+                ${r.combatEvent.label}${r.combatEvent.bonus>0?`<span style="color:#c0392b;margin-left:6px;">+${r.combatEvent.bonus} Combat</span>`:''}
+              </div>
+              <div class="combat-event-desc">${r.combatEvent.desc}</div>
+            </div>
+          </div>
+          <div class="combat-tier">${pcTier}</div>
+        </div>
+      </div>
+
+      <div class="sec-head">Childhood Traits <span class="sec-note">${r.traitStat} pool (archetype primary) — 2 awarded</span></div>
+      <div class="traits-grid">${traitsHtml}</div>
+
+      <div class="sec-head" style="margin-top:16px;">Combat Trait <span class="sec-note">Requires Martial or Personal Combat above 10</span></div>
+      ${ctHtml}
+
+      <div class="sec-head">Cultural Heritage</div>
+      <div class="culture-result">
+        <div class="cr-row"><strong>Regional Bonuses:</strong><span>${r.cultureData.bonuses}</span></div>
+        <div class="cr-row"><strong>Combat Tradition:</strong><span>${r.cultureData.combat}</span></div>
+        <div class="cr-row"><strong>Context:</strong><em style="color:#7a6045;">${r.cultureData.context}</em></div>
+      </div>
+
+      <div class="sec-head">Stat Growth Through Play</div>
+      <div class="growth-box">
+        <div class="growth-note">Stats grow only by doing the thing — never automatically. Hard cap: ${HARD_CAP}.</div>
+        <div>${growthRows}</div>
+      </div>
+
+      <div class="export-footer">
+        ${btn('Re-roll Stats','btn-primary','reroll()')}
+        <button class="btn-secondary ${S.copied?'btn-copied':''}" onclick="copySheet()">${S.copied?'Copied!':'Copy Sheet'}</button>
+        <button class="btn-secondary ${S.saved?'btn-copied':''}" onclick="saveCharacter()">${S.saved?'Saved!':'Save to Profile'}</button>
+        ${btn('New Character','btn-secondary','restart()')}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// STEP LOGIC
+// ══════════════════════════════════════════════════════════════
+function validate(step){
+  const e={};
+  if(step===1){
+    if(!S.firstName.trim()) e.firstName="Required.";
+    if(!S.familyName.trim()) e.familyName="Required.";
+    if(!S.faction) e.faction="Select a faction type.";
+  }
+  if(step===2&&!S.archetype) e.archetype="Select an archetype.";
+  if(step===3&&!S.culture) e.culture="Select a culture.";
+  return e;
+}
+
+function goNext(){
+  const e=validate(S.step);
+  if(Object.keys(e).length>0){ setState({errors:e}); return; }
+  if(S.step===3){
+    startRolling();
+  } else {
+    setState({step:S.step+1,errors:{}});
+  }
+}
+function goBack(){ setState({step:S.step-1,errors:{}}); }
+
+function startRolling(){
+  setState({rolling:true,result:null,step:4,errors:{}});
+  let tick=0;
+  const iv=setInterval(()=>{
+    const anim={};
+    STAT_KEYS.forEach(k=>{anim[k]=[0,0,0,0].map(()=>Math.floor(Math.random()*4)+1);});
+    S.diceAnim=anim; render();
+    tick++;
+    if(tick>=14){
+      clearInterval(iv);
+      const res=generate(S.archetype,S.culture,S.faction);
+      S.result=res; S.rolling=false; S.diceAnim={};
+      render();
+      setTimeout(()=>{
+        const el=document.getElementById('result-card');
+        if(el) el.scrollIntoView({behavior:'smooth'});
+      },100);
+    }
+  },100);
+}
+
+function reroll(){
+  S.result=null; S.rolling=true; render();
+  let tick=0;
+  const iv=setInterval(()=>{
+    const anim={};
+    STAT_KEYS.forEach(k=>{anim[k]=[0,0,0,0].map(()=>Math.floor(Math.random()*4)+1);});
+    S.diceAnim=anim; render();
+    tick++;
+    if(tick>=14){
+      clearInterval(iv);
+      const res=generate(S.archetype,S.culture,S.faction);
+      S.result=res; S.rolling=false; S.diceAnim={};
+      render();
+      setTimeout(()=>{
+        const el=document.getElementById('result-card');
+        if(el) el.scrollIntoView({behavior:'smooth'});
+      },100);
+    }
+  },100);
+}
+
+function copySheet(){
+  const text=buildExport(S.result);
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>{setState({copied:true});setTimeout(()=>setState({copied:false}),2500);});
+  } else {
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    setState({copied:true}); setTimeout(()=>setState({copied:false}),2500);
+  }
+}
+
+async function saveCharacter(){
+  if(!window.UR_USER){
+    window.location.href='/login.html?redirect=/character_creator.html';
+    return;
+  }
+  const r=S.result;
+  try{
+    const res=await fetch('/api/characters',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({
+        name:(S.firstName+' '+S.familyName).trim(),
+        faction:S.faction,
+        archetype:S.archetype,
+        culture:S.culture,
+        stats:r.stats,
+        notes:'PC:'+r.pc+' | '+r.traits.map(t=>t.name).join(', '),
+      }),
+    });
+    if(res.ok){setState({saved:true});setTimeout(()=>setState({saved:false}),3000);}
+  }catch(e){console.error('Save failed',e);}
+}
+
+function restart(){
+  S={step:1,firstName:"",familyName:"",faction:"",archetype:"",culture:"",hovArch:null,hovCulture:null,result:null,rolling:false,diceAnim:{},errors:{},copied:false,saved:false};
+  render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════════
+const STEP_LABELS=["Identity","Archetype","Culture","Character Sheet"];
+
+function render(){
+  // Steps indicator
+  const stepsEl=document.getElementById('steps');
+  if(stepsEl) stepsEl.innerHTML=STEP_LABELS.map((l,i)=>{
+    const n=i+1;
+    const active=S.step===n&&!S.rolling;
+    const done=S.step>n;
+    const cls='step'+(active?' active':done?' done':'');
+    const num=done?'✓':n;
+    return `<div class="${cls}"><div class="step-num">${num}</div><span class="step-label">${l}</span></div>`;
+  }).join('');
+
+  // View
+  const viewEl=document.getElementById('view');
+  if(!viewEl) return;
+  if(S.rolling){ viewEl.innerHTML=viewRolling(); return; }
+  if(S.step===4&&S.result){ viewEl.innerHTML=viewResult(); return; }
+  if(S.step===1){ viewEl.innerHTML=viewStep1(); return; }
+  if(S.step===2){ viewEl.innerHTML=viewStep2(); return; }
+  if(S.step===3){ viewEl.innerHTML=viewStep3(); return; }
+}
+
+render();
+</script>
+<script src="/js/ur-auth.js"></script>
+</body>
+</html>

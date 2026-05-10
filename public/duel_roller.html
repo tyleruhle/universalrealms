@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Universal Realms 1066 — Duel Roller</title>
+<style>
+:root {
+  /* ── UNIVERSAL REALMS MASTER TOKENS ── */
+  --bg-void:        #0e0a04;
+  --bg-dark:        #1a1208;
+  --bg-card:        #150e04;
+  --bg-input:       #0a0600;
+  --parch:          #f5edd8;
+  --parch-mid:      #ede0c4;
+  --parch-dark:     #d4c49a;
+  --parch-deep:     #e6d9b8;
+  --ink:            #1e1a14;
+  --ink-soft:       #4a3f2f;
+  --ink-faint:      #8a7a5c;
+  --text-on-dark:   #e8d5a3;
+  --text-gold-dark: #c8a84c;
+  --text-muted-dark:#7a6035;
+  --text-dim-dark:  #4a3a18;
+  --gold:           #b8860b;
+  --gold-bright:    #d4a017;
+  --gold-dim:       #7a5a08;
+  --gold-pale:      rgba(184,134,11,0.10);
+  --gold-border:    rgba(184,134,11,0.28);
+  --victory:        #1a4a2a;
+  --victory-lt:     #3a8a4a;
+  --victory-pale:   #e0f0e4;
+  --blood:          #7a1a1a;
+  --blood-lt:       #c04040;
+  --blood-pale:     #f5e0e0;
+  --steel:          #2a3a4a;
+  --steel-lt:       #4a6a8a;
+  --border-dark:    #2a1e0a;
+  --border-dark-2:  #3a2a0a;
+  --font-display:   'Cinzel', 'Palatino Linotype', serif;
+  --font-body:      'EB Garamond', 'Crimson Text', Georgia, serif;
+  --font-mono:      'JetBrains Mono', 'Consolas', monospace;
+  --shadow-dark:    0 4px 24px rgba(0,0,0,0.5);
+  --shadow-light:   0 4px 24px rgba(26,14,5,0.18);
+  --radius-sm:      3px;
+  --radius-md:      5px;
+  --radius-lg:      7px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --ink:       #1A0E05;
+  --parch:     #F5EDD8;
+  --parch-mid: #EDE0C4;
+  --parch-dark:#D4C49A;
+  --gold:      #B8860B;
+  --gold-lt:   #D4A843;
+  --gold-dim:  #7A5A08;
+  --blood:     #7A1A1A;
+  --blood-lt:  #C04040;
+  --blood-pale:#F5E0E0;
+  --steel:     #2A3A4A;
+  --steel-lt:  #4A6A8A;
+  --victory:   #1A4A2A;
+  --victory-lt:#3A8A4A;
+  --victory-pale:#E0F0E4;
+  --shadow:    rgba(26,14,5,0.18);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Crimson Text', Georgia, serif;
+  background: #0E0804;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(90,40,10,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 0%, rgba(60,20,5,0.4) 0%, transparent 60%);
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+.header-rule {
+  width: 340px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0 auto 14px;
+}
+.header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: .18em;
+  color: var(--gold);
+  text-shadow: 0 2px 12px rgba(184,134,11,0.5);
+}
+.header p {
+  font-style: italic;
+  color: var(--gold-dim);
+  font-size: 1rem;
+  margin-top: 4px;
+}
+
+/* ── Arena ── */
+.arena {
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr;
+  gap: 0;
+  width: 100%;
+  max-width: 820px;
+  margin-bottom: 20px;
+  align-items: start;
+}
+
+/* ── Fighter Cards ── */
+.fighter-card {
+  background: var(--parch);
+  border: 1px solid var(--parch-dark);
+  border-radius: 4px;
+  padding: 18px 16px;
+  box-shadow: 0 4px 24px var(--shadow);
+  position: relative;
+}
+.fighter-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
+}
+.card-a::before { background: var(--blood); }
+.card-b::before { background: var(--steel); }
+
+.fighter-label {
+  font-family: 'Cinzel', serif;
+  font-size: .65rem;
+  letter-spacing: .2em;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.card-a .fighter-label { color: var(--blood); }
+.card-b .fighter-label { color: var(--steel-lt); }
+
+.name-input {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--parch-dark);
+  padding: 4px 0 6px;
+  margin-bottom: 14px;
+  outline: none;
+}
+.name-input::placeholder { color: var(--parch-dark); font-weight: 400; }
+.name-input:focus { border-bottom-color: var(--gold); }
+
+.field-label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: .6rem;
+  letter-spacing: .15em;
+  color: var(--gold-dim);
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+
+.pc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.pc-input {
+  width: 68px;
+  font-family: 'Cinzel', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink);
+  background: var(--parch-mid);
+  border: 1px solid var(--parch-dark);
+  border-radius: 3px;
+  padding: 4px;
+  outline: none;
+}
+.pc-input:focus { border-color: var(--gold); }
+
+.pc-tier {
+  font-size: .85rem;
+  font-style: italic;
+  transition: color .2s;
+}
+.pc-bonus {
+  font-family: 'Cinzel', serif;
+  font-size: .95rem;
+  font-weight: 700;
+  margin-left: auto;
+  padding: 3px 8px;
+  border-radius: 3px;
+  min-width: 38px;
+  text-align: center;
+}
+.bonus-neg  { background: var(--blood-pale); color: var(--blood); }
+.bonus-zero { background: var(--parch-mid);  color: var(--ink); }
+.bonus-high { background: #E8F4E8;           color: var(--victory); }
+
+/* Traits */
+.traits-section { margin-top: 14px; }
+.traits-title {
+  font-family: 'Cinzel', serif;
+  font-size: .58rem;
+  letter-spacing: .18em;
+  color: var(--gold-dim);
+  margin-bottom: 8px;
+}
+.trait-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.trait-check input { display: none; }
+.trait-box {
+  width: 14px; height: 14px;
+  border: 1px solid var(--parch-dark);
+  border-radius: 2px;
+  background: var(--parch-mid);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem;
+  color: var(--gold);
+  transition: all .15s;
+}
+.trait-check input:checked ~ .trait-box {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  color: var(--parch);
+}
+.trait-text { font-size: .82rem; color: var(--ink); line-height: 1.3; }
+.trait-bonus { font-weight: 600; color: var(--blood); }
+.trait-cond { font-size: .72rem; font-style: italic; color: #8B6040; display: block; }
+
+/* ── VS Divider ── */
+.vs-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+  gap: 8px;
+}
+.vs-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(180deg, transparent, var(--gold-dim), transparent);
+}
+.vs-text {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: .1em;
+}
+
+/* ── Conditions ── */
+.conditions {
+  width: 100%;
+  max-width: 820px;
+  background: var(--parch);
+  border: 1px solid var(--parch-dark);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.conditions-title {
+  font-family: 'Cinzel', serif;
+  font-size: .6rem;
+  letter-spacing: .2em;
+  color: var(--gold-dim);
+  margin-bottom: 10px;
+}
+.cond-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* ── Roll Button ── */
+.roll-btn {
+  display: block;
+  width: 100%;
+  max-width: 820px;
+  padding: 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--parch);
+  background: linear-gradient(135deg, var(--blood) 0%, #5A1010 100%);
+  border: 1px solid var(--blood-lt);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(120,20,20,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: all .2s;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.roll-btn:hover {
+  background: linear-gradient(135deg, #9A2020 0%, var(--blood) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(120,20,20,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.roll-btn:active { transform: translateY(0); }
+
+/* ── Result Panel ── */
+#result-panel { display: none; width: 100%; max-width: 820px; }
+
+.result-fighters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.result-side {
+  border-radius: 4px;
+  padding: 14px;
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+}
+.rs-att { background: var(--blood-pale); border-color: var(--blood); }
+.rs-def { background: #E8EEF5;           border-color: var(--steel-lt); }
+.rs-win { border-width: 2px; }
+
+.rs-name {
+  font-family: 'Cinzel', serif;
+  font-size: .85rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.rs-att .rs-name { color: var(--blood); }
+.rs-def .rs-name { color: var(--steel); }
+
+.dice-display {
+  font-family: 'Cinzel', serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  padding: 8px 0;
+}
+.rs-att .dice-display { color: var(--blood); }
+.rs-def .dice-display { color: var(--steel); }
+
+.roll-breakdown {
+  font-size: .85rem;
+  text-align: center;
+  color: #5A4020;
+  margin-top: 4px;
+  font-style: italic;
+}
+.total-display {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  text-align: center;
+  margin-top: 8px;
+  padding: 6px;
+  border-radius: 3px;
+}
+.rs-att .total-display { background: var(--blood); color: var(--parch); }
+.rs-def .total-display { background: var(--steel); color: var(--parch); }
+
+.winner-crown {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 1.1rem;
+  opacity: 0;
+  transition: opacity .3s;
+}
+.winner-crown.visible { opacity: 1; }
+
+/* Outcome banner */
+.outcome-banner {
+  text-align: center;
+  padding: 12px;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  margin-bottom: 16px;
+  border: 1px solid;
+}
+.ob-win    { background: var(--victory-pale); color: var(--victory); border-color: var(--victory-lt); }
+.ob-tie    { background: #F5F0E0; color: var(--gold-dim); border-color: var(--gold); }
+
+/* Reroll banner */
+.reroll-banner {
+  display: none;
+  background: #F0EAF8;
+  border: 1px solid #8060A8;
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: .9rem;
+  color: #4A2A7A;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.reroll-btn {
+  font-family: 'Cinzel', serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  padding: 6px 12px;
+  background: #6A40A8;
+  color: var(--parch);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.reroll-btn:hover { background: #8060C0; }
+.reroll-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Winner choice */
+.choice-section {
+  background: var(--parch);
+  border: 1px solid var(--parch-dark);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.choice-title {
+  font-family: 'Cinzel', serif;
+  font-size: .7rem;
+  letter-spacing: .18em;
+  color: var(--gold-dim);
+  margin-bottom: 12px;
+}
+.choice-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.choice-btn {
+  padding: 10px 6px;
+  font-family: 'Cinzel', serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  border-radius: 4px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all .18s;
+  background: var(--parch-mid);
+}
+.cb-wound   { color: var(--blood); border-color: var(--blood); }
+.cb-wound:hover   { background: var(--blood-pale); }
+.cb-capture { color: var(--steel); border-color: var(--steel-lt); }
+.cb-capture:hover { background: #E8EEF8; }
+.cb-death   { color: #2A0808; border-color: #2A0808; background: var(--blood-pale); }
+.cb-death:hover   { background: #F0C8C8; }
+
+/* Wound result */
+.wound-result {
+  display: none;
+  background: var(--parch);
+  border: 1px solid var(--parch-dark);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.wound-die {
+  font-family: 'Cinzel', serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  text-align: center;
+  margin: 8px 0 4px;
+}
+.wound-severity {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+.sev-minor   { background: var(--victory-pale); color: var(--victory); }
+.sev-serious { background: #FFF8E0; color: #7A6008; }
+.sev-grievous{ background: #FCEEDE; color: #8B4A00; }
+.sev-mortal  { background: var(--blood-pale); color: var(--blood); }
+.wound-effect {
+  font-size: .9rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: var(--parch-mid);
+  border-radius: 3px;
+  border-left: 3px solid var(--parch-dark);
+}
+.recovery-note {
+  font-size: .82rem;
+  font-style: italic;
+  color: var(--blood);
+  margin-top: 6px;
+}
+
+/* Special outcomes */
+.special-card {
+  background: var(--parch);
+  border: 1px solid var(--parch-dark);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: .9rem;
+  color: var(--ink);
+  box-shadow: 0 2px 12px var(--shadow);
+  display: none;
+}
+.special-card.death-card {
+  background: #1A0808;
+  border-color: var(--blood);
+  color: var(--blood-pale);
+}
+.special-card.capture-card {
+  background: #E8EEF5;
+  border-color: var(--steel-lt);
+}
+
+/* Discord log */
+.log-section {
+  width: 100%;
+  max-width: 820px;
+  background: #1C1208;
+  border: 1px solid #3A2810;
+  border-radius: 4px;
+  padding: 14px;
+  margin-top: 8px;
+  display: none;
+}
+.log-title {
+  font-family: 'Cinzel', serif;
+  font-size: .6rem;
+  letter-spacing: .2em;
+  color: var(--gold-dim);
+  margin-bottom: 8px;
+}
+.log-text {
+  font-family: 'Courier New', monospace;
+  font-size: .78rem;
+  color: #C8B890;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.copy-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: .65rem;
+  letter-spacing: .15em;
+  color: var(--gold-dim);
+  background: transparent;
+  border: 1px solid #3A2810;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Reset */
+.reset-btn {
+  display: none;
+  width: 100%;
+  max-width: 820px;
+  padding: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: .68rem;
+  letter-spacing: .18em;
+  color: var(--gold-dim);
+  background: transparent;
+  border: 1px solid #3A2810;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all .2s;
+}
+.reset-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Spinning dice animation */
+@keyframes spinDie {
+  0%   { transform: rotate(0deg) scale(1.2); opacity: .7; }
+  50%  { transform: rotate(180deg) scale(0.8); opacity: 1; }
+  100% { transform: rotate(360deg) scale(1); opacity: 1; }
+}
+.rolling { animation: spinDie .4s ease-out; }
+
+@media (max-width: 640px) {
+  .arena { grid-template-columns: 1fr; }
+  .vs-divider { flex-direction: row; padding: 0; height: 40px; }
+  .vs-line { width: 40px; height: 1px; }
+  .result-fighters { grid-template-columns: 1fr; }
+  .choice-grid { grid-template-columns: 1fr; }
+  .cond-grid { grid-template-columns: 1fr; }
+}
+
+/* ══ UNIVERSAL REALMS NAV ══ */
+.ur-nav-shell {
+  height: 52px; display: flex; align-items: stretch;
+  background: #1a1208; border-bottom: 1px solid #2a1e0a;
+  position: relative; z-index: 1000; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+}
+.ur-nav-shell::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(184,134,11,0.4) 20%, rgba(184,134,11,0.4) 80%, transparent 100%);
+}
+.ur-logo-btn {
+  padding: 0 20px; display: flex; flex-direction: column;
+  justify-content: center; border-right: 1px solid rgba(255,255,255,0.06);
+  text-decoration: none; flex-shrink: 0; transition: background 0.15s;
+}
+.ur-logo-btn:hover { background: rgba(255,255,255,0.03); }
+.ur-logo-name {
+  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+  color: #f5edd8; letter-spacing: 2.5px; text-transform: uppercase; line-height: 1;
+}
+.ur-logo-tag {
+  font-family: 'EB Garamond', serif; font-size: 9px; color: #b8860b;
+  letter-spacing: 1.5px; margin-top: 3px; font-style: italic; opacity: 0.75;
+}
+.ur-nav-links {
+  display: flex; align-items: stretch; flex: 1;
+  padding: 0 4px; overflow-x: auto;
+}
+.ur-nav-links::-webkit-scrollbar { display: none; }
+.ur-nav-lnk {
+  display: flex; align-items: center; gap: 7px; padding: 0 13px;
+  font-family: 'EB Garamond', Georgia, serif; font-size: 13.5px; font-style: italic;
+  color: #9a8468; text-decoration: none;
+  border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
+}
+.ur-nav-lnk:hover { color: #e8d9bb; background: rgba(255,255,255,0.03); }
+.ur-nav-lnk.cur {
+  color: #d4ab55; border-bottom-color: #c99c3a;
+  font-style: normal; font-weight: 500; background: rgba(184,134,11,0.06);
+}
+.ur-nav-ic { font-size: 10px; opacity: 0.65; }
+.ur-nav-lnk.cur .ur-nav-ic { opacity: 1; }
+.ur-nav-right {
+  display: flex; align-items: center; padding: 0 16px; flex-shrink: 0;
+  border-left: 1px solid rgba(255,255,255,0.06); gap: 10px;
+}
+.ur-tool-tag {
+  font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: 2px;
+  text-transform: uppercase; padding: 4px 12px;
+  border: 1px solid; border-radius: 2px;
+}
+
+/* ── Duel Roller — UR Unified Theme ── */
+body {
+  font-family: 'EB Garamond', Georgia, serif !important;
+  background: var(--bg-void) !important;
+}
+.header h1 { font-family: var(--font-display) !important; color: var(--gold) !important; }
+.header p { font-family: var(--font-body) !important; font-style: italic; color: var(--gold-dim) !important; }
+.header-rule { background: linear-gradient(90deg, transparent, var(--gold), transparent) !important; }
+.fighter-card {
+  background: var(--parch) !important;
+  border-color: var(--parch-dark) !important;
+  font-family: var(--font-body) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-light) !important;
+}
+.field-label { font-family: var(--font-display) !important; letter-spacing: 0.12em; color: var(--ink-soft) !important; }
+input[type=text], input[type=number], select {
+  font-family: var(--font-body) !important;
+  background: var(--parch-mid) !important;
+  border-color: var(--parch-dark) !important;
+  color: var(--ink) !important;
+  border-radius: var(--radius-sm) !important;
+}
+input:focus, select:focus { border-color: var(--gold) !important; box-shadow: none !important; }
+.roll-btn {
+  font-family: var(--font-display) !important;
+  letter-spacing: 0.12em;
+  border-radius: var(--radius-sm) !important;
+}
+.result-section {
+  background: var(--parch) !important;
+  border-color: var(--parch-dark) !important;
+  border-radius: var(--radius-sm) !important;
+  font-family: var(--font-body) !important;
+}
+.traits-title, .conditions-title, .result-title, .choice-title {
+  font-family: var(--font-display) !important;
+  letter-spacing: 0.1em;
+}
+.trait-checkbox label { font-family: var(--font-body) !important; }
+
+</style>
+</head>
+<body>
+<div class="ur-nav-shell">
+  <a href="index.html" class="ur-logo-btn">
+    <div class="ur-logo-name">Universal Realms</div>
+    <div class="ur-logo-tag">World Engine</div>
+  </a>
+  <div class="ur-nav-links">
+    <a href="index.html"             class="ur-nav-lnk"><span class="ur-nav-ic">⌂</span>Dashboard</a>
+    <a href="character_creator.html" class="ur-nav-lnk "><span class="ur-nav-ic">◉</span>Characters</a>
+    <a href="battle_roller.html"     class="ur-nav-lnk "><span class="ur-nav-ic">⚔</span>Battle</a>
+    <a href="duel_roller.html"       class="ur-nav-lnk cur"><span class="ur-nav-ic">◈</span>Duel</a>
+    <a href="raid_roller.html"       class="ur-nav-lnk "><span class="ur-nav-ic">⚑</span>Raid</a>
+    <a href="chronicle_map.html"     class="ur-nav-lnk "><span class="ur-nav-ic">⊞</span>Chronicle Map</a>
+  </div>
+  <div class="ur-nav-right">
+    <div class="ur-tool-tag" style="color:#c04040;border-color:rgba(192,64,64,0.28);background:rgba(192,64,64,0.08)">Duel Roller</div>
+    <div id="ur-auth-nav"></div>
+  </div>
+</div>
+<!-- UNIVERSAL REALMS NAV SHELL -->
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+:root{
+  --ink-800:#2a1c0d;--ink-700:#3d2b14;
+  --parch-100:#fdf8ef;--parch-200:#f5edd8;--parch-300:#ecdcc0;
+  --gold-300:#d4ab55;--gold-400:#c99c3a;--gold-500:#b8892a;
+  --gold-border:rgba(184,137,42,0.28);--gold-100:rgba(184,137,42,0.10);
+  --text-muted:#8a7055;--border-mid:rgba(142,108,58,0.24);
+  --font-display:'Cinzel',serif;--font-body:'EB Garamond',Georgia,serif;
+}
+.ur-nav{
+  display:flex;align-items:stretch;height:50px;
+  background:var(--ink-800);border-bottom:1px solid var(--ink-700);
+  position:sticky;top:0;z-index:1000;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+.ur-nav::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,137,42,0.35) 20%,rgba(184,137,42,0.35) 80%,transparent);
+  pointer-events:none;
+}
+.ur-logo{
+  padding:0 20px;display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid rgba(255,255,255,0.06);text-decoration:none;
+  flex-shrink:0;transition:background 0.15s;
+}
+.ur-logo:hover{background:rgba(255,255,255,0.03);}
+.ur-logo-mark{
+  font-family:var(--font-display);font-size:12px;font-weight:600;
+  color:#f5edd8;letter-spacing:2.5px;text-transform:uppercase;line-height:1;
+}
+.ur-logo-sub{
+  font-family:var(--font-body);font-size:9px;color:var(--gold-500);
+  letter-spacing:1.5px;margin-top:3px;font-style:italic;opacity:0.7;
+}
+.ur-nav-links{display:flex;align-items:stretch;flex:1;padding:0 4px;overflow-x:auto;}
+.ur-nav-links::-webkit-scrollbar{display:none;}
+.ur-nav-link{
+  display:flex;align-items:center;gap:6px;padding:0 14px;
+  font-family:var(--font-body);font-size:13px;font-style:italic;
+  color:#9a8468;text-decoration:none;border-bottom:2px solid transparent;
+  transition:all 0.15s;white-space:nowrap;
+}
+.ur-nav-link:hover{color:#e8d9bb;background:rgba(255,255,255,0.03);}
+.ur-nav-link.active{
+  color:var(--gold-300);border-bottom-color:var(--gold-400);
+  font-style:normal;font-weight:500;background:rgba(184,137,42,0.06);
+}
+.ur-nav-icon{font-size:10px;opacity:0.7;}
+.ur-nav-link.active .ur-nav-icon{opacity:1;}
+.ur-nav-right{
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.06);
+}
+.ur-home-btn{
+  font-family:var(--font-display);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold-400);text-decoration:none;
+  padding:6px 14px;border:1px solid var(--gold-border);border-radius:2px;
+  background:rgba(184,137,42,0.08);transition:all 0.15s;white-space:nowrap;
+}
+.ur-home-btn:hover{background:rgba(184,137,42,0.15);color:var(--gold-300);}
+</style>
+
+<script>
+  (function(){
+    var el = document.getElementById('nav-duel');
+    if (el) el.classList.add('active');
+  })();
+</script>
+
+
+<div class="header">
+  <div class="header-rule"></div>
+  <h1>⚔ DUEL ROLLER ⚔</h1>
+  <p>Universal Realms — Anno Domini 1066</p>
+  <div class="header-rule" style="margin-top:14px;"></div>
+</div>
+
+<!-- Arena -->
+<div class="arena">
+  <!-- Fighter A -->
+  <div class="fighter-card card-a">
+    <div class="fighter-label">⚔ CHALLENGER</div>
+    <input class="name-input" id="a-name" type="text" placeholder="Name of challenger…" oninput="updateBonus('a')">
+
+    <span class="field-label">PERSONAL COMBAT SCORE</span>
+    <div class="pc-row">
+      <input class="pc-input" id="a-pc" type="number" min="1" max="20" value="12" oninput="updateBonus('a')">
+      <div>
+        <div class="pc-tier" id="a-tier">Average</div>
+        <div style="font-size:.76rem;color:#8B6040;font-style:italic;" id="a-tier-note">No duel modifier</div>
+      </div>
+      <div class="pc-bonus bonus-zero" id="a-bonus">+0</div>
+    </div>
+
+    <div class="traits-section">
+      <div class="traits-title">TRAITS & CONDITIONS</div>
+
+      <label class="trait-check">
+        <input type="checkbox" id="a-iron" onchange="updateBonus('a')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+1</span> Iron Constitution
+          <span class="trait-cond">All personal combat rolls</span></div>
+      </label>
+
+      <label class="trait-check">
+        <input type="checkbox" id="a-drilled" onchange="updateBonus('a')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+2</span> Drilled from Birth
+          <span class="trait-cond">Duels specifically</span></div>
+      </label>
+
+      <label class="trait-check">
+        <input type="checkbox" id="a-duelist" onchange="updateBonus('a')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+3</span> Duelist (Combat Trait)
+          <span class="trait-cond">+ one forced re-roll of opponent's die</span></div>
+      </label>
+
+      <label class="trait-check">
+        <input type="checkbox" id="a-backstabber" onchange="updateBonus('a')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+1</span> Backstabber
+          <span class="trait-cond">Only if target is unsuspecting</span></div>
+      </label>
+
+      <label class="trait-check">
+        <input type="checkbox" id="a-surprise" onchange="updateBonus('a')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+2</span> Surprise attack
+          <span class="trait-cond">First roll only — Intrigue-triggered</span></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- VS -->
+  <div class="vs-divider">
+    <div class="vs-line"></div>
+    <div class="vs-text">VS</div>
+    <div class="vs-line"></div>
+  </div>
+
+  <!-- Fighter B -->
+  <div class="fighter-card card-b">
+    <div class="fighter-label" style="color:var(--steel-lt);">🛡 DEFENDANT</div>
+    <input class="name-input" id="b-name" type="text" placeholder="Name of defendant…" oninput="updateBonus('b')">
+
+    <span class="field-label">PERSONAL COMBAT SCORE</span>
+    <div class="pc-row">
+      <input class="pc-input" id="b-pc" type="number" min="1" max="20" value="10" oninput="updateBonus('b')">
+      <div>
+        <div class="pc-tier" id="b-tier">Average</div>
+        <div style="font-size:.76rem;color:#8B6040;font-style:italic;" id="b-tier-note">No duel modifier</div>
+      </div>
+      <div class="pc-bonus bonus-zero" id="b-bonus">+0</div>
+    </div>
+
+    <div class="traits-section">
+      <div class="traits-title">TRAITS & CONDITIONS</div>
+
+      <label class="trait-check">
+        <input type="checkbox" id="b-iron" onchange="updateBonus('b')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+1</span> Iron Constitution
+          <span class="trait-cond">All personal combat rolls</span></div>
+      </label>
+
+      <label class="trait-check">
+        <input type="checkbox" id="b-drilled" onchange="updateBonus('b')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+2</span> Drilled from Birth
+          <span class="trait-cond">Duels specifically</span></div>
+      </label>
+
+      <label class="trait-check">
+        <input type="checkbox" id="b-shield" onchange="updateBonus('b')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+1</span> Shield Trained
+          <span class="trait-cond">Defender only — challenger cannot take this</span></div>
+      </label>
+
+      <label class="trait-check">
+        <input type="checkbox" id="b-duelist" onchange="updateBonus('b')">
+        <div class="trait-box">✓</div>
+        <div class="trait-text"><span class="trait-bonus">+3</span> Duelist (Combat Trait)
+          <span class="trait-cond">+ one forced re-roll of opponent's die</span></div>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Conditions -->
+<div class="conditions">
+  <div class="conditions-title">SPECIAL CONDITIONS</div>
+  <div class="cond-grid">
+    <label class="trait-check">
+      <input type="checkbox" id="cond-public">
+      <div class="trait-box">✓</div>
+      <div class="trait-text">Public duel — witnesses present
+        <span class="trait-cond">Loser's player may appeal for mercy. Killing without mercy has social cost.</span></div>
+    </label>
+    <label class="trait-check">
+      <input type="checkbox" id="cond-champion">
+      <div class="trait-box">✓</div>
+      <div class="trait-text">Champion fight — rolling on behalf of another
+        <span class="trait-cond">Champion's traits apply. Wound affects the champion only.</span></div>
+    </label>
+  </div>
+</div>
+
+<button class="roll-btn" onclick="rollDuel()">⚔ RESOLVE THE DUEL ⚔</button>
+
+<!-- Result Panel -->
+<div id="result-panel">
+
+  <!-- Fighter result cards -->
+  <div class="result-fighters" id="result-fighters"></div>
+
+  <!-- Outcome -->
+  <div class="outcome-banner" id="outcome-banner"></div>
+
+  <!-- Duelist re-roll notice -->
+  <div class="reroll-banner" id="reroll-banner" style="display:none">
+    <span id="reroll-text"></span>
+    <button class="reroll-btn" id="reroll-btn" onclick="executeReroll()">USE RE-ROLL ▶</button>
+  </div>
+
+  <!-- Winner's choice -->
+  <div class="choice-section" id="choice-section" style="display:none">
+    <div class="choice-title" id="choice-title">WINNER CHOOSES THE OUTCOME</div>
+    <div class="choice-grid">
+      <button class="choice-btn cb-wound"   onclick="chooseOutcome('wound')">⚔ Wound<br><small style="font-weight:400;font-size:.65rem">Roll D6 severity</small></button>
+      <button class="choice-btn cb-capture" onclick="chooseOutcome('capture')">⛓ Capture<br><small style="font-weight:400;font-size:.65rem">Terms by mod</small></button>
+      <button class="choice-btn cb-death"   onclick="chooseOutcome('death')">☠ Death<br><small style="font-weight:400;font-size:.65rem">Permanent</small></button>
+    </div>
+    <div id="mercy-note" style="display:none;margin-top:8px;font-size:.82rem;font-style:italic;color:var(--blood);">
+      ⚠ Public duel — loser may appeal for mercy. Death carries social consequences.
+    </div>
+  </div>
+
+  <!-- Wound result -->
+  <div class="wound-result" id="wound-result"></div>
+
+  <!-- Special cards -->
+  <div class="special-card" id="special-card"></div>
+
+  <!-- Discord log -->
+  <div class="log-section" id="log-section">
+    <div class="log-title">DISCORD OUTPUT</div>
+    <div class="log-text" id="log-text"></div>
+    <button class="copy-btn" onclick="copyLog()">📋 COPY TO DISCORD</button>
+  </div>
+
+</div>
+
+<button class="reset-btn" id="reset-btn" onclick="resetDuel()">↺ NEW DUEL</button>
+
+<script>
+// ── State ─────────────────────────────────────────────────────
+let state = {
+  aRaw: 0, bRaw: 0,
+  aTotal: 0, bTotal: 0,
+  aBonus: 0, bBonus: 0,
+  winner: null, loser: null,
+  winnerName: '', loserName: '',
+  aName: '', bName: '',
+  aDuelistUnused: false, bDuelistUnused: false,
+  surpriseUsed: false,
+  log: [],
+};
+
+// ── Helpers ───────────────────────────────────────────────────
+const gi  = id => parseInt(document.getElementById(id)?.value) || 0;
+const gc  = id => document.getElementById(id)?.checked || false;
+const gs  = id => document.getElementById(id)?.value || '';
+const el  = id => document.getElementById(id);
+const d20 = () => Math.floor(Math.random() * 20) + 1;
+const d6  = () => Math.floor(Math.random() * 6)  + 1;
+
+function pcTier(pc) {
+  if (pc >= 16) return { label: 'Elite',   note: '+4 duel bonus',        cls: 'bonus-high', mod: 4 };
+  if (pc >= 10) return { label: 'Average', note: 'No duel modifier',     cls: 'bonus-zero', mod: 0 };
+  return               { label: 'Poor',    note: '−1 duel modifier',     cls: 'bonus-neg',  mod: -1 };
+}
+
+function calcBonus(p) {
+  const pc  = gi(`${p}-pc`);
+  const tier = pcTier(pc);
+  let bonus = tier.mod;
+  if (gc(`${p}-iron`))       bonus += 1;
+  if (gc(`${p}-drilled`))    bonus += 2;
+  if (gc(`${p}-duelist`))    bonus += 3;
+  if (p === 'a' && gc('a-backstabber')) bonus += 1;
+  if (p === 'b' && gc('b-shield'))      bonus += 1;
+  if (p === 'a' && gc('a-surprise'))    bonus += 2; // first roll
+  return { bonus, tier };
+}
+
+function updateBonus(p) {
+  const { bonus, tier } = calcBonus(p);
+  const bonusEl = el(`${p}-bonus`);
+  el(`${p}-tier`).textContent = tier.label;
+  el(`${p}-tier-note`).textContent = tier.note;
+  bonusEl.textContent = (bonus >= 0 ? '+' : '') + bonus;
+  bonusEl.className = 'pc-bonus ' + tier.cls;
+}
+
+// ── Main Roll ─────────────────────────────────────────────────
+function rollDuel() {
+  const aName = gs('a-name') || 'Challenger';
+  const bName = gs('b-name') || 'Defendant';
+  const { bonus: aBonusFull, tier: aTier } = calcBonus('a');
+  const bBonusFull = calcBonus('b').bonus;
+  // Surprise only applies to first roll; it's included in calcBonus('a')
+  const surpriseActive = gc('a-surprise');
+  const aDuelist = gc('a-duelist');
+  const bDuelist = gc('b-duelist');
+
+  state.log = [];
+  state.aName = aName;
+  state.bName = bName;
+  state.aDuelistUnused = aDuelist;
+  state.bDuelistUnused = bDuelist;
+  state.surpriseActive = surpriseActive;
+
+  // Roll
+  const aRaw = d20();
+  const bRaw = d20();
+  const aBonus = aBonusFull;
+  const bBonus = bBonusFull;
+  const aTotal = aRaw + aBonus;
+  const bTotal = bRaw + bBonus;
+
+  state.aRaw = aRaw; state.bRaw = bRaw;
+  state.aBonus = aBonus; state.bBonus = bBonus;
+  state.aTotal = aTotal; state.bTotal = bTotal;
+
+  // Log opening
+  const surpriseNote = surpriseActive ? ` (incl. surprise +2 first roll)` : '';
+  state.log.push(`**⚔ DUEL — ${aName} vs ${bName}**`);
+  state.log.push(`**${aName}:** PC ${gi('a-pc')} (${aTier.label}) · modifier ${aBonus >= 0 ? '+' : ''}${aBonus}${surpriseNote} · rolled **${aRaw}** → total **${aTotal}**`);
+  state.log.push(`**${bName}:** PC ${gi('b-pc')} (${calcBonus('b').tier.label}) · modifier ${bBonus >= 0 ? '+' : ''}${bBonus} · rolled **${bRaw}** → total **${bTotal}**`);
+
+  renderFighters(aName, bName, aRaw, aBonus, aTotal, bRaw, bBonus, bTotal);
+  resolveResult(aName, bName, aTotal, bTotal);
+
+  el('result-panel').style.display = 'block';
+  el('result-panel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderFighters(aName, bName, aRaw, aBonus, aTotal, bRaw, bBonus, bTotal) {
+  const aWin = aTotal > bTotal;
+  const bWin = bTotal > aTotal;
+  const buildSide = (name, raw, bonus, total, win, side) => `
+    <div class="result-side rs-${side} ${win ? 'rs-win' : ''}">
+      <div class="winner-crown ${win ? 'visible' : ''}">👑</div>
+      <div class="rs-name">${side === 'att' ? '⚔' : '🛡'} ${name}</div>
+      <div class="dice-display rolling">⚅ ${raw}</div>
+      <div class="roll-breakdown">${raw} ${bonus >= 0 ? '+' : ''}${bonus} modifier</div>
+      <div class="total-display">${total}</div>
+    </div>`;
+  el('result-fighters').innerHTML =
+    buildSide(aName, aRaw, aBonus, aTotal, aWin, 'att') +
+    buildSide(bName, bRaw, bBonus, bTotal, bWin, 'def');
+}
+
+function resolveResult(aName, bName, aTotal, bTotal) {
+  const tied = aTotal === bTotal;
+  const aWins = aTotal > bTotal;
+
+  if (tied) {
+    state.winner = null;
+    el('outcome-banner').className = 'outcome-banner ob-tie';
+    el('outcome-banner').textContent = `⚔ TIE — ${aTotal} vs ${bTotal} — Re-roll required`;
+    state.log.push(`**Result: TIE (${aTotal} vs ${bTotal}) — re-roll both dice**`);
+    el('reroll-banner').style.display = 'none';
+    el('choice-section').style.display = 'none';
+
+    // Show a re-roll tie button
+    const rb = el('reroll-banner');
+    rb.style.display = 'flex';
+    el('reroll-text').textContent = 'A tie — both fighters clash again.';
+    const btn = el('reroll-btn');
+    btn.textContent = 'RE-ROLL TIE ▶';
+    btn.onclick = rerollTie;
+    btn.disabled = false;
+    state.aDuelistUnused = gc('a-duelist');
+    state.bDuelistUnused = gc('b-duelist');
+    return;
+  }
+
+  state.winner = aWins ? 'a' : 'b';
+  state.loser  = aWins ? 'b' : 'a';
+  state.winnerName = aWins ? aName : bName;
+  state.loserName  = aWins ? bName : aName;
+
+  el('outcome-banner').className = 'outcome-banner ob-win';
+  el('outcome-banner').textContent = `${state.winnerName} WINS — ${Math.max(aTotal,bTotal)} vs ${Math.min(aTotal,bTotal)}`;
+  state.log.push(`**${state.winnerName} WINS** (${Math.max(aTotal,bTotal)} vs ${Math.min(aTotal,bTotal)})`);
+
+  // Check if loser has unused Duelist re-roll
+  const loserHasDuelist = state.loser === 'a' ? gc('a-duelist') : gc('b-duelist');
+  const winnerHasDuelist = state.winner === 'a' ? gc('a-duelist') : gc('b-duelist');
+
+  // Winner Duelist: force opponent re-roll
+  if (winnerHasDuelist) {
+    const rb = el('reroll-banner');
+    rb.style.display = 'flex';
+    el('reroll-text').textContent = `${state.winnerName} has the Duelist trait — may force ${state.loserName} to re-roll their die once.`;
+    const btn = el('reroll-btn');
+    btn.textContent = 'FORCE RE-ROLL ▶';
+    btn.onclick = executeDuelistReroll;
+    btn.disabled = false;
+    state.winnerDuelistUsed = false;
+  } else {
+    el('reroll-banner').style.display = 'none';
+  }
+
+  showChoiceSection();
+}
+
+function executeDuelistReroll() {
+  // Winner forces loser to re-roll their die
+  const loserWas = state.loser === 'a' ? state.aRaw : state.bRaw;
+  const newRoll = d20();
+  const loserBonus = state.loser === 'a' ? state.aBonus : state.bBonus;
+  const newTotal = newRoll + loserBonus;
+  state.log.push(`**Duelist re-roll forced:** ${state.loserName} rolled ${loserWas}, now re-rolls → **${newRoll}** (total ${newTotal})`);
+
+  // Update loser's state
+  if (state.loser === 'a') { state.aRaw = newRoll; state.aTotal = newTotal; }
+  else { state.bRaw = newRoll; state.bTotal = newTotal; }
+
+  el('reroll-btn').disabled = true;
+  el('reroll-text').textContent = `Re-roll used. ${state.loserName} rolled ${newRoll} (total ${newTotal}).`;
+
+  // Re-render
+  const aWins = state.aTotal > state.bTotal;
+  const tied  = state.aTotal === state.bTotal;
+  if (tied) {
+    el('outcome-banner').className = 'outcome-banner ob-tie';
+    el('outcome-banner').textContent = `TIE even after re-roll — ${state.aTotal} vs ${state.bTotal} — mod resolves`;
+    state.log.push(`**Still tied after re-roll — mod discretion.**`);
+  } else {
+    const newWinner = aWins ? state.aName : state.bName;
+    const newLoser  = aWins ? state.bName : state.aName;
+    el('outcome-banner').textContent = `${newWinner} WINS — ${Math.max(state.aTotal,state.bTotal)} vs ${Math.min(state.aTotal,state.bTotal)}`;
+    state.winnerName = newWinner; state.loserName = newLoser;
+    state.winner = aWins ? 'a' : 'b'; state.loser = aWins ? 'b' : 'a';
+    state.log.push(`**After re-roll: ${newWinner} wins.**`);
+    el('choice-title').textContent = `${newWinner.toUpperCase()} CHOOSES THE OUTCOME`;
+  }
+  renderFighters(state.aName, state.bName, state.aRaw, state.aBonus, state.aTotal, state.bRaw, state.bBonus, state.bTotal);
+}
+
+function rerollTie() {
+  el('reroll-btn').disabled = true;
+  const aRaw = d20(); const bRaw = d20();
+  const aTotal = aRaw + state.aBonus;
+  const bTotal = bRaw + state.bBonus;
+  state.aRaw = aRaw; state.bRaw = bRaw;
+  state.aTotal = aTotal; state.bTotal = bTotal;
+  state.log.push(`**Re-roll (tie): ${state.aName} rolls ${aRaw} (total ${aTotal}) · ${state.bName} rolls ${bRaw} (total ${bTotal})**`);
+  renderFighters(state.aName, state.bName, aRaw, state.aBonus, aTotal, bRaw, state.bBonus, bTotal);
+  resolveResult(state.aName, state.bName, aTotal, bTotal);
+}
+
+function executeReroll() { executeDuelistReroll(); }
+
+function showChoiceSection() {
+  const cs = el('choice-section');
+  cs.style.display = 'block';
+  el('choice-title').textContent = `${state.winnerName.toUpperCase()} CHOOSES THE OUTCOME`;
+  const isPublic = gc('cond-public');
+  el('mercy-note').style.display = isPublic ? 'block' : 'none';
+}
+
+// ── Outcome choices ───────────────────────────────────────────
+function chooseOutcome(choice) {
+  el('choice-section').style.display = 'none';
+  el('reroll-banner').style.display = 'none';
+  el('reset-btn').style.display = 'block';
+
+  if (choice === 'wound') {
+    const roll = d6();
+    let severity, cls, effect, recovery = '', logLine;
+
+    if (roll <= 2) {
+      severity = 'MINOR WOUND'; cls = 'sev-minor';
+      effect = '−1 to Martial or Intrigue for 1 month. Full recovery — no roll required.';
+      logLine = 'Minor Wound — −1 Martial/Intrigue for 1 month';
+    } else if (roll <= 4) {
+      severity = 'SERIOUS WOUND'; cls = 'sev-serious';
+      effect = 'Cannot lead armies in person for 2 months. −2 to physical stat rolls.';
+      recovery = 'Recovery roll required: D20 vs 10.';
+      logLine = 'Serious Wound — cannot lead armies 2 months, −2 physical rolls, D20 vs 10 recovery';
+    } else if (roll === 5) {
+      severity = 'GRIEVOUS WOUND'; cls = 'sev-grievous';
+      effect = 'Incapacitated for 1 full month. −3 to all stats for 2 months after that.';
+      recovery = 'Recovery roll required: D20 vs 12.';
+      logLine = 'Grievous Wound — incapacitated 1 month, −3 all stats 2 months, D20 vs 12 recovery';
+    } else {
+      severity = 'MORTAL WOUND'; cls = 'sev-mortal';
+      effect = `${state.loserName} is dying. They must pass a D20 vs 15 recovery roll this same turn to survive.`;
+      recovery = 'A Physician present adds +2 to the recovery roll.';
+      logLine = 'Mortal Wound — D20 vs 15 to survive this turn. Physician adds +2.';
+    }
+
+    state.log.push(`**${state.winnerName} chooses: Wound**`);
+    state.log.push(`**Wound D6 roll: ${roll} → ${severity}**`);
+    state.log.push(`${state.loserName}: ${logLine}`);
+
+    const wr = el('wound-result');
+    wr.style.display = 'block';
+    wr.innerHTML = `
+      <div style="font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.18em;color:var(--gold-dim);margin-bottom:4px;">WOUND SEVERITY — D6 ROLL</div>
+      <div class="wound-die">⚄ ${roll}</div>
+      <div class="wound-severity ${cls}">${severity}</div>
+      <div class="wound-effect">${effect}</div>
+      ${recovery ? `<div class="recovery-note">${recovery}</div>` : ''}
+    `;
+
+  } else if (choice === 'capture') {
+    state.log.push(`**${state.winnerName} chooses: Capture**`);
+    state.log.push(`${state.loserName} is taken prisoner. Terms to be negotiated by the mod.`);
+    const sc = el('special-card');
+    sc.className = 'special-card capture-card';
+    sc.style.display = 'block';
+    sc.innerHTML = `
+      <div style="font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.15em;color:var(--steel);margin-bottom:8px;">⛓ PRISONER TAKEN</div>
+      <div style="font-size:.92rem;color:var(--ink);line-height:1.5;">
+        <b>${state.loserName}</b> is taken captive. The mod determines ransom value, conditions of imprisonment, and any political implications.
+        <div style="margin-top:8px;font-style:italic;color:#5A6A7A;">The loser's player may submit an appeal for terms in #character-actions.</div>
+      </div>`;
+
+  } else if (choice === 'death') {
+    const isPublic = gc('cond-public');
+    state.log.push(`**${state.winnerName} chooses: Death**`);
+    state.log.push(`☠ ${state.loserName} is slain. This is permanent — dynasty succession rules apply.`);
+    if (isPublic) state.log.push(`⚠ Public duel — killing a surrendered opponent carries social consequences. Mod notes this.`);
+    const sc = el('special-card');
+    sc.className = 'special-card death-card';
+    sc.style.display = 'block';
+    sc.innerHTML = `
+      <div style="font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.15em;color:var(--blood-lt);margin-bottom:8px;">☠ SLAIN</div>
+      <div style="font-size:.92rem;line-height:1.5;">
+        <b>${state.loserName}</b> is dead. This outcome is permanent.<br>
+        <div style="margin-top:8px;color:#F0A0A0;font-style:italic;">Dynasty succession rules apply. If ${state.loserName} had a designated heir, they inherit. If not, a succession crisis begins.</div>
+        ${isPublic ? `<div style="margin-top:8px;color:var(--blood-lt);font-size:.85rem;">⚠ This was a public duel. Killing without mercy before witnesses will be noted by the mod and may affect diplomacy with factions who respected ${state.loserName}.</div>` : ''}
+      </div>`;
+  }
+
+  // Build and show log
+  const ts = new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  const isPublic = gc('cond-public');
+  const isChampion = gc('cond-champion');
+  const flagLine = [isPublic ? '🔓 Public duel' : null, isChampion ? '🛡 Champion fight' : null].filter(Boolean).join(' · ');
+  const fullLog = [
+    `**⚔ DUEL RESOLVED — ${state.aName} vs ${state.bName}**`,
+    `_${ts}_${flagLine ? ' · ' + flagLine : ''}`,
+    '',
+    ...state.log.slice(1),
+  ].join('\n');
+
+  el('log-text').textContent = fullLog;
+  el('log-section').style.display = 'block';
+}
+
+function copyLog() {
+  const txt = el('log-text').textContent;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(txt).then(() => flashCopy());
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    flashCopy();
+  }
+}
+function flashCopy() {
+  const b = document.querySelector('.copy-btn');
+  b.textContent = '✓ COPIED';
+  setTimeout(() => b.textContent = '📋 COPY TO DISCORD', 2000);
+}
+
+function resetDuel() {
+  el('result-panel').style.display = 'none';
+  el('wound-result').style.display = 'none';
+  el('special-card').style.display = 'none';
+  el('log-section').style.display = 'none';
+  el('choice-section').style.display = 'none';
+  el('reroll-banner').style.display = 'none';
+  el('reset-btn').style.display = 'none';
+  el('result-fighters').innerHTML = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Init
+updateBonus('a'); updateBonus('b');
+</script>
+<script src="/js/ur-auth.js"></script>
+</body>
+</html>

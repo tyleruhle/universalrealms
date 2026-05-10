@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Universal Realms — World Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100vh; }
+
+    :root {
+      --ink-900:    #1c1208;
+      --ink-800:    #2a1c0d;
+      --ink-700:    #3d2b14;
+      --ink-600:    #52391d;
+      --parch-100:  #fdf8ef;
+      --parch-200:  #f5edd8;
+      --parch-300:  #ecdcc0;
+      --parch-400:  #dfc9a4;
+      --gold-300:   #d4ab55;
+      --gold-400:   #c99c3a;
+      --gold-500:   #b8892a;
+      --gold-600:   #8b6520;
+      --gold-border:rgba(184,137,42,0.28);
+      --gold-glow:  rgba(184,137,42,0.10);
+      --text-strong:#1c1208;
+      --text-body:  #2a1c0d;
+      --text-second:#52391d;
+      --text-muted: #8a7055;
+      --text-faint: #b0986e;
+      --surface:    #fdf8ef;
+      --surface-2:  #f7f0e0;
+      --surface-3:  #f0e6ce;
+      --border-xs:  rgba(142,108,58,0.10);
+      --border-sm:  rgba(142,108,58,0.16);
+      --border-md:  rgba(142,108,58,0.26);
+      --border-lg:  rgba(142,108,58,0.42);
+      --font-d:     'Cinzel', serif;
+      --font-b:     'EB Garamond', Georgia, serif;
+    }
+
+    body { font-family: var(--font-b); background: var(--parch-300); color: var(--text-body); }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-repeat: repeat; mix-blend-mode: multiply;
+    }
+
+    /* ── NAV ── */
+    .ur-nav-shell {
+      height: 52px; display: flex; align-items: stretch;
+      background: var(--ink-800); border-bottom: 1px solid var(--ink-700);
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+    }
+    .ur-nav-shell::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold-border) 20%, var(--gold-border) 80%, transparent 100%);
+      pointer-events: none;
+    }
+    .ur-logo-btn {
+      padding: 0 22px; display: flex; flex-direction: column; justify-content: center;
+      border-right: 1px solid rgba(255,255,255,0.06); text-decoration: none;
+      flex-shrink: 0; transition: background 0.15s;
+    }
+    .ur-logo-btn:hover { background: rgba(255,255,255,0.03); }
+    .ur-logo-name {
+      font-family: var(--font-d); font-size: 12px; font-weight: 600;
+      color: var(--parch-200); letter-spacing: 2.5px; text-transform: uppercase; line-height: 1;
+    }
+    .ur-logo-tag {
+      font-family: var(--font-b); font-size: 9px; color: var(--gold-500);
+      letter-spacing: 1.5px; margin-top: 3px; font-style: italic; opacity: 0.75;
+    }
+    .ur-nav-links { display: flex; align-items: stretch; flex: 1; padding: 0 4px; overflow-x: auto; }
+    .ur-nav-links::-webkit-scrollbar { display: none; }
+    .ur-nav-lnk {
+      display: flex; align-items: center; gap: 7px; padding: 0 14px;
+      font-family: var(--font-b); font-size: 13.5px; font-style: italic;
+      color: #9a8468; text-decoration: none;
+      border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
+    }
+    .ur-nav-lnk:hover { color: #e8d9bb; background: rgba(255,255,255,0.03); }
+    .ur-nav-lnk.cur {
+      color: var(--gold-300); border-bottom-color: var(--gold-400);
+      font-style: normal; font-weight: 500; background: var(--gold-glow);
+    }
+    .ur-nav-ic { font-size: 10px; opacity: 0.65; }
+    .ur-nav-lnk.cur .ur-nav-ic { opacity: 1; }
+    .ur-nav-right {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 18px; flex-shrink: 0;
+      border-left: 1px solid rgba(255,255,255,0.06);
+    }
+    .ur-tool-tag {
+      font-family: var(--font-d); font-size: 8.5px; letter-spacing: 2px;
+      text-transform: uppercase; padding: 5px 14px;
+      border: 1px solid var(--gold-border);
+      border-radius: 2px; color: var(--gold-400); background: var(--gold-glow);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      background: linear-gradient(180deg, var(--parch-200) 0%, var(--parch-100) 100%);
+      border-bottom: 1px solid var(--border-sm);
+      padding: 64px 24px 56px; text-align: center; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background-image: radial-gradient(ellipse at 50% 0%, rgba(184,137,42,0.06) 0%, transparent 60%);
+    }
+    .hero-eyebrow {
+      font-family: var(--font-d); font-size: 9px; letter-spacing: 5px;
+      color: var(--gold-500); text-transform: uppercase; opacity: 0.7; margin-bottom: 20px;
+    }
+    .hero-title {
+      font-family: var(--font-d); font-size: clamp(28px, 5vw, 48px); font-weight: 600;
+      color: var(--text-strong); letter-spacing: 5px; text-transform: uppercase;
+      line-height: 1.15; margin-bottom: 6px;
+    }
+    .hero-title-sub {
+      font-family: var(--font-d); font-size: clamp(11px, 2vw, 14px); font-weight: 400;
+      color: var(--gold-600); letter-spacing: 4px; text-transform: uppercase;
+      margin-bottom: 24px; opacity: 0.8;
+    }
+    .hero-divider {
+      display: flex; align-items: center; gap: 14px;
+      max-width: 400px; margin: 0 auto 24px;
+    }
+    .hero-divider::before, .hero-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border-md);
+    }
+    .hero-divider span { font-size: 11px; color: var(--gold-500); opacity: 0.6; letter-spacing: 2px; }
+    .hero-desc {
+      font-family: var(--font-b); font-size: 17px; font-style: italic;
+      color: var(--text-muted); max-width: 580px; margin: 0 auto 36px; line-height: 1.75;
+    }
+    .hero-stats {
+      display: flex; justify-content: center;
+      max-width: 440px; margin: 0 auto;
+      border: 1px solid var(--border-sm); border-radius: 3px;
+      overflow: hidden; background: var(--surface);
+    }
+    .hero-stat {
+      flex: 1; padding: 14px 20px; text-align: center;
+      border-right: 1px solid var(--border-sm);
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat-num {
+      font-family: var(--font-d); font-size: 20px; font-weight: 600;
+      color: var(--gold-500); line-height: 1; margin-bottom: 4px;
+    }
+    .hero-stat-label {
+      font-family: var(--font-d); font-size: 7.5px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-faint);
+    }
+
+    /* ── CONTENT ── */
+    .content { position: relative; z-index: 1; max-width: 1020px; margin: 0 auto; padding: 48px 28px 72px; }
+
+    .sec-hdr { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+    .sec-hdr-label {
+      font-family: var(--font-d); font-size: 8.5px; letter-spacing: 3.5px;
+      color: var(--gold-500); text-transform: uppercase; white-space: nowrap; opacity: 0.9;
+    }
+    .sec-hdr-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-md), transparent); }
+
+    /* ── TOOL GRID ── */
+    .tool-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px; margin-bottom: 52px;
+    }
+    .tool-card {
+      background: var(--surface); border: 1px solid var(--border-sm); border-radius: 3px;
+      padding: 22px 22px 18px; text-decoration: none;
+      display: flex; flex-direction: column; transition: all 0.2s ease;
+      position: relative; overflow: hidden;
+    }
+    .tool-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--tc, var(--gold-400)); opacity: 0.45; transition: opacity 0.2s;
+    }
+    .tool-card:hover {
+      border-color: var(--border-lg); background: var(--surface-2);
+      transform: translateY(-2px); box-shadow: 0 8px 24px rgba(28,18,8,0.12);
+    }
+    .tool-card:hover::before { opacity: 0.9; }
+    .tc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .tc-icon { font-size: 22px; opacity: 0.45; line-height: 1; transition: opacity 0.2s; }
+    .tool-card:hover .tc-icon { opacity: 0.7; }
+    .tc-badge {
+      font-family: var(--font-d); font-size: 7px; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 3px 8px;
+      border: 1px solid; border-radius: 2px;
+    }
+    .tc-badge.live { border-color: rgba(74,138,74,0.3); color: #4a6a4a; background: rgba(74,138,74,0.07); }
+    .tc-name {
+      font-family: var(--font-d); font-size: 11.5px; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text-strong); margin-bottom: 8px; font-weight: 500;
+    }
+    .tc-desc {
+      font-family: var(--font-b); font-size: 14px; font-style: italic;
+      color: var(--text-muted); line-height: 1.7; flex: 1; margin-bottom: 14px;
+    }
+    .tc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 16px; }
+    .tc-tag {
+      font-family: var(--font-d); font-size: 7px; letter-spacing: 1px;
+      text-transform: uppercase; padding: 3px 8px;
+      border: 1px solid var(--border-sm); border-radius: 2px; color: var(--text-muted);
+    }
+    .tc-cta {
+      font-family: var(--font-d); font-size: 8.5px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gold-500);
+      display: flex; align-items: center; gap: 6px;
+      padding-top: 12px; border-top: 1px solid var(--border-xs); transition: color 0.15s;
+    }
+    .tool-card:hover .tc-cta { color: var(--gold-400); }
+
+    /* ── ROADMAP ── */
+    .roadmap-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px; margin-bottom: 52px;
+    }
+    .roadmap-item {
+      background: var(--surface); border: 1px solid var(--border-xs); border-radius: 3px;
+      padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; opacity: 0.7;
+    }
+    .roadmap-icon { font-size: 14px; opacity: 0.35; flex-shrink: 0; margin-top: 2px; }
+    .roadmap-name {
+      font-family: var(--font-d); font-size: 9.5px; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text-second); margin-bottom: 4px; font-weight: 500;
+    }
+    .roadmap-desc {
+      font-family: var(--font-b); font-size: 13px; font-style: italic;
+      color: var(--text-muted); line-height: 1.55;
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 52px;
+    }
+    .about-card {
+      background: var(--surface); border: 1px solid var(--border-sm);
+      border-radius: 3px; padding: 20px 22px;
+    }
+    .about-card-title {
+      font-family: var(--font-d); font-size: 9.5px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gold-500);
+      margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-xs);
+    }
+    .about-card-body {
+      font-family: var(--font-b); font-size: 14px; color: var(--text-second);
+      line-height: 1.75; font-style: italic;
+    }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      position: relative; z-index: 1; background: var(--ink-800);
+      border-top: 1px solid var(--ink-700); padding: 28px 28px 24px; text-align: center;
+    }
+    .site-footer::before {
+      content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-border), transparent);
+    }
+    .footer-mark {
+      font-family: var(--font-d); font-size: 11px; font-weight: 600;
+      color: var(--parch-300); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px;
+    }
+    .footer-sub { font-family: var(--font-b); font-size: 12px; font-style: italic; color: #5a4830; }
+    .footer-orn { font-family: var(--font-d); font-size: 10px; color: var(--gold-600); letter-spacing: 4px; margin-top: 14px; opacity: 0.5; }
+
+    @media (max-width: 640px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .hero-stats { flex-direction: column; }
+      .hero-stat { border-right: none; border-bottom: 1px solid var(--border-sm); }
+      .hero-stat:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="ur-nav-shell">
+    <a href="index.html" class="ur-logo-btn">
+      <div class="ur-logo-name">Universal Realms</div>
+      <div class="ur-logo-tag">World Engine</div>
+    </a>
+    <div class="ur-nav-links">
+      <a href="index.html"             class="ur-nav-lnk cur"><span class="ur-nav-ic">⌂</span>Dashboard</a>
+      <a href="character_creator.html" class="ur-nav-lnk"><span class="ur-nav-ic">◉</span>Characters</a>
+      <a href="battle_roller.html"     class="ur-nav-lnk"><span class="ur-nav-ic">⚔</span>Battle</a>
+      <a href="duel_roller.html"       class="ur-nav-lnk"><span class="ur-nav-ic">◈</span>Duel</a>
+      <a href="raid_roller.html"       class="ur-nav-lnk"><span class="ur-nav-ic">⚑</span>Raid</a>
+      <a href="chronicle_map.html"     class="ur-nav-lnk"><span class="ur-nav-ic">⊞</span>Chronicle Map</a>
+    </div>
+    <div class="ur-nav-right">
+      <div class="ur-tool-tag">✦ v0.1 Alpha</div>
+      <div id="ur-auth-nav"></div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Anno Domini 1066 · World Engine</div>
+    <h1 class="hero-title">Universal Realms</h1>
+    <div class="hero-title-sub">A Living World Platform</div>
+    <div class="hero-divider"><span>✦</span></div>
+    <p class="hero-desc">
+      Create worlds, forge characters, command armies, and shape history.
+      A modular platform where everything you build connects — characters inhabit worlds,
+      worlds contain factions, factions collide in battles.
+    </p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">5</div>
+        <div class="hero-stat-label">Tools Live</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">22+</div>
+        <div class="hero-stat-label">Regions Mapped</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">∞</div>
+        <div class="hero-stat-label">Worlds to Build</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div class="sec-hdr">
+      <span class="sec-hdr-label">Available Now</span>
+      <div class="sec-hdr-line"></div>
+    </div>
+
+    <div class="tool-grid">
+
+      <a href="character_creator.html" class="tool-card" style="--tc:#c8a838">
+        <div class="tc-header">
+          <div class="tc-icon">◉</div>
+          <span class="tc-badge live">Live</span>
+        </div>
+        <div class="tc-name">Character Creator</div>
+        <div class="tc-desc">Build a fully realised noble — choose faction, archetype, and culture, then roll your stats and receive a complete exportable character sheet.</div>
+        <div class="tc-tags">
+          <span class="tc-tag">Factions</span><span class="tc-tag">Archetypes</span>
+          <span class="tc-tag">Stat Roll</span><span class="tc-tag">Export</span>
+        </div>
+        <div class="tc-cta">Open Creator →</div>
+      </a>
+
+      <a href="chronicle_map.html" class="tool-card" style="--tc:#4a7aaa">
+        <div class="tc-header">
+          <div class="tc-icon">⊞</div>
+          <span class="tc-badge live">Live</span>
+        </div>
+        <div class="tc-name">Chronicle Map</div>
+        <div class="tc-desc">An interactive political map of the known world. Click provinces, explore regions, and switch between political, geographic, and resource layers.</div>
+        <div class="tc-tags">
+          <span class="tc-tag">3 Map Layers</span><span class="tc-tag">22 Regions</span>
+          <span class="tc-tag">Zoom & Pan</span><span class="tc-tag">Province Detail</span>
+        </div>
+        <div class="tc-cta">Open Map →</div>
+      </a>
+
+      <a href="battle_roller.html" class="tool-card" style="--tc:#7a9ab0">
+        <div class="tc-header">
+          <div class="tc-icon">⚔</div>
+          <span class="tc-badge live">Live</span>
+        </div>
+        <div class="tc-name">Battle Roller</div>
+        <div class="tc-desc">Resolve large-scale battles between armies. Troop quality, terrain, martial skill, and conditions shape the outcome and casualty count.</div>
+        <div class="tc-tags">
+          <span class="tc-tag">Army vs Army</span><span class="tc-tag">Casualties</span>
+          <span class="tc-tag">Rout Checks</span><span class="tc-tag">Discord Export</span>
+        </div>
+        <div class="tc-cta">Roll Battle →</div>
+      </a>
+
+      <a href="duel_roller.html" class="tool-card" style="--tc:#b06050">
+        <div class="tc-header">
+          <div class="tc-icon">◈</div>
+          <span class="tc-badge live">Live</span>
+        </div>
+        <div class="tc-name">Duel Roller</div>
+        <div class="tc-desc">Settle personal conflicts between two fighters. Weapons, traits, and conditions determine who draws blood — and the severity of their wounds.</div>
+        <div class="tc-tags">
+          <span class="tc-tag">1v1 Combat</span><span class="tc-tag">Wound Severity</span>
+          <span class="tc-tag">Traits</span><span class="tc-tag">Post-Duel Choice</span>
+        </div>
+        <div class="tc-cta">Enter the Arena →</div>
+      </a>
+
+      <a href="raid_roller.html" class="tool-card" style="--tc:#4a8a5a">
+        <div class="tc-header">
+          <div class="tc-icon">⚑</div>
+          <span class="tc-badge live">Live</span>
+        </div>
+        <div class="tc-name">Raid Roller</div>
+        <div class="tc-desc">Plan and resolve coastal or land raids. Force size, target defences, and raider traits determine the plunder — or the disaster that follows.</div>
+        <div class="tc-tags">
+          <span class="tc-tag">Coastal & Land</span><span class="tc-tag">Loot Results</span>
+          <span class="tc-tag">Casualties</span><span class="tc-tag">Discord Export</span>
+        </div>
+        <div class="tc-cta">Launch the Raid →</div>
+      </a>
+
+    </div>
+
+    <div class="sec-hdr">
+      <span class="sec-hdr-label">In Development</span>
+      <div class="sec-hdr-line"></div>
+    </div>
+
+    <div class="roadmap-grid">
+      <div class="roadmap-item">
+        <div class="roadmap-icon">◈</div>
+        <div>
+          <div class="roadmap-name">World Generator</div>
+          <div class="roadmap-desc">AI-generated worlds with factions, geography, conflicts, and campaign hooks.</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon">⚑</div>
+        <div>
+          <div class="roadmap-name">Faction Browser</div>
+          <div class="roadmap-desc">Deep faction profiles — history, military, economy, religion, and alliances.</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon">⚔</div>
+        <div>
+          <div class="roadmap-name">Scenario Engine</div>
+          <div class="roadmap-desc">Create and play through branching story scenarios within your world.</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon">✦</div>
+        <div>
+          <div class="roadmap-name">Lorebook</div>
+          <div class="roadmap-desc">Religions, bestiary, historical timeline, and lore archive for your world.</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon">◎</div>
+        <div>
+          <div class="roadmap-name">Economy Dashboard</div>
+          <div class="roadmap-desc">Trade flows, resource maps, and power balance across your civilisations.</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-icon">◉</div>
+        <div>
+          <div class="roadmap-name">Multiplayer</div>
+          <div class="roadmap-desc">Shared sessions, persistent history, and live game management for groups.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-hdr">
+      <span class="sec-hdr-label">What is Universal Realms</span>
+      <div class="sec-hdr-line"></div>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-card-title">The Vision</div>
+        <div class="about-card-body">Universal Realms sits between a tabletop rulebook, an AI world generator, and a strategy game. Every tool feeds into the same living world — characters are born into factions, factions wage wars, wars reshape maps, maps define the world your next character inhabits.</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-title">Built for Game Masters</div>
+        <div class="about-card-body">Designed for GMs running persistent campaigns, players building characters with depth, and creators who want a world that feels like history rather than a static backdrop. Every system is modular — use what you need, ignore what you don't.</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-title">Any Genre, Any Era</div>
+        <div class="about-card-body">Starting in 1066 Europe but built to support any setting — high fantasy, ancient mythology, political intrigue, post-war reconstruction, or worlds that don't exist yet. The tools adapt to your world, not the other way around.</div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-title">Current Status</div>
+        <div class="about-card-body">Version 0.1 Alpha. Five tools are live and functional. The full platform — AI world generation, persistent saves, user accounts, and multiplayer — is in active development. Feedback and playtesting welcome.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-mark">Universal Realms</div>
+    <div class="footer-sub">World Engine · Anno Domini 1066 · v0.1 Alpha</div>
+    <div class="footer-orn">— ✦ —</div>
+  </footer>
+
+  <script src="/js/ur-auth.js"></script>
+</body>
+</html>

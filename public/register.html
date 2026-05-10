@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — Universal Realms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:         #1a1208;
+      --bg-card:    #150e04;
+      --gold:       #c8a838;
+      --gold-dim:   #8b6914;
+      --gold-pale:  rgba(200,168,56,0.08);
+      --gold-border:rgba(200,168,56,0.28);
+      --text:       #e8d5a3;
+      --text-muted: #a08848;
+      --text-dim:   #7a6030;
+      --error:      #c0392b;
+      --font-d:     'Cinzel', serif;
+      --font-b:     'EB Garamond', Georgia, serif;
+    }
+    body {
+      font-family: var(--font-b); background: var(--bg);
+      color: var(--text); min-height: 100vh; display: flex; flex-direction: column;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+    }
+    .ur-nav-shell {
+      height: 52px; display: flex; align-items: stretch;
+      background: #2a1c0d; border-bottom: 1px solid #3d2b14;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+    }
+    .ur-nav-shell::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(184,137,42,0.28), transparent);
+    }
+    .ur-logo-btn {
+      padding: 0 22px; display: flex; flex-direction: column; justify-content: center;
+      border-right: 1px solid rgba(255,255,255,0.06); text-decoration: none; flex-shrink: 0;
+    }
+    .ur-logo-name { font-family: var(--font-d); font-size: 12px; font-weight: 600; color: #f5edd8; letter-spacing: 2.5px; text-transform: uppercase; line-height: 1; }
+    .ur-logo-tag  { font-family: var(--font-b); font-size: 9px; color: var(--gold); letter-spacing: 1.5px; margin-top: 3px; font-style: italic; opacity: 0.75; }
+    .ur-nav-links { display: flex; align-items: stretch; flex: 1; padding: 0 4px; overflow-x: auto; }
+    .ur-nav-links::-webkit-scrollbar { display: none; }
+    .ur-nav-lnk {
+      display: flex; align-items: center; gap: 7px; padding: 0 14px;
+      font-family: var(--font-b); font-size: 13.5px; font-style: italic;
+      color: #9a8468; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.15s;
+    }
+    .ur-nav-lnk:hover { color: #e8d9bb; background: rgba(255,255,255,0.03); }
+    .ur-nav-right { display: flex; align-items: center; padding: 0 18px; flex-shrink: 0; border-left: 1px solid rgba(255,255,255,0.06); }
+
+    main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; z-index: 1; }
+
+    .auth-wrap { width: 100%; max-width: 440px; }
+    .auth-eyebrow { font-family: var(--font-d); font-size: 8px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; opacity: 0.7; text-align: center; margin-bottom: 16px; }
+    .auth-title { font-family: var(--font-d); font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: 4px; text-transform: uppercase; text-align: center; margin-bottom: 6px; }
+    .auth-sub { font-family: var(--font-b); font-size: 14px; font-style: italic; color: var(--text-muted); text-align: center; margin-bottom: 28px; }
+
+    .auth-card {
+      background: var(--bg-card); border: 1px solid var(--gold-dim);
+      border-radius: 4px; padding: 28px 28px 24px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+    }
+    .auth-card::before {
+      content: ''; display: block; height: 2px; margin: -28px -28px 24px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    label { font-family: var(--font-d); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); }
+    .field-hint { font-size: 11px; color: var(--text-dim); font-style: italic; }
+    input {
+      background: rgba(10,8,4,0.7); border: 1px solid var(--gold-dim);
+      border-radius: 3px; color: var(--text); padding: 11px 14px;
+      font-size: 15px; font-family: var(--font-b); outline: none; width: 100%;
+      transition: border-color 0.15s;
+    }
+    input:focus { border-color: var(--gold); }
+    input.err   { border-color: var(--error); }
+    .err-msg { font-size: 12px; color: var(--error); font-style: italic; }
+
+    .divider { height: 1px; background: var(--gold-border); margin: 20px 0; }
+
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold), var(--gold-dim));
+      border: none; border-radius: 3px; cursor: pointer;
+      font-family: var(--font-d); font-size: 11px; letter-spacing: 2.5px;
+      text-transform: uppercase; color: #1a1208; font-weight: 700;
+      box-shadow: 0 2px 12px rgba(200,168,56,0.3); transition: filter 0.15s;
+    }
+    .btn-submit:hover    { filter: brightness(1.1); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+
+    .auth-error {
+      background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.3);
+      border-radius: 3px; padding: 10px 14px;
+      font-size: 13px; color: #e88070; font-style: italic; margin-bottom: 16px;
+      display: none;
+    }
+    .auth-error.show { display: block; }
+
+    .auth-switch { font-family: var(--font-b); font-size: 13px; font-style: italic; color: var(--text-dim); text-align: center; margin-top: 20px; }
+    .auth-switch a { color: var(--gold); text-decoration: none; }
+    .auth-switch a:hover { text-decoration: underline; }
+    .footer-orn { font-family: var(--font-d); font-size: 10px; color: var(--gold-dim); letter-spacing: 4px; opacity: 0.4; text-align: center; margin-top: 32px; }
+  </style>
+</head>
+<body>
+
+  <nav class="ur-nav-shell">
+    <a href="/" class="ur-logo-btn">
+      <div class="ur-logo-name">Universal Realms</div>
+      <div class="ur-logo-tag">World Engine</div>
+    </a>
+    <div class="ur-nav-links">
+      <a href="/"                       class="ur-nav-lnk"><span>⌂</span>Dashboard</a>
+      <a href="/character_creator.html" class="ur-nav-lnk"><span>◉</span>Characters</a>
+      <a href="/battle_roller.html"     class="ur-nav-lnk"><span>⚔</span>Battle</a>
+      <a href="/duel_roller.html"       class="ur-nav-lnk"><span>◈</span>Duel</a>
+      <a href="/raid_roller.html"       class="ur-nav-lnk"><span>⚑</span>Raid</a>
+      <a href="/chronicle_map.html"     class="ur-nav-lnk"><span>⊞</span>Map</a>
+    </div>
+    <div class="ur-nav-right" id="ur-auth-nav"></div>
+  </nav>
+
+  <main>
+    <div class="auth-wrap">
+      <div class="auth-eyebrow">Anno Domini 1066 · World Engine</div>
+      <div class="auth-title">Forge Your Legend</div>
+      <p class="auth-sub">Create your account and begin building your world.</p>
+
+      <div class="auth-card">
+        <div class="auth-error" id="err-box"></div>
+
+        <form id="register-form" onsubmit="handleRegister(event)">
+          <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" autocomplete="username" required
+              placeholder="e.g. Aldric_of_Wessex" minlength="3" maxlength="20" />
+            <span class="field-hint">3–20 characters. Letters, numbers, _ and - only.</span>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email" required placeholder="your@email.com" />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="new-password" required
+              placeholder="At least 8 characters" minlength="8" />
+          </div>
+          <div class="field">
+            <label for="confirm">Confirm Password</label>
+            <input type="password" id="confirm" name="confirm" autocomplete="new-password" required placeholder="Repeat password" />
+          </div>
+          <div class="divider"></div>
+          <button type="submit" class="btn-submit" id="submit-btn">Begin the Chronicle</button>
+        </form>
+      </div>
+
+      <p class="auth-switch">Already have an account? <a href="/login.html">Sign in here →</a></p>
+      <div class="footer-orn">— ✦ —</div>
+    </div>
+  </main>
+
+  <script>
+    async function handleRegister(e) {
+      e.preventDefault();
+      const btn    = document.getElementById('submit-btn');
+      const errBox = document.getElementById('err-box');
+      errBox.classList.remove('show');
+
+      const password = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirm').value;
+      if (password !== confirm) {
+        errBox.textContent = 'Passwords do not match.';
+        errBox.classList.add('show');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Registering…';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            username: document.getElementById('username').value.trim(),
+            email:    document.getElementById('email').value.trim(),
+            password,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          errBox.textContent = data.error || 'Registration failed.';
+          errBox.classList.add('show');
+          btn.disabled = false;
+          btn.textContent = 'Begin the Chronicle';
+          return;
+        }
+
+        window.location.href = '/profile.html';
+      } catch {
+        errBox.textContent = 'Network error. Please try again.';
+        errBox.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Begin the Chronicle';
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Universal Realms 1066 — Raid Roller</title>
+<style>
+:root {
+  /* ── UNIVERSAL REALMS MASTER TOKENS ── */
+  --bg-void:        #0e0a04;
+  --bg-dark:        #1a1208;
+  --bg-card:        #150e04;
+  --bg-input:       #0a0600;
+  --parch:          #f5edd8;
+  --parch-mid:      #ede0c4;
+  --parch-dark:     #d4c49a;
+  --parch-deep:     #e6d9b8;
+  --ink:            #1e1a14;
+  --ink-soft:       #4a3f2f;
+  --ink-faint:      #8a7a5c;
+  --text-on-dark:   #e8d5a3;
+  --text-gold-dark: #c8a84c;
+  --text-muted-dark:#7a6035;
+  --text-dim-dark:  #4a3a18;
+  --gold:           #b8860b;
+  --gold-bright:    #d4a017;
+  --gold-dim:       #7a5a08;
+  --gold-pale:      rgba(184,134,11,0.10);
+  --gold-border:    rgba(184,134,11,0.28);
+  --victory:        #1a4a2a;
+  --victory-lt:     #3a8a4a;
+  --victory-pale:   #e0f0e4;
+  --blood:          #7a1a1a;
+  --blood-lt:       #c04040;
+  --blood-pale:     #f5e0e0;
+  --steel:          #2a3a4a;
+  --steel-lt:       #4a6a8a;
+  --border-dark:    #2a1e0a;
+  --border-dark-2:  #3a2a0a;
+  --font-display:   'Cinzel', 'Palatino Linotype', serif;
+  --font-body:      'EB Garamond', 'Crimson Text', Georgia, serif;
+  --font-mono:      'JetBrains Mono', 'Consolas', monospace;
+  --shadow-dark:    0 4px 24px rgba(0,0,0,0.5);
+  --shadow-light:   0 4px 24px rgba(26,14,5,0.18);
+  --radius-sm:      3px;
+  --radius-md:      5px;
+  --radius-lg:      7px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+:root{
+  --ink:#1A0E05;--parch:#F5EDD8;--pm:#EDE0C4;--pd:#D4C49A;
+  --gold:#B8860B;--gd:#7A5A08;--gl:#D4A843;
+  --blood:#7A1A1A;--bl:#C04040;--bp:#F5E0E0;
+  --sea:#0A2A4A;--sl:#1A5A8A;--sp:#D8EAF5;
+  --land:#2A4A1A;--ll:#4A8A2A;--lp:#D8F0D0;
+  --fire:#8B3A00;--fl:#D46000;--fp:#FEF0E0;
+  --vic:#1A4A2A;--vl:#3A8A4A;--vp:#E0F0E4;
+  --sh:#333;--shadow:rgba(26,14,5,0.2);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Crimson Text',Georgia,serif;background:#080C06;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 14px 60px;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(10,42,74,.45) 0%,transparent 55%),radial-gradient(ellipse at 80% 0%,rgba(42,74,26,.35) 0%,transparent 55%);}
+.hdr{text-align:center;margin-bottom:24px;}
+.hline{width:340px;height:2px;margin:0 auto 12px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.hdr h1{font-family:'Cinzel',serif;font-size:1.45rem;font-weight:900;letter-spacing:.18em;color:var(--gold);text-shadow:0 2px 12px rgba(184,134,11,.5);}
+.hdr p{font-style:italic;color:var(--gd);font-size:.95rem;margin-top:4px;}
+
+/* Tabs */
+.tabs{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:820px;border-radius:4px 4px 0 0;overflow:hidden;border:1px solid #283820;border-bottom:none;}
+.tab{padding:12px;font-family:'Cinzel',serif;font-size:.76rem;font-weight:700;letter-spacing:.13em;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.tab-c{background:#0A1520;color:#507090;}
+.tab-c.on{background:var(--sea);color:var(--parch);}
+.tab-l{background:#0A1008;color:#4A7A4A;}
+.tab-l.on{background:var(--land);color:var(--parch);}
+
+/* Card */
+.card{width:100%;max-width:820px;background:var(--parch);border:1px solid var(--pd);border-radius:0 0 4px 4px;padding:20px 18px;box-shadow:0 6px 32px var(--shadow);margin-bottom:18px;}
+
+/* Labels */
+.sec{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.2em;color:var(--gd);margin:16px 0 8px;}
+.sec:first-child{margin-top:0;}
+.flabel{font-family:'Cinzel',serif;font-size:.57rem;letter-spacing:.14em;color:var(--gd);margin-bottom:3px;display:block;}
+
+/* Grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+
+/* Inputs */
+input[type=text],select{font-family:'Crimson Text',serif;font-size:.98rem;color:var(--ink);background:var(--pm);border:1px solid var(--pd);border-radius:3px;padding:5px 8px;outline:none;width:100%;}
+input[type=text]:focus,select:focus{border-color:var(--gold);}
+input[type=number]{font-family:'Cinzel',serif;font-size:1.15rem;font-weight:700;text-align:center;color:var(--ink);background:var(--pm);border:1px solid var(--pd);border-radius:3px;padding:5px;outline:none;width:100%;}
+input[type=number]:focus{border-color:var(--gold);}
+
+/* Live displays */
+.live{font-family:'Cinzel',serif;font-size:.88rem;font-weight:700;text-align:center;padding:5px;border-radius:3px;margin-top:2px;}
+.lv-pos{background:#E8F4E8;color:var(--vic);}
+.lv-neu{background:var(--pm);color:var(--ink);}
+.lv-neg{background:var(--bp);color:var(--blood);}
+.army-line{font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;text-align:center;padding:8px;background:var(--pm);border:1px solid var(--pd);border-radius:3px;margin-top:8px;color:var(--ink);}
+.army-line span{color:var(--blood);margin:0 4px;}
+
+/* Divider */
+.div{height:1px;margin:14px 0;background:linear-gradient(90deg,transparent,var(--pd),transparent);}
+
+/* DC display */
+.dc-box{text-align:center;padding:10px;border-radius:3px;margin-top:4px;}
+.dc-box .dc-n{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;}
+.dc-box .dc-req{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.1em;margin-top:3px;}
+.dc-easy{background:var(--vp);}  .dc-easy .dc-n{color:var(--vic);}  .dc-easy .dc-req{color:var(--vl);}
+.dc-med{background:#FFF8E0;}     .dc-med .dc-n{color:#7A6008;}       .dc-med .dc-req{color:#9A8020;}
+.dc-hard{background:var(--fp);}  .dc-hard .dc-n{color:var(--fire);}  .dc-hard .dc-req{color:var(--fl);}
+.dc-fort{background:var(--bp);}  .dc-fort .dc-n{color:var(--blood);}  .dc-fort .dc-req{color:var(--bl);}
+
+/* Traits */
+.trait-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px;}
+.tc{display:flex;align-items:flex-start;gap:6px;cursor:pointer;user-select:none;}
+.tc input{display:none;}
+.tbox{width:13px;height:13px;border:1px solid var(--pd);border-radius:2px;background:var(--pm);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:.58rem;color:var(--gold);transition:all .14s;}
+.tc input:checked~.tbox{background:var(--gd);border-color:var(--gold);color:var(--parch);}
+.tlabel{font-size:.82rem;color:var(--ink);line-height:1.25;}
+.tv{font-weight:700;}
+.tnote{font-size:.7rem;font-style:italic;color:#7A5A3A;display:block;}
+.trait-disabled{opacity:.4;pointer-events:none;}
+
+/* Roll button */
+.rbtn{display:block;width:100%;max-width:820px;padding:13px;font-family:'Cinzel',serif;font-size:.98rem;font-weight:700;letter-spacing:.17em;color:var(--parch);border:none;border-radius:4px;cursor:pointer;margin-bottom:22px;transition:all .2s;text-shadow:0 1px 4px rgba(0,0,0,.5);}
+.rbtn-c{background:linear-gradient(135deg,var(--sea) 0%,#060F18 100%);border:1px solid var(--sl);box-shadow:0 4px 20px rgba(10,42,74,.5);}
+.rbtn-c:hover{background:linear-gradient(135deg,var(--sl) 0%,var(--sea) 100%);transform:translateY(-1px);}
+.rbtn-l{background:linear-gradient(135deg,var(--land) 0%,#060C04 100%);border:1px solid var(--ll);box-shadow:0 4px 20px rgba(42,74,26,.4);}
+.rbtn-l:hover{background:linear-gradient(135deg,var(--ll) 0%,var(--land) 100%);transform:translateY(-1px);}
+.rbtn:active{transform:translateY(0);}
+
+/* Result area */
+#result{display:none;width:100%;max-width:820px;}
+
+/* Dice row */
+.dice-row{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0;}
+.die{width:44px;height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;border:2px solid;flex-direction:column;gap:0;}
+.die-hit{background:var(--vp);border-color:var(--vl);color:var(--vic);}
+.die-miss{background:var(--bp);border-color:var(--bl);color:var(--blood);}
+.die-sub{font-size:.5rem;font-weight:400;letter-spacing:.06em;}
+
+/* Result panels */
+.rpanel{background:var(--parch);border:1px solid var(--pd);border-radius:4px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 12px var(--shadow);}
+.rpanel-title{font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.18em;color:var(--gd);margin-bottom:10px;}
+
+/* Outcome banner */
+.obanner{border-radius:4px;padding:14px 18px;margin-bottom:14px;border:1px solid;text-align:center;}
+.ob-full{background:var(--vp);border-color:var(--vl);}
+.ob-part{background:var(--fp);border-color:var(--fl);}
+.ob-fail{background:var(--bp);border-color:var(--bl);}
+.ob-title{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:900;letter-spacing:.08em;margin-bottom:4px;}
+.ob-full .ob-title{color:var(--vic);}
+.ob-part .ob-title{color:var(--fire);}
+.ob-fail .ob-title{color:var(--blood);}
+.ob-sub{font-size:.9rem;font-style:italic;}
+
+/* Loot */
+.loot-big{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:900;color:var(--gold);text-align:center;margin:6px 0;text-shadow:0 2px 8px rgba(184,134,11,.35);}
+.loot-note{font-size:.84rem;text-align:center;font-style:italic;color:#7A6040;}
+
+/* Effect rows */
+.eff{display:flex;align-items:flex-start;gap:9px;padding:6px 0;border-bottom:1px solid var(--pm);font-size:.88rem;color:var(--ink);}
+.eff:last-child{border-bottom:none;}
+.eff-icon{font-size:.95rem;flex-shrink:0;margin-top:1px;}
+.eff-mech{font-weight:600;color:var(--blood);}
+.eff-note{font-size:.78rem;font-style:italic;color:#6A5040;display:block;}
+
+/* Roll summary */
+.roll-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;}
+.rc{text-align:center;}
+.rc-label{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:.12em;color:var(--gd);margin-bottom:3px;}
+.rc-val{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:900;}
+.rc-note{font-size:.72rem;font-style:italic;color:#7A6040;}
+
+/* Log */
+.logbox{background:#0A0E06;border:1px solid #1E2A14;border-radius:4px;padding:12px;margin-bottom:12px;display:none;}
+.log-title{font-family:'Cinzel',serif;font-size:.56rem;letter-spacing:.2em;color:var(--gd);margin-bottom:7px;}
+.log-pre{font-family:'Courier New',monospace;font-size:.76rem;color:#BCC890;line-height:1.6;white-space:pre-wrap;}
+.cpbtn{display:block;width:100%;margin-top:9px;padding:7px;font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.15em;color:var(--gd);background:transparent;border:1px solid #1E2A14;border-radius:3px;cursor:pointer;transition:all .2s;}
+.cpbtn:hover{border-color:var(--gold);color:var(--gold);}
+
+.rstbtn{display:none;width:100%;max-width:820px;padding:9px;font-family:'Cinzel',serif;font-size:.63rem;letter-spacing:.17em;color:var(--gd);background:transparent;border:1px solid #1E2A14;border-radius:4px;cursor:pointer;transition:all .2s;}
+.rstbtn:hover{border-color:var(--gold);color:var(--gold);}
+
+@keyframes pop{0%{transform:scale(1.25);opacity:.6;}100%{transform:scale(1);opacity:1;}}
+.pop{animation:pop .3s ease-out;}
+@media(max-width:580px){.g2,.g3,.g4{grid-template-columns:1fr 1fr;}.trait-grid{grid-template-columns:1fr;}.roll-grid{grid-template-columns:repeat(3,1fr);}}
+
+/* ══ UNIVERSAL REALMS NAV ══ */
+.ur-nav-shell {
+  height: 52px; display: flex; align-items: stretch;
+  background: #1a1208; border-bottom: 1px solid #2a1e0a;
+  position: relative; z-index: 1000; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+}
+.ur-nav-shell::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(184,134,11,0.4) 20%, rgba(184,134,11,0.4) 80%, transparent 100%);
+}
+.ur-logo-btn {
+  padding: 0 20px; display: flex; flex-direction: column;
+  justify-content: center; border-right: 1px solid rgba(255,255,255,0.06);
+  text-decoration: none; flex-shrink: 0; transition: background 0.15s;
+}
+.ur-logo-btn:hover { background: rgba(255,255,255,0.03); }
+.ur-logo-name {
+  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+  color: #f5edd8; letter-spacing: 2.5px; text-transform: uppercase; line-height: 1;
+}
+.ur-logo-tag {
+  font-family: 'EB Garamond', serif; font-size: 9px; color: #b8860b;
+  letter-spacing: 1.5px; margin-top: 3px; font-style: italic; opacity: 0.75;
+}
+.ur-nav-links {
+  display: flex; align-items: stretch; flex: 1;
+  padding: 0 4px; overflow-x: auto;
+}
+.ur-nav-links::-webkit-scrollbar { display: none; }
+.ur-nav-lnk {
+  display: flex; align-items: center; gap: 7px; padding: 0 13px;
+  font-family: 'EB Garamond', Georgia, serif; font-size: 13.5px; font-style: italic;
+  color: #9a8468; text-decoration: none;
+  border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
+}
+.ur-nav-lnk:hover { color: #e8d9bb; background: rgba(255,255,255,0.03); }
+.ur-nav-lnk.cur {
+  color: #d4ab55; border-bottom-color: #c99c3a;
+  font-style: normal; font-weight: 500; background: rgba(184,134,11,0.06);
+}
+.ur-nav-ic { font-size: 10px; opacity: 0.65; }
+.ur-nav-lnk.cur .ur-nav-ic { opacity: 1; }
+.ur-nav-right {
+  display: flex; align-items: center; padding: 0 16px; flex-shrink: 0;
+  border-left: 1px solid rgba(255,255,255,0.06); gap: 10px;
+}
+.ur-tool-tag {
+  font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: 2px;
+  text-transform: uppercase; padding: 4px 12px;
+  border: 1px solid; border-radius: 2px;
+}
+
+/* ── Raid Roller — UR Unified Theme ── */
+body {
+  font-family: 'EB Garamond', Georgia, serif !important;
+  background: var(--bg-void) !important;
+}
+.hdr h1 { font-family: var(--font-display) !important; }
+.hdr p { font-family: var(--font-body) !important; font-style: italic; }
+.hline { background: linear-gradient(90deg, transparent, var(--gold), transparent) !important; }
+.tab { font-family: var(--font-display) !important; letter-spacing: 0.1em; }
+.card {
+  font-family: var(--font-body) !important;
+  background: var(--parch) !important;
+  border-color: var(--parch-dark) !important;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm) !important;
+  box-shadow: var(--shadow-light) !important;
+}
+.sec { font-family: var(--font-display) !important; letter-spacing: 0.18em; color: var(--gold-dim) !important; }
+.flabel { font-family: var(--font-display) !important; letter-spacing: 0.12em; color: var(--gold-dim) !important; }
+input[type=text], select {
+  font-family: var(--font-body) !important;
+  background: var(--parch-mid) !important;
+  border-color: var(--parch-dark) !important;
+  color: var(--ink) !important;
+  border-radius: var(--radius-sm) !important;
+}
+input[type=number] {
+  font-family: var(--font-display) !important;
+  background: var(--parch-mid) !important;
+  border-color: var(--parch-dark) !important;
+  color: var(--ink) !important;
+  border-radius: var(--radius-sm) !important;
+}
+input:focus, select:focus { border-color: var(--gold) !important; }
+.rbtn { font-family: var(--font-display) !important; letter-spacing: 0.15em; border-radius: var(--radius-sm) !important; }
+.tlabel { font-family: var(--font-body) !important; }
+.tnote { font-family: var(--font-body) !important; font-style: italic; }
+
+</style>
+</head>
+<body>
+<div class="ur-nav-shell">
+  <a href="index.html" class="ur-logo-btn">
+    <div class="ur-logo-name">Universal Realms</div>
+    <div class="ur-logo-tag">World Engine</div>
+  </a>
+  <div class="ur-nav-links">
+    <a href="index.html"             class="ur-nav-lnk"><span class="ur-nav-ic">⌂</span>Dashboard</a>
+    <a href="character_creator.html" class="ur-nav-lnk "><span class="ur-nav-ic">◉</span>Characters</a>
+    <a href="battle_roller.html"     class="ur-nav-lnk "><span class="ur-nav-ic">⚔</span>Battle</a>
+    <a href="duel_roller.html"       class="ur-nav-lnk "><span class="ur-nav-ic">◈</span>Duel</a>
+    <a href="raid_roller.html"       class="ur-nav-lnk cur"><span class="ur-nav-ic">⚑</span>Raid</a>
+    <a href="chronicle_map.html"     class="ur-nav-lnk "><span class="ur-nav-ic">⊞</span>Chronicle Map</a>
+  </div>
+  <div class="ur-nav-right">
+    <div class="ur-tool-tag" style="color:#4a8a4a;border-color:rgba(74,138,74,0.28);background:rgba(74,138,74,0.08)">Raid Roller</div>
+    <div id="ur-auth-nav"></div>
+  </div>
+</div>
+<!-- UNIVERSAL REALMS NAV SHELL -->
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+:root{
+  --ink-800:#2a1c0d;--ink-700:#3d2b14;
+  --parch-100:#fdf8ef;--parch-200:#f5edd8;--parch-300:#ecdcc0;
+  --gold-300:#d4ab55;--gold-400:#c99c3a;--gold-500:#b8892a;
+  --gold-border:rgba(184,137,42,0.28);--gold-100:rgba(184,137,42,0.10);
+  --text-muted:#8a7055;--border-mid:rgba(142,108,58,0.24);
+  --font-display:'Cinzel',serif;--font-body:'EB Garamond',Georgia,serif;
+}
+.ur-nav{
+  display:flex;align-items:stretch;height:50px;
+  background:var(--ink-800);border-bottom:1px solid var(--ink-700);
+  position:sticky;top:0;z-index:1000;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+.ur-nav::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,137,42,0.35) 20%,rgba(184,137,42,0.35) 80%,transparent);
+  pointer-events:none;
+}
+.ur-logo{
+  padding:0 20px;display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid rgba(255,255,255,0.06);text-decoration:none;
+  flex-shrink:0;transition:background 0.15s;
+}
+.ur-logo:hover{background:rgba(255,255,255,0.03);}
+.ur-logo-mark{
+  font-family:var(--font-display);font-size:12px;font-weight:600;
+  color:#f5edd8;letter-spacing:2.5px;text-transform:uppercase;line-height:1;
+}
+.ur-logo-sub{
+  font-family:var(--font-body);font-size:9px;color:var(--gold-500);
+  letter-spacing:1.5px;margin-top:3px;font-style:italic;opacity:0.7;
+}
+.ur-nav-links{display:flex;align-items:stretch;flex:1;padding:0 4px;overflow-x:auto;}
+.ur-nav-links::-webkit-scrollbar{display:none;}
+.ur-nav-link{
+  display:flex;align-items:center;gap:6px;padding:0 14px;
+  font-family:var(--font-body);font-size:13px;font-style:italic;
+  color:#9a8468;text-decoration:none;border-bottom:2px solid transparent;
+  transition:all 0.15s;white-space:nowrap;
+}
+.ur-nav-link:hover{color:#e8d9bb;background:rgba(255,255,255,0.03);}
+.ur-nav-link.active{
+  color:var(--gold-300);border-bottom-color:var(--gold-400);
+  font-style:normal;font-weight:500;background:rgba(184,137,42,0.06);
+}
+.ur-nav-icon{font-size:10px;opacity:0.7;}
+.ur-nav-link.active .ur-nav-icon{opacity:1;}
+.ur-nav-right{
+  display:flex;align-items:center;gap:10px;
+  padding:0 16px;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.06);
+}
+.ur-home-btn{
+  font-family:var(--font-display);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold-400);text-decoration:none;
+  padding:6px 14px;border:1px solid var(--gold-border);border-radius:2px;
+  background:rgba(184,137,42,0.08);transition:all 0.15s;white-space:nowrap;
+}
+.ur-home-btn:hover{background:rgba(184,137,42,0.15);color:var(--gold-300);}
+</style>
+
+<script>
+  (function(){
+    var el = document.getElementById('nav-raid');
+    if (el) el.classList.add('active');
+  })();
+</script>
+
+
+<div class="hdr">
+  <div class="hline"></div>
+  <h1>🔥 RAID ROLLER 🔥</h1>
+  <p>Universal Realms — Anno Domini 1066</p>
+  <div class="hline" style="margin-top:12px;"></div>
+</div>
+
+<div class="tabs">
+  <button class="tab tab-c on" onclick="setTab('c')">⚓ COASTAL RAID</button>
+  <button class="tab tab-l"   onclick="setTab('l')">⚔ LAND RAID</button>
+</div>
+
+<div class="card">
+
+  <!-- RAIDER -->
+  <div class="sec">THE RAIDER</div>
+  <div class="g2">
+    <div><span class="flabel">RAIDER NAME / FACTION</span>
+      <input type="text" id="r-name" placeholder="e.g. Harald Hardrada…"></div>
+    <div><span class="flabel">CULTURE</span>
+      <select id="r-culture" onchange="upd()">
+        <optgroup label="2,000/die">
+          <option value="2000-0-0">English / Norman / French / German / Iberian</option>
+          <option value="2000-3-0">Scandinavian (+3 coastal raid)</option>
+        </optgroup>
+        <optgroup label="2,500/die">
+          <option value="2500-0-0">Byzantine / Italian / Persian</option>
+        </optgroup>
+        <optgroup label="3,000/die">
+          <option value="3000-2-0">Scottish / Irish (+2 land raid)</option>
+          <option value="3000-0-0">Polish / Russian / Arab / Caucasian / Egyptian</option>
+          <option value="3000-2-2">North African (+2 coastal, +2 land raid)</option>
+        </optgroup>
+        <optgroup label="3,500/die">
+          <option value="3500-0-3">Steppe / Nomadic (+3 land raid open terrain)</option>
+          <option value="3500-0-0">Berber / Almoravid / Bedouin / Arabian</option>
+        </optgroup>
+        <optgroup label="4,000/die">
+          <option value="4000-0-2">Balkan / Irish (+2 land raid home terrain)</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-top:10px;">
+    <div><span class="flabel">COMMANDER MARTIAL</span>
+      <input type="number" id="r-martial" value="12" min="1" max="20" oninput="upd()"></div>
+    <div><span class="flabel">TOTAL MODIFIER</span>
+      <div class="live lv-neu" id="r-mod-disp">+1</div></div>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- TROOPS -->
+  <div class="sec">RAIDING FORCE</div>
+  <div class="g4">
+    <div><span class="flabel">LEVY</span>
+      <input type="number" id="r-levy" value="0" min="0" step="100" oninput="upd()"></div>
+    <div><span class="flabel">RETINUE ✦</span>
+      <input type="number" id="r-ret" value="500" min="0" step="100" oninput="upd()"></div>
+    <div><span class="flabel">CAVALRY ✦</span>
+      <input type="number" id="r-cav" value="0" min="0" step="100" oninput="upd()"></div>
+    <div><span class="flabel">ARCHERS</span>
+      <input type="number" id="r-arch" value="0" min="0" step="100" oninput="upd()"></div>
+  </div>
+  <div class="army-line" id="army-line">Enter troops above</div>
+
+  <div class="div"></div>
+
+  <!-- TARGET -->
+  <div class="sec">TARGET PROVINCE</div>
+  <div class="g2">
+    <div><span class="flabel">PROVINCE NAME</span>
+      <input type="text" id="t-name" placeholder="e.g. Lindisfarne Abbey…"></div>
+    <div><span class="flabel">DEFENCE LEVEL</span>
+      <select id="t-def" onchange="upd()">
+        <option value="village">Undefended village / monastery</option>
+        <option value="town">Defended town (garrison &lt; 500)</option>
+        <option value="castle">Fortified port / castle</option>
+        <option value="city">Major city with full garrison</option>
+      </select>
+    </div>
+  </div>
+  <div id="dc-display" class="dc-box dc-easy" style="margin-top:8px;">
+    <div class="dc-n">DC 6</div>
+    <div class="dc-req">NEED 1 HIT TO SUCCEED</div>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- MODIFIERS -->
+  <div class="sec">MODIFIERS</div>
+  <div class="trait-grid">
+    <label class="tc"><input type="checkbox" id="m-winter" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel"><span class="tv" style="color:var(--blood)">−1</span> Winter season</div></label>
+    <label class="tc"><input type="checkbox" id="m-supply" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel"><span class="tv" style="color:var(--vic)">+1</span> Supply advantage</div></label>
+    <label class="tc"><input type="checkbox" id="m-ambush" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel"><span class="tv" style="color:var(--vic)">+3</span> Ambush / surprise
+        <span class="tnote">DC 12 Intrigue (or 9 with Ghost of Field)</span></div></label>
+    <label class="tc" id="m-steppe-row" style="display:none"><input type="checkbox" id="m-steppe" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel"><span class="tv" style="color:var(--vic)">+3</span> Steppe open terrain confirmed</div></label>
+    <label class="tc" id="m-homeport-row"><input type="checkbox" id="m-homeport" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel"><span class="tv" style="color:var(--blood)">−2</span> Defender: home port
+        <span class="tnote">Coastal only — defender in own harbour</span></div></label>
+    <label class="tc" id="m-storm-row"><input type="checkbox" id="m-storm" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel"><span class="tv" style="color:var(--blood)">−2</span> Storm condition
+        <span class="tnote">Coastal only — mod-triggered</span></div></label>
+    <label class="tc" id="m-forest-row" style="display:none"><input type="checkbox" id="m-forest" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel"><span class="tv" style="color:var(--vic)">+2</span> Forest / marsh terrain
+        <span class="tnote">Land only — activates Hunter Born if held</span></div></label>
+    <label class="tc"><input type="checkbox" id="m-defending" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel"><span class="tv" style="color:var(--blood)">−1</span> Raiding own homeland
+        <span class="tnote">Civil unrest penalty — levy won't burn own towns</span></div></label>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- TRAITS -->
+  <div class="sec">COMMANDER TRAITS</div>
+  <div class="trait-grid" id="trait-grid">
+    <label class="tc"><input type="checkbox" id="t-warlords" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel">👁 <span class="tv">+1</span> Warlord's Eye
+        <span class="tnote">Always — commanding any army</span></div></label>
+    <label class="tc"><input type="checkbox" id="t-hunter" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel">🏹 <span class="tv">+2</span> Hunter Born
+        <span class="tnote">Forest / marsh terrain only</span></div></label>
+    <label class="tc"><input type="checkbox" id="t-cavalry" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel">🐴 <span class="tv">+1</span> Cavalry Bred
+        <span class="tnote">When >30% cavalry in raiding force</span></div></label>
+    <label class="tc"><input type="checkbox" id="t-siege" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel">🪨 <span class="tv">+1</span> Siege Breaker
+        <span class="tnote">Castle / city targets only</span></div></label>
+    <label class="tc"><input type="checkbox" id="t-ghost" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel">🌑 Ghost of the Field
+        <span class="tnote">Ambush DC 9 instead of 12 (no modifier)</span></div></label>
+    <label class="tc"><input type="checkbox" id="t-military" onchange="upd()"><div class="tbox">✓</div>
+      <div class="tlabel">📜 <span class="tv">+1</span> Military Historian
+        <span class="tnote">Tactically familiar situation — mod discretion</span></div></label>
+  </div>
+
+</div>
+
+<button class="rbtn rbtn-c" id="roll-btn" onclick="rollRaid()">⚓ LAUNCH THE RAID ⚓</button>
+
+<div id="result">
+
+  <div class="rpanel" id="roll-panel">
+    <div class="rpanel-title">THE ROLL</div>
+    <div class="roll-grid" id="roll-summary"></div>
+    <div style="height:1px;background:linear-gradient(90deg,transparent,var(--pd),transparent);margin:8px 0;"></div>
+    <div class="rpanel-title" style="margin-bottom:6px;">DICE — <span id="dice-label"></span></div>
+    <div class="dice-row" id="dice-row"></div>
+    <div style="margin-top:8px;font-size:.88rem;color:#5A4020;" id="hit-summary"></div>
+  </div>
+
+  <div class="obanner ob-full" id="outcome-banner">
+    <div class="ob-title" id="ob-title">SUCCESS</div>
+    <div class="ob-sub" id="ob-sub"></div>
+  </div>
+
+  <div class="rpanel" id="detail-panel"></div>
+
+  <div class="logbox" id="logbox">
+    <div class="log-title">DISCORD OUTPUT</div>
+    <div class="log-pre" id="log-pre"></div>
+    <button class="cpbtn" onclick="copyLog()">📋 COPY TO DISCORD</button>
+  </div>
+
+</div>
+
+<button class="rstbtn" id="rst-btn" onclick="resetRaid()">↺ NEW RAID</button>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const DEF = {
+  village:{ dc:6, cls:'dc-easy', label:'Undefended village / monastery',
+    hitsNeeded:[1,0,0], // [full,partial,fail] = [>=1, none, 0]
+    hitLabels:['FULL SUCCESS','—','REPULSED'],
+    loot:{full:[20,6],partial:null},
+    successText:'No meaningful resistance. The raid sweeps through unopposed.',
+    partialText:null,
+    failText:'The settlement was already emptied or your force was spotted before landing.',
+    fullFx:[
+      {i:'💰',m:'{loot}g looted',n:'1D6 × 20g. Resources stripped per mod decision.'},
+      {i:'⚔',m:'Raider casualties: ~2–5% of deployed force',n:'Minor skirmish losses.'},
+      {i:'👥',m:'Province population loss — minor',n:'Noted in province record. Income unaffected.'},
+    ],
+    failFx:[
+      {i:'↩',m:'Raid withdrawn. No loot.',n:'Force retreats without engagement.'},
+    ]},
+  town:{ dc:10, cls:'dc-med', label:'Defended town (garrison < 500)',
+    hitsNeeded:[2,1,0],
+    hitLabels:['FULL SACK','PARTIAL RAID','REPULSED'],
+    loot:{full:[30,6],partial:[15,6]},
+    successText:'Garrison overwhelmed. Town sacked fully.',
+    partialText:'Outer district breached. Partial loot before withdrawal.',
+    failText:'Garrison held the walls. Force repulsed with losses.',
+    fullFx:[
+      {i:'💰',m:'{loot}g looted',n:'1D6 × 30g. Resources and buildings stripped.'},
+      {i:'⚔',m:'Raider casualties: ~5–10%',n:'Garrison resistance.'},
+      {i:'⚔',m:'Garrison casualties: ~10–20%',n:'Defenders took serious losses.'},
+      {i:'👥',m:'Province Tense — income −10% for 1 turn',n:'Population displaced.'},
+    ],
+    partialFx:[
+      {i:'💰',m:'{loot}g looted',n:'1D6 × 15g. Outer district only.'},
+      {i:'⚔',m:'Raider casualties: ~8–12%',n:'Fought their way in and out.'},
+      {i:'⚔',m:'Garrison casualties: ~5–10%',n:'Held the inner walls.'},
+    ],
+    failFx:[
+      {i:'⚔',m:'Raider casualties: ~10–15%',n:'Repulsed under fire.'},
+      {i:'↩',m:'Forced withdrawal. No loot.',n:'Garrison intact.'},
+    ]},
+  castle:{ dc:14, cls:'dc-hard', label:'Fortified port / castle',
+    hitsNeeded:[3,1,0],
+    hitLabels:['PARTIAL SUCCESS','MINOR INCURSION','REPULSED'],
+    loot:{full:[0,0],partial:[0,0]},
+    successText:'Outer defences breached. Significant losses on both sides.',
+    partialText:'Perimeter probed. Minor loot from outer area before falling back.',
+    failText:'Castle walls held. Raiding force takes serious casualties withdrawing.',
+    fullFx:[
+      {i:'💰',m:'Loot: mod determines (typically 40–100g)',n:'Outer stores only. Castle structure intact.'},
+      {i:'⚔',m:'Raider casualties: ~15–25%',n:'Assault on fortified position.'},
+      {i:'⚔',m:'Garrison casualties: ~10–15%',n:'Castle walls held. Garrison intact.'},
+      {i:'🏰',m:'Fortifications undamaged',n:'No structural effect. Only goods taken.'},
+    ],
+    partialFx:[
+      {i:'💰',m:'Loot: mod determines (typically 10–30g)',n:'Outer dock / gatehouse area only.'},
+      {i:'⚔',m:'Raider casualties: ~10–15%',n:'Probed and pulled back.'},
+    ],
+    failFx:[
+      {i:'⚔',m:'Raider casualties: ~20–30%',n:'Serious losses withdrawing under arrow fire.'},
+      {i:'↩',m:'Full withdrawal. No loot.',n:'Garrison fully intact.'},
+    ]},
+  city:{ dc:18, cls:'dc-fort', label:'Major city with full garrison',
+    hitsNeeded:[4,2,0],
+    hitLabels:['MAJOR INCURSION','PARTIAL BREACH','REPULSED'],
+    loot:{full:[0,0],partial:[0,0]},
+    successText:'Against all expectation — the outer district is taken. This will be remembered.',
+    partialText:'Walls breached briefly. Minor loot before the garrison counterattacks.',
+    failText:'City garrison repelled the assault. Fleet takes serious damage withdrawing.',
+    fullFx:[
+      {i:'💰',m:'Loot: mod determines (typically 80–200g)',n:'Outer district plundered. Inner city untouched.'},
+      {i:'⚔',m:'Raider casualties: ~25–35%',n:'Even in success this is brutal.'},
+      {i:'📣',m:'World event — sacking a major city',n:'All factions in the region note this. Reputation effect per mod.'},
+      {i:'🏰',m:'Province Contested for 1 turn',n:'Outer district destabilised.'},
+    ],
+    partialFx:[
+      {i:'💰',m:'Loot: mod determines (typically 20–60g)',n:'Brief breach before pushed back.'},
+      {i:'⚔',m:'Raider casualties: ~20–25%',n:'Street fighting to escape.'},
+    ],
+    failFx:[
+      {i:'⚔',m:'Raider casualties: ~20–30%',n:'Repulsed from the walls.'},
+      {i:'🔥',m:'Fleet / force structural damage',n:'Ships damaged or destroyed. Report to mod.'},
+      {i:'📣',m:'Failed assault on major city — noted',n:'Reputation loss with factions that respect this city.'},
+    ]},
+};
+
+// ── State ──────────────────────────────────────────────────────
+let tab = 'c', logLines = [];
+
+// ── Helpers ────────────────────────────────────────────────────
+const gi = id => parseInt(document.getElementById(id)?.value)||0;
+const gc = id => document.getElementById(id)?.checked||false;
+const gs = id => document.getElementById(id)?.value||'';
+const el = id => document.getElementById(id);
+const d6  = () => Math.floor(Math.random()*6)+1;
+const d20 = () => Math.floor(Math.random()*20)+1;
+
+function martialBonus(v){ return v>=20?3:v>=15?2:v>=10?1:0; }
+
+function parseCulture(){
+  const parts = gs('r-culture').split('-');
+  return { ratio: parseInt(parts[0]), coastalBonus: parseInt(parts[1]), landBonus: parseInt(parts[2]) };
+}
+
+function armyStats(){
+  const { ratio } = parseCulture();
+  const levy = gi('r-levy'), ret = gi('r-ret'), cav = gi('r-cav'), arch = gi('r-arch');
+  const total = levy + ret + cav + arch;
+  const quality = ret + cav;
+  const qpct = total > 0 ? Math.round(quality/total*100) : 0;
+  const dice = total > 0 ? Math.max(1, Math.floor(total/ratio)) : 0;
+  const compMod = total===0 ? 0 : qpct<10 ? -1 : qpct<=30 ? 0 : qpct<=60 ? 1 : 2;
+  const cavPct = total > 0 ? cav/total*100 : 0;
+  return { levy, ret, cav, arch, total, quality, qpct, dice, compMod, cavPct, ratio };
+}
+
+function calcNetMod(){
+  const { ratio, coastalBonus, landBonus } = parseCulture();
+  const a = armyStats();
+  const mart = martialBonus(gi('r-martial'));
+  const culturalBonus = tab === 'c' ? coastalBonus : landBonus;
+  const def = gs('t-def');
+  const isForest = gc('m-forest');
+  const isCastleOrCity = def === 'castle' || def === 'city';
+  const cavDom = a.cavPct > 30;
+
+  let mod = mart + a.compMod + culturalBonus;
+  if(gc('m-winter'))   mod -= 1;
+  if(gc('m-supply'))   mod += 1;
+  if(gc('m-ambush'))   mod += 3;
+  if(gc('m-steppe') && tab==='l') mod += 3;
+  if(gc('m-homeport') && tab==='c') mod -= 2;
+  if(gc('m-storm') && tab==='c')    mod -= 2;
+  if(gc('m-defending')) mod -= 1;
+  // Traits
+  if(gc('t-warlords'))  mod += 1;
+  if(gc('t-hunter') && isForest) mod += 2;
+  if(gc('t-cavalry') && cavDom)  mod += 1;
+  if(gc('t-siege') && isCastleOrCity) mod += 1;
+  if(gc('t-military')) mod += 1;
+  return Math.min(5, Math.max(-5, mod));
+}
+
+function upd(){
+  const a = armyStats();
+  const { ratio, coastalBonus, landBonus } = parseCulture();
+  const isSteppe = gs('r-culture').includes('3500-0-3');
+  const def = gs('t-def');
+  const defData = DEF[def];
+  const isForest = gc('m-forest');
+  const isCastleOrCity = def==='castle'||def==='city';
+
+  // Show/hide conditional modifiers
+  el('m-steppe-row').style.display = (isSteppe && tab==='l') ? '' : 'none';
+  el('m-homeport-row').style.display = tab==='c' ? '' : 'none';
+  el('m-storm-row').style.display    = tab==='c' ? '' : 'none';
+  el('m-forest-row').style.display   = tab==='l' ? '' : 'none';
+
+  // Disable traits that don't apply
+  el('t-hunter').closest('label').classList.toggle('trait-disabled', !isForest);
+  el('t-cavalry').closest('label').classList.toggle('trait-disabled', a.cavPct <= 30);
+  el('t-siege').closest('label').classList.toggle('trait-disabled', !isCastleOrCity);
+
+  // Army summary line
+  if(a.total === 0){
+    el('army-line').innerHTML = 'Enter troops above';
+  } else {
+    const compLabel = a.compMod>0?`+${a.compMod}`:a.compMod<0?`${a.compMod}`:'±0';
+    el('army-line').innerHTML =
+      `Total: <b>${a.total.toLocaleString()}</b> men &nbsp;·&nbsp; ` +
+      `<span>${a.dice}D20 pool (${a.ratio.toLocaleString()}/die)</span> &nbsp;·&nbsp; ` +
+      `Quality: ${a.qpct}% → comp <b>${compLabel}</b>`;
+  }
+
+  // Net modifier
+  const net = calcNetMod();
+  const threshold = 10 - net;
+  const modEl = el('r-mod-disp');
+  modEl.textContent = (net>=0?'+':'')+net+' (hits on '+threshold+'+)';
+  modEl.className = 'live ' + (net>0?'lv-pos':net<0?'lv-neg':'lv-neu');
+
+  // DC box
+  const hitsRequired = defData.hitsNeeded[0];
+  el('dc-display').className = 'dc-box ' + defData.cls;
+  el('dc-display').innerHTML = `<div class="dc-n">DC ${defData.dc}</div>
+    <div class="dc-req">NEED ${hitsRequired} HIT${hitsRequired>1?'S':''} TO SUCCEED FULLY · THRESHOLD ${threshold}+</div>`;
+}
+
+// ── Roll ───────────────────────────────────────────────────────
+function rollRaid(){
+  const a = armyStats();
+  if(a.dice === 0){ alert('Enter troop numbers first.'); return; }
+
+  const net = calcNetMod();
+  const threshold = 10 - net;
+  const def = gs('t-def');
+  const defData = DEF[def];
+  const raidName = gs('r-name') || 'The Raider';
+  const targetName = gs('t-name') || 'the target province';
+  const { ratio, coastalBonus, landBonus } = parseCulture();
+  logLines = [];
+
+  // Roll dice
+  const rolls = Array.from({length:a.dice}, d20);
+  const hits = rolls.filter(r => r >= threshold).length;
+
+  // Determine outcome tier
+  const [fullReq, partReq] = defData.hitsNeeded;
+  let tier; // 'full','partial','fail'
+  if(hits >= fullReq)          tier = 'full';
+  else if(partReq > 0 && hits >= partReq) tier = 'partial';
+  else                         tier = 'fail';
+
+  // Loot roll
+  let lootVal = 0, lootRoll = 0;
+  if(tier !== 'fail' && defData.loot[tier==='full'?'full':'partial'] && defData.loot[tier==='full'?'full':'partial'][0]>0){
+    const ld = defData.loot[tier==='full'?'full':'partial'];
+    lootRoll = d6(); lootVal = lootRoll * ld[0];
+  }
+
+  // ── Build modifiers breakdown ─────────────────────────────
+  const mods = [];
+  const mart = martialBonus(gi('r-martial'));
+  if(mart>0) mods.push(`Martial ${gi('r-martial')} +${mart}`);
+  if(a.compMod!==0) mods.push(`Composition ${a.compMod>0?'+':''}${a.compMod} (${a.qpct}% quality)`);
+  const cult = tab==='c'?coastalBonus:landBonus;
+  if(cult>0) mods.push(`Cultural +${cult}`);
+  if(gc('m-winter'))   mods.push('Winter −1');
+  if(gc('m-supply'))   mods.push('Supply +1');
+  if(gc('m-ambush'))   mods.push('Ambush +3');
+  if(gc('m-steppe') && tab==='l') mods.push('Steppe open +3');
+  if(gc('m-homeport') && tab==='c') mods.push('Home port −2');
+  if(gc('m-storm') && tab==='c')    mods.push('Storm −2');
+  if(gc('m-defending')) mods.push('Own homeland −1');
+  if(gc('t-warlords'))  mods.push("Warlord's Eye +1");
+  if(gc('t-hunter') && gc('m-forest')) mods.push('Hunter Born +2');
+  if(gc('t-cavalry') && a.cavPct>30) mods.push('Cavalry Bred +1');
+  if(gc('t-siege') && (def==='castle'||def==='city')) mods.push('Siege Breaker +1');
+  if(gc('t-military')) mods.push('Military Historian +1');
+
+  // ── Log ───────────────────────────────────────────────────
+  const ts = new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const typeLabel = tab==='c'?'⚓ COASTAL RAID':'⚔ LAND RAID';
+  logLines.push(`**${typeLabel} — ${raidName} → ${targetName}**`);
+  logLines.push(`_${ts}_`);
+  logLines.push('');
+  logLines.push(`**Force:** ${a.total.toLocaleString()} men (${a.dice}D20 pool · ${a.ratio.toLocaleString()}/die · ${a.qpct}% quality)`);
+  logLines.push(`**Target:** ${defData.label}`);
+  logLines.push(`**Net modifier:** ${net>=0?'+':''}${net} (${mods.join(', ')||'none'}) → threshold ${threshold}+`);
+  logLines.push(`**Rolls:** [${rolls.join(', ')}] → **${hits}** hit${hits!==1?'s':''} of ${a.dice} dice`);
+
+  const tierLabel = tier==='full' ? (defData.hitLabels[0]) : tier==='partial' ? defData.hitLabels[1] : defData.hitLabels[2];
+  logLines.push(`**Result: ${tierLabel}** (needed ${fullReq} for full${defData.hitsNeeded[1]>0?', '+defData.hitsNeeded[1]+' for partial':''})`);
+  if(lootVal>0) logLines.push(`**Loot:** D6 roll ${lootRoll} × ${defData.loot[tier==='full'?'full':'partial'][0]}g = **${lootVal}g**`);
+
+  // ── Render dice ───────────────────────────────────────────
+  el('dice-label').textContent = `${a.dice}D20 · threshold ${threshold}+ · ${hits}/${a.dice} hits`;
+  el('dice-row').innerHTML = rolls.map(r=>{
+    const hit = r>=threshold;
+    return `<div class="die ${hit?'die-hit':'die-miss'} pop">${r}<span class="die-sub">${hit?'HIT':'MISS'}</span></div>`;
+  }).join('');
+  el('hit-summary').innerHTML =
+    `<b>${hits}</b> of <b>${a.dice}</b> dice hit the threshold (${threshold}+) &nbsp;·&nbsp; ` +
+    `Net modifier <b>${net>=0?'+':''}${net}</b> &nbsp;·&nbsp; Modifiers: ${mods.join(' · ')||'none'}`;
+
+  // Roll summary grid
+  el('roll-summary').innerHTML = `
+    <div class="rc"><div class="rc-label">DICE POOL</div><div class="rc-val">${a.dice}D20</div><div class="rc-note">${a.total.toLocaleString()} men ÷ ${a.ratio.toLocaleString()}</div></div>
+    <div class="rc"><div class="rc-label">NET MOD</div><div class="rc-val" style="color:${net>0?'var(--vic)':net<0?'var(--blood)':'var(--ink)'}">${net>=0?'+':''}${net}</div><div class="rc-note">capped ±5</div></div>
+    <div class="rc"><div class="rc-label">THRESHOLD</div><div class="rc-val">${threshold}+</div><div class="rc-note">10 − modifier</div></div>
+    <div class="rc"><div class="rc-label">HITS</div><div class="rc-val" style="color:${hits>0?'var(--vic)':'var(--blood)'}">${hits}</div><div class="rc-note">of ${a.dice} dice</div></div>
+    <div class="rc"><div class="rc-label">NEEDED</div><div class="rc-val" style="color:var(--gd)">${fullReq}</div><div class="rc-note">for full success</div></div>`;
+
+  // ── Outcome banner ────────────────────────────────────────
+  const ob = el('outcome-banner');
+  ob.className = 'obanner ' + (tier==='fail'?'ob-fail':tier==='partial'?'ob-part':'ob-full');
+  el('ob-title').textContent = tierLabel;
+  el('ob-sub').textContent = tier==='full' ? defData.successText : tier==='partial' ? defData.partialText : defData.failText;
+
+  // ── Detail panel ──────────────────────────────────────────
+  const fx = tier==='full' ? defData.fullFx : tier==='partial' ? (defData.partialFx||defData.failFx) : defData.failFx;
+  let detHtml = '<div class="rpanel-title">OUTCOMES</div>';
+  if(lootVal>0){
+    detHtml += `<div class="loot-big">💰 ${lootVal}g</div>
+      <div class="loot-note">D6 rolled ${lootRoll} × ${defData.loot[tier==='full'?'full':'partial'][0]}g</div>`;
+  } else if(tier!=='fail' && (def==='castle'||def==='city')){
+    detHtml += `<div style="text-align:center;font-style:italic;color:var(--gd);padding:6px 0;">Loot amount: moderator determines based on specific province wealth</div>`;
+  }
+  fx.forEach(f=>{
+    const mtext = f.m.replace('{loot}', lootVal>0?lootVal+'g':'—');
+    detHtml += `<div class="eff"><div class="eff-icon">${f.i}</div><div><span class="eff-mech">${mtext}</span>${f.n?`<span class="eff-note">${f.n}</span>`:''}</div></div>`;
+    logLines.push(`${f.i} ${mtext}${f.n?' — '+f.n:''}`);
+  });
+  el('detail-panel').innerHTML = detHtml;
+
+  // ── Log ───────────────────────────────────────────────────
+  el('log-pre').textContent = logLines.join('\n');
+  el('logbox').style.display = 'block';
+  el('result').style.display = 'block';
+  el('rst-btn').style.display = 'block';
+  el('result').scrollIntoView({behavior:'smooth'});
+}
+
+function copyLog(){
+  const txt = el('log-pre').textContent;
+  if(navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(txt).then(fc); }
+  else{ const t=document.createElement('textarea');t.value=txt;t.style.cssText='position:fixed;top:0;left:0;opacity:0;';document.body.appendChild(t);t.focus();t.select();document.execCommand('copy');document.body.removeChild(t);fc(); }
+}
+function fc(){ const b=document.querySelector('.cpbtn');b.textContent='✓ COPIED';setTimeout(()=>b.textContent='📋 COPY TO DISCORD',2000); }
+
+function resetRaid(){
+  el('result').style.display='none';
+  el('logbox').style.display='none';
+  el('rst-btn').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function setTab(t){
+  tab=t;
+  el('roll-btn').className='rbtn rbtn-'+t;
+  el('roll-btn').textContent = t==='c'?'⚓ LAUNCH THE RAID ⚓':'⚔ RIDE TO RAID ⚔';
+  document.querySelector('.tab-c').classList.toggle('on',t==='c');
+  document.querySelector('.tab-l').classList.toggle('on',t==='l');
+  upd();
+}
+
+upd();
+</script>
+<script src="/js/ur-auth.js"></script>
+</body>
+</html>
