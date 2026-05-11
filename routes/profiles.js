@@ -1,11 +1,29 @@
 const express = require('express');
-const { QueryCommand, GetCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const { QueryCommand, GetCommand, UpdateCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 const dynamo      = require('../lib/dynamo');
 const requireAuth = require('../middleware/auth');
 
 const router      = express.Router();
 const USERS_TABLE = 'ur_users';
 const CHARS_TABLE = 'ur_characters';
+
+// GET /api/profiles — list all players
+router.get('/', async (req, res) => {
+  try {
+    const result = await dynamo.send(new ScanCommand({
+      TableName: USERS_TABLE,
+      ProjectionExpression: 'userId, username, displayName, title, createdAt, bio, stats',
+    }));
+
+    const players = (result.Items || [])
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.json(players);
+  } catch (err) {
+    console.error('List players error:', err);
+    res.status(500).json({ error: 'Failed to fetch players.' });
+  }
+});
 
 // GET /api/profiles/:username — public profile
 router.get('/:username', async (req, res) => {

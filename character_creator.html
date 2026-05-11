@@ -328,6 +328,7 @@ input[type=text]:focus { border-color: var(--gold) !important; }
     <a href="duel_roller.html"       class="ur-nav-lnk "><span class="ur-nav-ic">◈</span>Duel</a>
     <a href="raid_roller.html"       class="ur-nav-lnk "><span class="ur-nav-ic">⚑</span>Raid</a>
     <a href="chronicle_map.html"     class="ur-nav-lnk "><span class="ur-nav-ic">⊞</span>Chronicle Map</a>
+    <a href="/players.html"           class="ur-nav-lnk "><span class="ur-nav-ic">◎</span>Players</a>
   </div>
   <div class="ur-nav-right">
     <div class="ur-tool-tag" style="color:#c8a838;border-color:rgba(200,168,56,0.30);background:rgba(200,168,56,0.30)">Character Creator</div>
@@ -1082,12 +1083,22 @@ async function saveCharacter(){
       headers:{'Content-Type':'application/json'},
       credentials:'include',
       body:JSON.stringify({
-        name:(S.firstName+' '+S.familyName).trim(),
-        faction:S.faction,
-        archetype:S.archetype,
-        culture:S.culture,
-        stats:r.stats,
-        notes:'PC:'+r.pc+' | '+r.traits.map(t=>t.name).join(', '),
+        name:        (S.firstName+' '+S.familyName).trim(),
+        faction:     S.faction,
+        factionLabel:r.factionData.label,
+        factionRank: r.factionData.rank,
+        archetype:   S.archetype,
+        archetypeName:r.arch.name,
+        archetypeIcon:r.arch.icon,
+        culture:     S.culture,
+        cultureLabel:r.cultureData.label,
+        cultureRegion:r.cultureData.region,
+        cultureBonuses:r.cultureData.bonuses,
+        cultureCombat: r.cultureData.combat,
+        stats:       r.stats,
+        pc:          r.pc,
+        traits:      r.traits.map(t=>({name:t.name,bonus:t.bonus,icon:t.icon,flavor:t.flavor})),
+        combatTrait: r.combatTrait?{name:r.combatTrait.name,bonus:r.combatTrait.bonus,icon:r.combatTrait.icon}:null,
       }),
     });
     if(res.ok){setState({saved:true});setTimeout(()=>setState({saved:false}),3000);}
