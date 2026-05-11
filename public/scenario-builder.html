@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Scenario Builder — Universal Realms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#1a1208; --bg-card:#150e04; --bg-card2:#1e1408; --bg-input:rgba(10,8,4,0.7);
+      --gold:#c8a838; --gold-dim:#8b6914; --gold-border:rgba(200,168,56,0.28); --gold-glow:rgba(200,168,56,0.08);
+      --text:#e8d5a3; --text-muted:#a08848; --text-dim:#7a6030; --text-faint:#4a3a18;
+      --success:#27ae60; --error:#c0392b;
+      --font-d:'Cinzel',serif; --font-b:'EB Garamond',Georgia,serif;
+    }
+    body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* ── LAYOUT ── */
+    .builder-shell{display:flex;min-height:calc(100vh - 52px);}
+
+    /* ── SIDEBAR ── */
+    .builder-sidebar{
+      width:190px;flex-shrink:0;background:var(--bg-card);
+      border-right:1px solid rgba(139,105,20,0.2);
+      position:sticky;top:52px;height:calc(100vh - 52px);
+      overflow-y:auto;display:flex;flex-direction:column;
+    }
+    .bs-header{padding:20px 16px 14px;border-bottom:1px solid rgba(139,105,20,0.15);}
+    .bs-title{font-family:var(--font-d);font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+    .bs-scenario-name{font-family:var(--font-b);font-size:13px;font-style:italic;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .bs-status{font-family:var(--font-d);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;}
+    .bs-status.saved{color:var(--success);}
+    .bs-status.unsaved{color:var(--gold);}
+    .bs-status.saving{color:var(--text-dim);}
+
+    .bs-nav{padding:8px 0;flex:1;}
+    .bs-tab{
+      display:flex;align-items:center;gap:9px;width:100%;padding:11px 18px;
+      background:none;border:none;cursor:pointer;
+      font-family:var(--font-b);font-size:14px;font-style:italic;
+      color:var(--text-dim);transition:all 0.15s;text-align:left;
+    }
+    .bs-tab:hover{color:var(--text-muted);background:rgba(255,255,255,0.02);}
+    .bs-tab.active{color:var(--gold);background:var(--gold-glow);font-style:normal;font-weight:500;}
+    .bs-tab-icon{font-size:12px;opacity:0.7;flex-shrink:0;}
+    .bs-tab.active .bs-tab-icon{opacity:1;}
+    .bs-tab-count{margin-left:auto;font-family:var(--font-d);font-size:9px;background:rgba(139,105,20,0.2);padding:2px 7px;border-radius:10px;color:var(--text-dim);}
+    .bs-tab.active .bs-tab-count{background:rgba(200,168,56,0.15);color:var(--gold);}
+
+    .bs-footer{padding:14px 16px;border-top:1px solid rgba(139,105,20,0.15);}
+    .btn-publish{width:100%;padding:10px;background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));border:none;border-radius:2px;color:#1a1208;font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;cursor:pointer;transition:filter 0.15s;}
+    .btn-publish:hover{filter:brightness(1.1);}
+    .btn-publish:disabled{opacity:0.4;cursor:not-allowed;filter:none;}
+
+    /* ── MAIN CONTENT ── */
+    .builder-main{flex:1;padding:32px 36px;max-width:800px;}
+    .section{display:none;}
+    .section.active{display:block;}
+
+    .section-title{font-family:var(--font-d);font-size:14px;font-weight:600;color:var(--text);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+    .section-desc{font-family:var(--font-b);font-size:14px;font-style:italic;color:var(--text-muted);margin-bottom:24px;line-height:1.6;}
+
+    /* ── FORM FIELDS ── */
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    label{font-family:var(--font-d);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
+    .field-hint{font-family:var(--font-b);font-size:11px;font-style:italic;color:var(--text-dim);}
+    input[type=text],input[type=number],select,textarea{
+      background:var(--bg-input);border:1px solid var(--gold-dim);
+      border-radius:3px;color:var(--text);padding:10px 13px;
+      font-size:14px;font-family:var(--font-b);outline:none;width:100%;
+      transition:border-color 0.15s;
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+    textarea{resize:vertical;min-height:80px;}
+    select option{background:#1a1208;}
+
+    .form-divider{height:1px;background:var(--gold-border);margin:24px 0;}
+
+    .btn-save{font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));border:none;border-radius:2px;color:#1a1208;font-weight:700;cursor:pointer;transition:filter 0.15s;}
+    .btn-save:hover{filter:brightness(1.1);}
+    .btn-add{font-family:var(--font-d);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border:1px solid var(--gold-border);border-radius:2px;color:var(--gold);background:var(--gold-glow);cursor:pointer;transition:all 0.15s;}
+    .btn-add:hover{background:rgba(200,168,56,0.15);}
+
+    /* ── ITEM CARDS ── */
+    .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:16px;}
+    .item-card{background:var(--bg-card);border:1px solid rgba(139,105,20,0.2);border-radius:3px;padding:14px 16px;position:relative;}
+    .item-card-icon{font-size:20px;margin-bottom:6px;}
+    .item-card-name{font-family:var(--font-d);font-size:10px;font-weight:600;color:var(--text);letter-spacing:1px;margin-bottom:4px;}
+    .item-card-sub{font-family:var(--font-b);font-size:12px;font-style:italic;color:var(--text-muted);line-height:1.4;}
+    .item-card-actions{display:flex;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(139,105,20,0.12);}
+    .btn-edit-sm{font-family:var(--font-d);font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border:1px solid rgba(139,105,20,0.3);border-radius:2px;color:var(--text-dim);background:none;cursor:pointer;transition:all 0.15s;}
+    .btn-edit-sm:hover{color:var(--gold);border-color:var(--gold-border);}
+    .btn-del-sm{font-family:var(--font-d);font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border:1px solid rgba(192,57,43,0.2);border-radius:2px;color:var(--error);background:none;cursor:pointer;transition:all 0.15s;opacity:0.6;}
+    .btn-del-sm:hover{opacity:1;background:rgba(192,57,43,0.08);}
+
+    /* Stat chips */
+    .stat-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+    .stat-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg-card);border:1px solid rgba(139,105,20,0.25);border-radius:3px;font-family:var(--font-d);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);}
+    .stat-chip input{width:80px;font-size:12px;padding:4px 8px;margin:0;}
+    .btn-remove-stat{background:none;border:none;color:var(--error);cursor:pointer;font-size:12px;opacity:0.6;padding:0 2px;}
+    .btn-remove-stat:hover{opacity:1;}
+
+    /* Trait tabs */
+    .trait-tabs{display:flex;gap:2px;border-bottom:1px solid var(--gold-border);margin-bottom:20px;}
+    .trait-tab{font-family:var(--font-d);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;border-top:none;border-left:none;border-right:none;transition:all 0.15s;}
+    .trait-tab:hover{color:var(--text-muted);}
+    .trait-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+    .trait-panel{display:none;}
+    .trait-panel.active{display:block;}
+
+    .trait-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-card);border:1px solid rgba(139,105,20,0.15);border-radius:3px;margin-bottom:6px;}
+    .trait-row-icon{font-size:16px;flex-shrink:0;}
+    .trait-row-info{flex:1;min-width:0;}
+    .trait-row-name{font-family:var(--font-d);font-size:9.5px;font-weight:600;color:var(--text);letter-spacing:0.5px;}
+    .trait-row-bonus{font-family:var(--font-b);font-size:12px;font-style:italic;color:var(--text-muted);}
+
+    /* Publish summary */
+    .publish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:28px;}
+    .pub-cell{background:var(--bg-card);border:1px solid rgba(139,105,20,0.18);border-radius:3px;padding:16px;text-align:center;}
+    .pub-num{font-family:var(--font-d);font-size:26px;font-weight:600;color:var(--gold);line-height:1;margin-bottom:4px;}
+    .pub-lbl{font-family:var(--font-d);font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);}
+    .pub-check{font-family:var(--font-b);font-size:13px;font-style:italic;padding:8px 0;border-bottom:1px solid rgba(139,105,20,0.12);}
+    .pub-check:last-child{border-bottom:none;}
+    .pub-check.ok{color:var(--success);}
+    .pub-check.warn{color:var(--gold);}
+    .pub-check.err{color:var(--error);}
+    .pub-checks{background:var(--bg-card);border:1px solid rgba(139,105,20,0.18);border-radius:3px;padding:14px 18px;margin-bottom:20px;}
+
+    /* ── MODAL ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--bg-card);border:1px solid var(--gold-dim);border-radius:4px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.6);}
+    .modal-hdr{padding:20px 24px 16px;border-bottom:1px solid rgba(139,105,20,0.2);position:sticky;top:0;background:var(--bg-card);z-index:1;}
+    .modal-title-txt{font-family:var(--font-d);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+    .modal-body{padding:20px 24px;}
+    .modal-footer{padding:14px 24px;border-top:1px solid rgba(139,105,20,0.2);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--bg-card);}
+    .btn-modal-ok{background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));border:none;border-radius:2px;color:#1a1208;font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:9px 20px;cursor:pointer;font-weight:700;}
+    .btn-modal-cancel{background:transparent;border:1px solid var(--gold-dim);border-radius:2px;color:var(--text-dim);font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;cursor:pointer;}
+
+    .bonus-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:4px;}
+    .bonus-cell{display:flex;flex-direction:column;gap:4px;}
+    .bonus-cell label{font-size:8px;}
+    .bonus-cell input{padding:6px 10px;font-size:13px;}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card);border:1px solid rgba(139,105,20,0.4);border-radius:3px;padding:12px 20px;font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);box-shadow:0 4px 20px rgba(0,0,0,0.5);transform:translateY(20px);opacity:0;transition:all 0.25s;z-index:9999;}
+    .toast.show{transform:translateY(0);opacity:1;}
+    .toast.error{border-color:rgba(192,57,43,0.4);color:var(--error);}
+
+    .empty-section{text-align:center;padding:40px 20px;color:var(--text-dim);border:1px dashed rgba(139,105,20,0.2);border-radius:3px;margin-bottom:16px;}
+    .empty-section-text{font-family:var(--font-b);font-size:14px;font-style:italic;margin-bottom:10px;}
+
+    @media(max-width:680px){
+      .builder-sidebar{width:52px;}
+      .bs-tab span:not(.bs-tab-icon){display:none;}
+      .bs-tab-count{display:none;}
+      .builder-main{padding:20px 16px;}
+      .field-row{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="builder-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="builder-sidebar">
+    <div class="bs-header">
+      <div class="bs-title">Builder</div>
+      <div class="bs-scenario-name" id="bs-name">New Scenario</div>
+      <div class="bs-status unsaved" id="bs-status">Unsaved</div>
+    </div>
+    <nav class="bs-nav">
+      <button class="bs-tab active" onclick="showSection('info')"><span class="bs-tab-icon">ℹ</span><span>World Info</span></button>
+      <button class="bs-tab" onclick="showSection('stats')"><span class="bs-tab-icon">📊</span><span>Stat System</span></button>
+      <button class="bs-tab" onclick="showSection('factions')"><span class="bs-tab-icon">🏰</span><span>Factions</span><span class="bs-tab-count" id="cnt-factions">0</span></button>
+      <button class="bs-tab" onclick="showSection('archetypes')"><span class="bs-tab-icon">◉</span><span>Archetypes</span><span class="bs-tab-count" id="cnt-archetypes">0</span></button>
+      <button class="bs-tab" onclick="showSection('cultures')"><span class="bs-tab-icon">🌍</span><span>Cultures</span><span class="bs-tab-count" id="cnt-cultures">0</span></button>
+      <button class="bs-tab" onclick="showSection('traits')"><span class="bs-tab-icon">✦</span><span>Traits</span><span class="bs-tab-count" id="cnt-traits">0</span></button>
+      <button class="bs-tab" onclick="showSection('publish')"><span class="bs-tab-icon">🚀</span><span>Publish</span></button>
+    </nav>
+    <div class="bs-footer">
+      <button class="btn-publish" id="btn-publish" onclick="publishScenario()">Publish</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="builder-main">
+
+    <!-- WORLD INFO -->
+    <div id="section-info" class="section active">
+      <div class="section-title">World Info</div>
+      <p class="section-desc">The identity of your scenario. Name, setting, and what players will see on the scenarios page.</p>
+      <div class="field-row">
+        <div class="field">
+          <label>Scenario Name *</label>
+          <input type="text" id="info-name" placeholder="e.g. The Iron Throne War" oninput="autoSlug()"/>
+        </div>
+        <div class="field">
+          <label>Slug * <span style="color:var(--text-dim);font-size:8px;">(URL identifier)</span></label>
+          <input type="text" id="info-slug" placeholder="e.g. iron-throne-war"/>
+          <span class="field-hint">Lowercase, letters, numbers, hyphens. Cannot change after first save.</span>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Era / Setting</label>
+          <input type="text" id="info-era" placeholder="e.g. 1066 AD, Far Future, Ancient Rome"/>
+        </div>
+        <div class="field">
+          <label>Visibility</label>
+          <select id="info-visibility">
+            <option value="private">Private — only you</option>
+            <option value="unlisted">Unlisted — anyone with the link</option>
+            <option value="public">Public — listed in directory</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Tagline</label>
+        <input type="text" id="info-tagline" placeholder="One line that hooks a player" maxlength="120"/>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea id="info-description" placeholder="Describe the world, the premise, and what players will experience…" style="min-height:120px;"></textarea>
+      </div>
+      <button class="btn-save" onclick="saveInfo()">Save World Info</button>
+    </div>
+
+    <!-- STAT SYSTEM -->
+    <div id="section-stats" class="section">
+      <div class="section-title">Stat System</div>
+      <p class="section-desc">Define which stats characters have. Each archetype will assign bonuses to these stats and each trait pool maps to one stat.</p>
+      <div class="field">
+        <label>Stats <span style="color:var(--text-dim);font-size:8px;">(click × to remove)</span></label>
+        <div class="stat-chips" id="stat-chips"></div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+          <input type="text" id="new-stat-name" placeholder="New stat name" style="max-width:180px;" onkeydown="if(event.key==='Enter')addStat()"/>
+          <button class="btn-add" onclick="addStat()">+ Add Stat</button>
+        </div>
+      </div>
+      <div class="form-divider"></div>
+      <div class="field-row">
+        <div class="field">
+          <label>Stat Cap <span style="color:var(--text-dim);font-size:8px;">(maximum at character creation)</span></label>
+          <input type="number" id="stat-cap" min="10" max="30" value="18"/>
+        </div>
+        <div class="field">
+          <label>Hard Cap <span style="color:var(--text-dim);font-size:8px;">(absolute maximum through play)</span></label>
+          <input type="number" id="stat-hard-cap" min="10" max="50" value="25"/>
+        </div>
+      </div>
+      <button class="btn-save" onclick="saveStats()">Save Stat System</button>
+    </div>
+
+    <!-- FACTIONS -->
+    <div id="section-factions" class="section">
+      <div class="section-title">Factions</div>
+      <p class="section-desc">The political or social groups players can belong to. Each character chooses one at creation.</p>
+      <div class="item-grid" id="faction-grid"></div>
+      <button class="btn-add" onclick="openModal('faction')">+ Add Faction</button>
+    </div>
+
+    <!-- ARCHETYPES -->
+    <div id="section-archetypes" class="section">
+      <div class="section-title">Archetypes</div>
+      <p class="section-desc">Character backgrounds that set stat bonuses, personal combat base, and which trait pool they draw from.</p>
+      <div class="item-grid" id="archetype-grid"></div>
+      <button class="btn-add" onclick="openModal('archetype')">+ Add Archetype</button>
+    </div>
+
+    <!-- CULTURES -->
+    <div id="section-cultures" class="section">
+      <div class="section-title">Cultures</div>
+      <p class="section-desc">Regional backgrounds that grant combat traditions and bonus modifiers. Each character picks one.</p>
+      <div class="item-grid" id="culture-grid"></div>
+      <button class="btn-add" onclick="openModal('culture')">+ Add Culture</button>
+    </div>
+
+    <!-- TRAITS -->
+    <div id="section-traits" class="section">
+      <div class="section-title">Traits</div>
+      <p class="section-desc">Childhood traits drawn from each stat pool during character creation. Each archetype has a primary stat — two traits are randomly awarded from that pool.</p>
+      <div class="trait-tabs" id="trait-tabs"></div>
+      <div id="trait-panels"></div>
+    </div>
+
+    <!-- PUBLISH -->
+    <div id="section-publish" class="section">
+      <div class="section-title">Publish</div>
+      <p class="section-desc">Review your scenario content before making it available for games.</p>
+      <div class="publish-grid" id="publish-summary"></div>
+      <div class="pub-checks" id="pub-checks"></div>
+      <button class="btn-save" onclick="publishScenario()" id="btn-pub-main">Publish Scenario</button>
+    </div>
+
+  </main>
+</div>
+
+<!-- ITEM MODAL -->
+<div class="modal-overlay" id="item-modal" onclick="handleModalOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title-txt" id="modal-title">Add Item</div>
+    </div>
+    <div class="modal-body" id="modal-form"></div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-modal-ok" onclick="saveFromModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/ur-nav.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const params      = new URLSearchParams(window.location.search);
+let SCENARIO_ID   = params.get('id') || null;
+let SLUG_LOCKED   = !!SCENARIO_ID;
+let ACTIVE_SECTION = 'info';
+let MODAL_TYPE    = null;
+let MODAL_INDEX   = null;
+let MODAL_STAT    = null;
+let ACTIVE_TRAIT_STAT = null;
+
+let META = { name:'', slug:'', era:'', tagline:'', description:'', visibility:'private' };
+let CONTENT = {
+  statKeys: ['Martial','Diplomacy','Stewardship','Intrigue','Learning'],
+  statCap: 18, hardCap: 25,
+  factions: [], archetypes: [], cultures: [],
+  traits: {}, combatTraits: [],
+  combatEvents: [
+    {roll:1,bonus:0,icon:'🌾',label:'Uneventful Upbringing',desc:'No noteworthy combat experience.'},
+    {roll:2,bonus:0,icon:'🌾',label:'Uneventful Upbringing',desc:'No noteworthy combat experience.'},
+    {roll:3,bonus:1,icon:'🐗',label:'Hunting Accident',desc:'A boar, a cornered wolf, a riding fall. They learned about pain — and getting back up.'},
+    {roll:4,bonus:1,icon:'🥊',label:'Formative Brawl',desc:'A street fight, a tavern confrontation. Not training — but real.'},
+    {roll:5,bonus:2,icon:'⚔', label:'Border Skirmish',desc:'A raid, a bandit attack. They fought before they were ready.'},
+    {roll:6,bonus:3,icon:'🔥',label:'Survived Serious Violence',desc:'Ambush, siege, a battle they had no business being in. They are harder for it.'},
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+async function init() {
+  // Wait for auth
+  await new Promise(r => setTimeout(r, 500));
+  if (!window.UR_USER) {
+    window.location.href = '/login.html?redirect=/scenario-builder.html' + (SCENARIO_ID ? '?id=' + SCENARIO_ID : '');
+    return;
+  }
+
+  if (SCENARIO_ID) {
+    await loadScenario();
+  } else {
+    renderAllSections();
+  }
+}
+
+async function loadScenario() {
+  try {
+    const res = await fetch(`/api/scenarios/${SCENARIO_ID}`);
+    if (!res.ok) { showToast('Scenario not found', 'error'); return; }
+    const s = await res.json();
+
+    if (s.authorUserId !== window.UR_USER.userId && s.authorUserId !== 'system') {
+      showToast('Not your scenario', 'error');
+      setTimeout(() => window.location.href = '/scenarios.html', 1500);
+      return;
+    }
+
+    META = { name: s.name, slug: s.slug, era: s.era || '', tagline: s.tagline || '', description: s.description || '', visibility: s.visibility || 'private' };
+    if (s.content) CONTENT = { ...CONTENT, ...s.content };
+    SLUG_LOCKED = true;
+
+    populateInfoForm();
+    renderAllSections();
+    setStatus('saved');
+    document.getElementById('bs-name').textContent = META.name || 'Untitled';
+  } catch {
+    showToast('Failed to load scenario', 'error');
+  }
+}
+
+function populateInfoForm() {
+  document.getElementById('info-name').value        = META.name;
+  document.getElementById('info-slug').value        = META.slug;
+  document.getElementById('info-era').value         = META.era;
+  document.getElementById('info-tagline').value     = META.tagline;
+  document.getElementById('info-description').value = META.description;
+  document.getElementById('info-visibility').value  = META.visibility;
+  if (SLUG_LOCKED) {
+    document.getElementById('info-slug').disabled = true;
+    document.getElementById('info-slug').style.opacity = '0.5';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showSection(name) {
+  ACTIVE_SECTION = name;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.bs-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.querySelectorAll('.bs-tab')[['info','stats','factions','archetypes','cultures','traits','publish'].indexOf(name)].classList.add('active');
+  if (name === 'traits') renderTraits();
+  if (name === 'publish') renderPublish();
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAVE INFO
+// ═══════════════════════════════════════════════════════════
+function autoSlug() {
+  if (SLUG_LOCKED) return;
+  const name = document.getElementById('info-name').value;
+  document.getElementById('info-slug').value = name.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,50).replace(/^-|-$/g,'');
+}
+
+async function saveInfo() {
+  const name       = document.getElementById('info-name').value.trim();
+  const slug       = document.getElementById('info-slug').value.trim();
+  const era        = document.getElementById('info-era').value.trim();
+  const tagline    = document.getElementById('info-tagline').value.trim();
+  const description= document.getElementById('info-description').value.trim();
+  const visibility = document.getElementById('info-visibility').value;
+
+  if (!name || !slug) { showToast('Name and slug are required', 'error'); return; }
+  if (!/^[a-z][a-z0-9-]{1,49}$/.test(slug)) { showToast('Invalid slug format', 'error'); return; }
+
+  META = { name, slug, era, tagline, description, visibility };
+  setStatus('saving');
+
+  try {
+    if (!SCENARIO_ID) {
+      const res = await fetch('/api/scenarios', {
+        method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+        body: JSON.stringify(META),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error || 'Create failed', 'error'); setStatus('unsaved'); return; }
+      SCENARIO_ID = data.scenarioId;
+      SLUG_LOCKED = true;
+      document.getElementById('info-slug').disabled = true;
+      document.getElementById('info-slug').style.opacity = '0.5';
+      history.replaceState({}, '', `/scenario-builder.html?id=${SCENARIO_ID}`);
+    } else {
+      const res = await fetch(`/api/scenarios/${SCENARIO_ID}`, {
+        method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+        body: JSON.stringify({ name, era, tagline, description, visibility }),
+      });
+      if (!res.ok) { showToast('Save failed', 'error'); setStatus('unsaved'); return; }
+    }
+    document.getElementById('bs-name').textContent = name;
+    setStatus('saved');
+    showToast('World info saved');
+  } catch { showToast('Network error', 'error'); setStatus('unsaved'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAVE STATS
+// ═══════════════════════════════════════════════════════════
+function addStat() {
+  const inp = document.getElementById('new-stat-name');
+  const name = inp.value.trim();
+  if (!name) return;
+  if (CONTENT.statKeys.includes(name)) { showToast('Stat already exists', 'error'); return; }
+  CONTENT.statKeys.push(name);
+  if (!CONTENT.traits[name]) CONTENT.traits[name] = [];
+  inp.value = '';
+  renderStatChips();
+}
+
+function removeStat(name) {
+  if (CONTENT.statKeys.length <= 1) { showToast('Need at least one stat', 'error'); return; }
+  CONTENT.statKeys = CONTENT.statKeys.filter(s => s !== name);
+  renderStatChips();
+}
+
+function renderStatChips() {
+  document.getElementById('stat-chips').innerHTML = CONTENT.statKeys.map(s => `
+    <div class="stat-chip">
+      <span>${s}</span>
+      <button class="btn-remove-stat" onclick="removeStat('${s}')" title="Remove ${s}">×</button>
+    </div>`).join('');
+}
+
+async function saveStats() {
+  CONTENT.statCap  = parseInt(document.getElementById('stat-cap').value) || 18;
+  CONTENT.hardCap  = parseInt(document.getElementById('stat-hard-cap').value) || 25;
+  await saveContent();
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAVE CONTENT (shared)
+// ═══════════════════════════════════════════════════════════
+async function saveContent() {
+  if (!SCENARIO_ID) { showToast('Save World Info first', 'error'); return; }
+  setStatus('saving');
+  try {
+    const res = await fetch(`/api/scenarios/${SCENARIO_ID}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ content: CONTENT }),
+    });
+    if (!res.ok) throw new Error();
+    setStatus('saved');
+    updateCounts();
+    showToast('Saved');
+  } catch { setStatus('unsaved'); showToast('Save failed', 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER SECTIONS
+// ═══════════════════════════════════════════════════════════
+function renderAllSections() {
+  renderStatChips();
+  document.getElementById('stat-cap').value      = CONTENT.statCap;
+  document.getElementById('stat-hard-cap').value = CONTENT.hardCap;
+  renderItemGrid('faction');
+  renderItemGrid('archetype');
+  renderItemGrid('culture');
+  updateCounts();
+}
+
+function renderItemGrid(type) {
+  const arr = CONTENT[type + 's'] || [];
+  const grid = document.getElementById(type + '-grid');
+  if (!arr.length) {
+    grid.innerHTML = `<div class="empty-section" style="grid-column:1/-1"><div class="empty-section-text">No ${type}s yet. Add your first one.</div></div>`;
+    return;
+  }
+  grid.innerHTML = arr.map((item, i) => renderItemCard(type, item, i)).join('');
+}
+
+function renderItemCard(type, item, i) {
+  let icon = item.icon || '◉';
+  let name = item.name || item.label || 'Unnamed';
+  let sub  = '';
+  if (type === 'faction')   sub = item.rank || '';
+  if (type === 'archetype') sub = `PC ${item.pc} · ${item.primary || ''}`;
+  if (type === 'culture')   sub = item.region || '';
+  return `
+    <div class="item-card">
+      <div class="item-card-icon">${icon}</div>
+      <div class="item-card-name">${esc(name)}</div>
+      <div class="item-card-sub">${esc(sub)}</div>
+      <div class="item-card-actions">
+        <button class="btn-edit-sm" onclick="openModal('${type}',${i})">Edit</button>
+        <button class="btn-del-sm"  onclick="deleteItem('${type}',${i})">Delete</button>
+      </div>
+    </div>`;
+}
+
+function deleteItem(type, index) {
+  if (!confirm('Delete this item?')) return;
+  CONTENT[type + 's'].splice(index, 1);
+  renderItemGrid(type);
+  saveContent();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TRAITS
+// ═══════════════════════════════════════════════════════════
+function renderTraits() {
+  const tabs   = document.getElementById('trait-tabs');
+  const panels = document.getElementById('trait-panels');
+  if (!CONTENT.statKeys.length) {
+    tabs.innerHTML = ''; panels.innerHTML = '<p style="color:var(--text-dim);font-style:italic;font-size:14px;">Add stats first.</p>';
+    return;
+  }
+  if (!ACTIVE_TRAIT_STAT || !CONTENT.statKeys.includes(ACTIVE_TRAIT_STAT)) {
+    ACTIVE_TRAIT_STAT = CONTENT.statKeys[0];
+  }
+  tabs.innerHTML = CONTENT.statKeys.map(s =>
+    `<button class="trait-tab${s === ACTIVE_TRAIT_STAT ? ' active' : ''}" onclick="switchTraitTab('${s}')">${s}</button>`
+  ).join('');
+  panels.innerHTML = CONTENT.statKeys.map(s => {
+    const traits = CONTENT.traits[s] || [];
+    return `<div class="trait-panel${s === ACTIVE_TRAIT_STAT ? ' active' : ''}" id="trait-panel-${s}">
+      ${traits.length ? traits.map((t, i) => `
+        <div class="trait-row">
+          <div class="trait-row-icon">${t.icon || '✦'}</div>
+          <div class="trait-row-info">
+            <div class="trait-row-name">${esc(t.name)}</div>
+            <div class="trait-row-bonus">${esc(t.bonus)}</div>
+          </div>
+          <button class="btn-edit-sm" onclick="openModal('trait',${i},'${s}')">Edit</button>
+          <button class="btn-del-sm"  onclick="deleteTrait('${s}',${i})">✕</button>
+        </div>`).join('')
+      : `<div class="empty-section"><div class="empty-section-text">No ${s} traits yet.</div></div>`}
+      <button class="btn-add" style="margin-top:10px;" onclick="openModal('trait',null,'${s}')">+ Add ${s} Trait</button>
+    </div>`;
+  }).join('');
+  updateCounts();
+}
+
+function switchTraitTab(stat) {
+  ACTIVE_TRAIT_STAT = stat;
+  document.querySelectorAll('.trait-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.trait-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('trait-panel-' + stat).classList.add('active');
+}
+
+function deleteTrait(stat, index) {
+  if (!confirm('Delete this trait?')) return;
+  CONTENT.traits[stat].splice(index, 1);
+  renderTraits();
+  saveContent();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PUBLISH
+// ═══════════════════════════════════════════════════════════
+function renderPublish() {
+  const totalTraits = Object.values(CONTENT.traits || {}).reduce((a, t) => a + (t||[]).length, 0);
+  document.getElementById('publish-summary').innerHTML = `
+    <div class="pub-cell"><div class="pub-num">${CONTENT.factions.length}</div><div class="pub-lbl">Factions</div></div>
+    <div class="pub-cell"><div class="pub-num">${CONTENT.archetypes.length}</div><div class="pub-lbl">Archetypes</div></div>
+    <div class="pub-cell"><div class="pub-num">${CONTENT.cultures.length}</div><div class="pub-lbl">Cultures</div></div>
+    <div class="pub-cell"><div class="pub-num">${totalTraits}</div><div class="pub-lbl">Traits</div></div>`;
+
+  const checks = [
+    { ok: !!META.name,                   msg: META.name        ? `✓ Name: "${META.name}"`              : '✗ No scenario name' },
+    { ok: CONTENT.factions.length >= 1,  msg: CONTENT.factions.length  ? `✓ ${CONTENT.factions.length} factions`   : '✗ No factions (minimum 1)' },
+    { ok: CONTENT.archetypes.length >= 1,msg: CONTENT.archetypes.length ? `✓ ${CONTENT.archetypes.length} archetypes`: '✗ No archetypes (minimum 1)' },
+    { ok: CONTENT.cultures.length >= 1,  msg: CONTENT.cultures.length  ? `✓ ${CONTENT.cultures.length} cultures`   : '⚠ No cultures (recommended)', warn: true },
+    { ok: totalTraits > 0,               msg: totalTraits               ? `✓ ${totalTraits} traits total`           : '⚠ No traits (recommended)', warn: true },
+  ];
+
+  document.getElementById('pub-checks').innerHTML = checks.map(c =>
+    `<div class="pub-check ${c.ok ? 'ok' : c.warn ? 'warn' : 'err'}">${c.msg}</div>`
+  ).join('');
+
+  const canPublish = !!META.name && CONTENT.factions.length >= 1 && CONTENT.archetypes.length >= 1;
+  document.getElementById('btn-pub-main').disabled = !canPublish;
+  document.getElementById('btn-publish').disabled  = !canPublish;
+}
+
+async function publishScenario() {
+  if (!SCENARIO_ID) { showToast('Save World Info first', 'error'); return; }
+  const vis = document.getElementById('info-visibility')?.value || META.visibility;
+  try {
+    const res = await fetch(`/api/scenarios/${SCENARIO_ID}/publish`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ visibility: vis }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Publish failed', 'error'); return; }
+    showToast('Scenario published!');
+    setTimeout(() => window.location.href = `/scenario.html?id=${SCENARIO_ID}`, 1500);
+  } catch { showToast('Network error', 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════
+function openModal(type, index = null, stat = null) {
+  MODAL_TYPE  = type;
+  MODAL_INDEX = index;
+  MODAL_STAT  = stat;
+
+  const isEdit = index !== null;
+  let item = {};
+  if (type === 'trait') {
+    item = isEdit ? (CONTENT.traits[stat] || [])[index] || {} : {};
+  } else {
+    item = isEdit ? (CONTENT[type + 's'] || [])[index] || {} : {};
+  }
+
+  document.getElementById('modal-title').textContent = `${isEdit ? 'Edit' : 'New'} ${capitalize(type)}${stat ? ' (' + stat + ')' : ''}`;
+  document.getElementById('modal-form').innerHTML = buildFormHTML(type, item);
+  document.getElementById('item-modal').classList.add('show');
+}
+
+function buildFormHTML(type, item) {
+  if (type === 'faction') return `
+    <div class="field-row">
+      <div class="field"><label>Icon (emoji)</label><input type="text" id="m-icon" value="${esc(item.icon||'🏰')}" placeholder="🏰"/></div>
+      <div class="field"><label>Name *</label><input type="text" id="m-label" value="${esc(item.label||'')}" placeholder="Noble House"/></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Rank / Title</label><input type="text" id="m-rank" value="${esc(item.rank||'')}" placeholder="Baron / Count"/></div>
+      <div class="field"><label>Starting Gold</label><input type="text" id="m-gold" value="${esc(item.gold||'')}" placeholder="200–400"/></div>
+    </div>
+    <div class="field"><label>Starting Army</label><input type="text" id="m-army" value="${esc(item.army||'')}" placeholder="500–2,000 levies"/></div>
+    <div class="field"><label>Description</label><textarea id="m-desc" placeholder="What makes this faction unique?">${esc(item.desc||'')}</textarea></div>`;
+
+  if (type === 'archetype') {
+    const bonusInputs = CONTENT.statKeys.map(k =>
+      `<div class="bonus-cell"><label>${k}</label><input type="number" id="m-bonus-${k}" value="${item.bonuses?.[k]||0}" min="0" max="5"/></div>`
+    ).join('');
+    const primaryOpts = CONTENT.statKeys.map(k =>
+      `<option value="${k}" ${item.primary===k?'selected':''}>${k}</option>`
+    ).join('');
+    return `
+    <div class="field-row">
+      <div class="field"><label>Icon</label><input type="text" id="m-icon" value="${esc(item.icon||'◉')}" placeholder="◉"/></div>
+      <div class="field"><label>Name *</label><input type="text" id="m-name" value="${esc(item.name||'')}" placeholder="The Warlord"/></div>
+    </div>
+    <div class="field"><label>Background</label><input type="text" id="m-bg" value="${esc(item.bg||'')}" placeholder="Short description of their upbringing"/></div>
+    <div class="field"><label>Flavor Quote</label><textarea id="m-flavor" style="min-height:60px;" placeholder="A sentence that captures their essence.">${esc(item.flavor||'')}</textarea></div>
+    <div class="field-row">
+      <div class="field"><label>Personal Combat Base</label><input type="number" id="m-pc" value="${item.pc||6}" min="1" max="20"/></div>
+      <div class="field"><label>Primary Stat (trait pool)</label><select id="m-primary">${primaryOpts}</select></div>
+    </div>
+    <div class="field"><label>Stat Bonuses</label><div class="bonus-grid">${bonusInputs}</div></div>`;
+  }
+
+  if (type === 'culture') return `
+    <div class="field-row">
+      <div class="field"><label>Name *</label><input type="text" id="m-label" value="${esc(item.label||'')}" placeholder="Norman"/></div>
+      <div class="field"><label>Region</label><input type="text" id="m-region" value="${esc(item.region||'')}" placeholder="Normandy"/></div>
+    </div>
+    <div class="field"><label>Regional Bonuses</label><input type="text" id="m-bonuses" value="${esc(item.bonuses||'')}" placeholder="+2 Cavalry, +1 Siege"/></div>
+    <div class="field"><label>Combat Tradition</label><input type="text" id="m-combat" value="${esc(item.combat||'')}" placeholder="Cavalry charge bonus on open ground"/></div>
+    <div class="field"><label>Historical Context</label><textarea id="m-context" style="min-height:60px;" placeholder="What's happening in this region during the scenario?">${esc(item.context||'')}</textarea></div>`;
+
+  if (type === 'trait') return `
+    <div class="field-row">
+      <div class="field"><label>Icon</label><input type="text" id="m-icon" value="${esc(item.icon||'✦')}" placeholder="✦"/></div>
+      <div class="field"><label>Name *</label><input type="text" id="m-name" value="${esc(item.name||'')}" placeholder="Iron Constitution"/></div>
+    </div>
+    <div class="field"><label>Flavor</label><input type="text" id="m-flavor" value="${esc(item.flavor||'')}" placeholder="A sentence that evokes the trait"/></div>
+    <div class="field"><label>Bonus *</label><input type="text" id="m-bonus" value="${esc(item.bonus||'')}" placeholder="+1 to all personal combat rolls"/></div>`;
+
+  return '';
+}
+
+function saveFromModal() {
+  let item = {};
+  if (MODAL_TYPE === 'faction') {
+    const label = document.getElementById('m-label').value.trim();
+    if (!label) { showToast('Name is required', 'error'); return; }
+    item = { id: toId(label), icon: document.getElementById('m-icon').value.trim()||'⚑', label, rank: document.getElementById('m-rank').value.trim(), gold: document.getElementById('m-gold').value.trim(), army: document.getElementById('m-army').value.trim(), desc: document.getElementById('m-desc').value.trim() };
+  } else if (MODAL_TYPE === 'archetype') {
+    const name = document.getElementById('m-name').value.trim();
+    if (!name) { showToast('Name is required', 'error'); return; }
+    const bonuses = {};
+    CONTENT.statKeys.forEach(k => { const v = parseInt(document.getElementById('m-bonus-'+k).value)||0; if (v) bonuses[k]=v; });
+    item = { id: toId(name), icon: document.getElementById('m-icon').value.trim()||'◉', name, bg: document.getElementById('m-bg').value.trim(), flavor: document.getElementById('m-flavor').value.trim(), pc: parseInt(document.getElementById('m-pc').value)||6, primary: document.getElementById('m-primary').value, bonuses };
+  } else if (MODAL_TYPE === 'culture') {
+    const label = document.getElementById('m-label').value.trim();
+    if (!label) { showToast('Name is required', 'error'); return; }
+    item = { id: toId(label), label, region: document.getElementById('m-region').value.trim(), bonuses: document.getElementById('m-bonuses').value.trim(), combat: document.getElementById('m-combat').value.trim(), context: document.getElementById('m-context').value.trim() };
+  } else if (MODAL_TYPE === 'trait') {
+    const name = document.getElementById('m-name').value.trim();
+    const bonus = document.getElementById('m-bonus').value.trim();
+    if (!name || !bonus) { showToast('Name and bonus are required', 'error'); return; }
+    if (!CONTENT.traits[MODAL_STAT]) CONTENT.traits[MODAL_STAT] = [];
+    item = { id: toId(name), icon: document.getElementById('m-icon').value.trim()||'✦', name, flavor: document.getElementById('m-flavor').value.trim(), bonus };
+    if (MODAL_INDEX !== null) {
+      CONTENT.traits[MODAL_STAT][MODAL_INDEX] = item;
+    } else {
+      CONTENT.traits[MODAL_STAT].push(item);
+    }
+    closeModal();
+    renderTraits();
+    saveContent();
+    return;
+  }
+
+  const arr = CONTENT[MODAL_TYPE + 's'];
+  if (MODAL_INDEX !== null) arr[MODAL_INDEX] = item; else arr.push(item);
+  closeModal();
+  renderItemGrid(MODAL_TYPE);
+  saveContent();
+}
+
+function closeModal() { document.getElementById('item-modal').classList.remove('show'); }
+function handleModalOverlayClick(e) { if (e.target === document.getElementById('item-modal')) closeModal(); }
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function updateCounts() {
+  document.getElementById('cnt-factions').textContent  = CONTENT.factions.length;
+  document.getElementById('cnt-archetypes').textContent= CONTENT.archetypes.length;
+  document.getElementById('cnt-cultures').textContent  = CONTENT.cultures.length;
+  const totalTraits = Object.values(CONTENT.traits||{}).reduce((a,t)=>a+(t||[]).length,0);
+  document.getElementById('cnt-traits').textContent = totalTraits;
+}
+
+function setStatus(state) {
+  const el = document.getElementById('bs-status');
+  el.className = 'bs-status ' + state;
+  el.textContent = state === 'saved' ? 'All saved' : state === 'saving' ? 'Saving…' : 'Unsaved changes';
+}
+
+function toId(label) {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,30) || 'item_'+Date.now();
+}
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function esc(str) {
+  if (!str) return '';
+  const d = document.createElement('div'); d.textContent = String(str); return d.innerHTML;
+}
+
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = 'toast' + (type==='error' ? ' error' : '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300);},2500);
+}
+
+init();
+</script>
+</body>
+</html>

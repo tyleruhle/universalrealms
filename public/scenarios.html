@@ -114,27 +114,65 @@
       </div>
     </div>
 
-    <div class="sec-hdr">
-      <span class="sec-hdr-label" id="count-label">Published Worlds</span>
-      <div class="sec-hdr-line"></div>
+    <!-- Tabs -->
+    <div style="display:flex;gap:2px;border-bottom:1px solid var(--gold-border);margin-bottom:24px;">
+      <button id="tab-public" class="sc-tab active" onclick="switchTab('public')" style="font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 18px;color:var(--gold);background:none;border:none;border-bottom:2px solid var(--gold);margin-bottom:-1px;cursor:pointer;">Published</button>
+      <button id="tab-mine" class="sc-tab" onclick="switchTab('mine')" style="font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 18px;color:var(--text-dim);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;display:none;">My Scenarios</button>
     </div>
 
-    <div class="scenario-grid" id="scenario-grid">
-      <div class="loading">Loading worlds…</div>
+    <div id="panel-public" class="sc-panel" style="display:block;">
+      <div class="sec-hdr">
+        <span class="sec-hdr-label" id="count-label">Published Worlds</span>
+        <div class="sec-hdr-line"></div>
+      </div>
+      <div class="scenario-grid" id="scenario-grid">
+        <div class="loading">Loading worlds…</div>
+      </div>
     </div>
+
+    <div id="panel-mine" class="sc-panel" style="display:none;">
+      <div class="sec-hdr">
+        <span class="sec-hdr-label">My Scenarios</span>
+        <div class="sec-hdr-line"></div>
+        <a href="/scenario-builder.html" style="font-family:var(--font-d);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-decoration:none;white-space:nowrap;">+ New Scenario</a>
+      </div>
+      <div class="scenario-grid" id="my-scenario-grid">
+        <div class="loading">Loading…</div>
+      </div>
+    </div>
+
   </div>
 
   <script src="/js/ur-nav.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // Show create button if logged in
       await new Promise(r => setTimeout(r, 400));
       if (window.UR_USER) {
         document.getElementById('btn-create').style.display = '';
         document.getElementById('btn-mine').style.display   = '';
+        document.getElementById('tab-mine').style.display   = '';
       }
       loadScenarios();
+      // Check if mine tab requested
+      if (new URLSearchParams(window.location.search).get('mine') === '1' && window.UR_USER) {
+        switchTab('mine');
+      }
     });
+
+    let ACTIVE_TAB = 'public';
+    function switchTab(tab) {
+      ACTIVE_TAB = tab;
+      document.querySelectorAll('.sc-tab').forEach(t => {
+        t.style.color = 'var(--text-dim)';
+        t.style.borderBottom = '2px solid transparent';
+      });
+      document.querySelectorAll('.sc-panel').forEach(p => p.style.display = 'none');
+      const activeTab = document.getElementById('tab-' + tab);
+      activeTab.style.color = 'var(--gold)';
+      activeTab.style.borderBottom = '2px solid var(--gold)';
+      document.getElementById('panel-' + tab).style.display = 'block';
+      if (tab === 'mine') loadMyScenarios();
+    }
 
     async function loadScenarios() {
       try {
@@ -144,6 +182,37 @@
       } catch {
         document.getElementById('scenario-grid').innerHTML =
           `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">Failed to load scenarios.</div></div>`;
+      }
+    }
+
+    async function loadMyScenarios() {
+      const grid = document.getElementById('my-scenario-grid');
+      grid.innerHTML = '<div class="loading">Loading…</div>';
+      try {
+        const res = await fetch('/api/scenarios/mine', { credentials: 'include' });
+        const scenarios = res.ok ? await res.json() : [];
+        if (!scenarios.length) {
+          grid.innerHTML = `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">You haven't created any scenarios yet.</div></div>`;
+          return;
+        }
+        grid.innerHTML = scenarios.map(s => {
+          const games = s.gameCount || 0;
+          return `<a href="/scenario-builder.html?id=${esc(s.scenarioId)}" class="scenario-card">
+            <div class="sc-header">
+              <span class="sc-era">${esc(s.era || 'Custom Era')}</span>
+              <span class="sc-state ${s.state}">${s.state}</span>
+            </div>
+            <div class="sc-name">${esc(s.name)}</div>
+            <div class="sc-tagline">${esc(s.tagline || 'No tagline yet')}</div>
+            <div class="sc-meta">
+              <div class="sc-meta-item"><span>⚑</span>${games} Game${games!==1?'s':''}</div>
+              <div class="sc-meta-item"><span>✦</span>v${esc(s.version||'1.0.0')}</div>
+            </div>
+            <div class="sc-cta">Edit Scenario →</div>
+          </a>`;
+        }).join('');
+      } catch {
+        grid.innerHTML = `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">Failed to load your scenarios.</div></div>`;
       }
     }
 
