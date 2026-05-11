@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Games — Universal Realms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#1a1208;--bg-card:#150e04;--bg-card2:#1e1408;--gold:#c8a838;--gold-dim:#8b6914;--gold-border:rgba(200,168,56,0.28);--gold-glow:rgba(200,168,56,0.08);--text:#e8d5a3;--text-muted:#a08848;--text-dim:#7a6030;--font-d:'Cinzel',serif;--font-b:'EB Garamond',Georgia,serif;}
+    body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);}
+    .ur-nav-shell{height:52px;display:flex;align-items:stretch;background:#2a1c0d;border-bottom:1px solid #3d2b14;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.45);}
+    .ur-nav-shell::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(184,137,42,0.28),transparent);}
+    .ur-logo-btn{padding:0 22px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,0.06);text-decoration:none;flex-shrink:0;}
+    .ur-logo-name{font-family:var(--font-d);font-size:12px;font-weight:600;color:#f5edd8;letter-spacing:2.5px;text-transform:uppercase;line-height:1;}
+    .ur-logo-tag{font-family:var(--font-b);font-size:9px;color:var(--gold);letter-spacing:1.5px;margin-top:3px;font-style:italic;opacity:0.75;}
+    .ur-nav-links{display:flex;align-items:stretch;flex:1;padding:0 4px;overflow-x:auto;}
+    .ur-nav-links::-webkit-scrollbar{display:none;}
+    .ur-nav-lnk{display:flex;align-items:center;gap:7px;padding:0 14px;font-family:var(--font-b);font-size:13.5px;font-style:italic;color:#9a8468;text-decoration:none;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;}
+    .ur-nav-lnk:hover{color:#e8d9bb;background:rgba(255,255,255,0.03);}
+    .ur-nav-lnk.cur{color:var(--gold);border-bottom-color:var(--gold-dim);font-style:normal;font-weight:500;background:var(--gold-glow);}
+    .ur-nav-right{display:flex;align-items:center;padding:0 18px;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.06);}
+    .content{position:relative;z-index:1;max-width:1020px;margin:0 auto;padding:40px 24px 80px;}
+    .page-hero{text-align:center;margin-bottom:40px;}
+    .page-eyebrow{font-family:var(--font-d);font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);opacity:0.7;margin-bottom:12px;}
+    .page-title{font-family:var(--font-d);font-size:clamp(20px,4vw,34px);font-weight:600;color:#f0d878;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;text-shadow:0 2px 20px rgba(200,168,56,0.2);}
+    .page-sub{font-family:var(--font-b);font-size:15px;font-style:italic;color:var(--text-muted);}
+    .tabs{display:flex;gap:2px;margin-bottom:28px;border-bottom:1px solid var(--gold-border);}
+    .tab{font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 18px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none;}
+    .tab:hover{color:var(--text-muted);}
+    .tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+    .sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+    .sec-hdr-label{font-family:var(--font-d);font-size:8.5px;letter-spacing:3.5px;color:var(--gold);text-transform:uppercase;white-space:nowrap;opacity:0.9;}
+    .sec-hdr-line{flex:1;height:1px;background:linear-gradient(90deg,var(--gold-border),transparent);}
+    .game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+    .game-card{background:var(--bg-card);border:1px solid rgba(139,105,20,0.2);border-radius:3px;padding:20px 20px 16px;text-decoration:none;display:flex;flex-direction:column;transition:all 0.2s;position:relative;overflow:hidden;}
+    .game-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);opacity:0.3;transition:opacity 0.2s;}
+    .game-card:hover{border-color:rgba(200,168,56,0.45);background:var(--bg-card2);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.35);}
+    .game-card:hover::before{opacity:0.9;}
+    .gc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+    .gc-state{font-family:var(--font-d);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:2px;}
+    .gc-state.running{color:#27ae60;border:1px solid rgba(39,174,96,0.3);background:rgba(39,174,96,0.07);}
+    .gc-state.setup{color:var(--gold);border:1px solid var(--gold-border);background:var(--gold-glow);}
+    .gc-state.paused{color:#e8a080;border:1px solid rgba(232,160,128,0.3);background:rgba(232,160,128,0.07);}
+    .gc-state.concluded{color:var(--text-dim);border:1px solid rgba(139,105,20,0.2);}
+    .gc-scenario{font-family:var(--font-d);font-size:7.5px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);}
+    .gc-name{font-family:var(--font-d);font-size:14px;font-weight:600;color:var(--text);letter-spacing:1.5px;margin-bottom:5px;}
+    .gc-tagline{font-family:var(--font-b);font-size:13px;font-style:italic;color:var(--text-muted);line-height:1.6;margin-bottom:12px;flex:1;}
+    .gc-meta{display:flex;gap:14px;padding-top:10px;border-top:1px solid rgba(139,105,20,0.12);}
+    .gc-meta-item{font-family:var(--font-d);font-size:7.5px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);}
+    .gc-meta-item span{color:var(--gold);margin-right:4px;}
+    .gc-cta{font-family:var(--font-d);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-top:10px;opacity:0.6;transition:opacity 0.15s;}
+    .game-card:hover .gc-cta{opacity:1;}
+    .empty-state{text-align:center;padding:60px 20px;}
+    .empty-icon{font-size:32px;opacity:0.3;margin-bottom:14px;}
+    .empty-text{font-family:var(--font-b);font-size:15px;font-style:italic;color:var(--text-dim);margin-bottom:20px;}
+    .empty-link{font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:9px 22px;border:1px solid var(--gold-border);border-radius:2px;color:var(--gold);text-decoration:none;background:var(--gold-glow);transition:all 0.15s;display:inline-block;}
+    .empty-link:hover{background:rgba(200,168,56,0.15);}
+    .loading{text-align:center;padding:60px 20px;font-family:var(--font-d);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);}
+    .tab-panel{display:none;} .tab-panel.active{display:block;}
+  </style>
+</head>
+<body>
+  <nav class="ur-nav-shell">
+    <a href="/" class="ur-logo-btn"><div class="ur-logo-name">Universal Realms</div><div class="ur-logo-tag">World Engine</div></a>
+    <div class="ur-nav-links">
+      <a href="/"                       class="ur-nav-lnk"><span>⌂</span>Dashboard</a>
+      <a href="/character_creator.html" class="ur-nav-lnk"><span>◉</span>Characters</a>
+      <a href="/battle_roller.html"     class="ur-nav-lnk"><span>⚔</span>Battle</a>
+      <a href="/duel_roller.html"       class="ur-nav-lnk"><span>◈</span>Duel</a>
+      <a href="/raid_roller.html"       class="ur-nav-lnk"><span>⚑</span>Raid</a>
+      <a href="/chronicle_map.html"     class="ur-nav-lnk"><span>⊞</span>Map</a>
+      <a href="/players.html"           class="ur-nav-lnk"><span>◎</span>Players</a>
+      <a href="/scenarios.html"         class="ur-nav-lnk"><span>✦</span>Scenarios</a>
+      <a href="/games.html"             class="ur-nav-lnk cur"><span>⚑</span>Games</a>
+    </div>
+    <div class="ur-nav-right" id="ur-auth-nav"></div>
+  </nav>
+
+  <div class="content">
+    <div class="page-hero">
+      <div class="page-eyebrow">World Engine · Active Campaigns</div>
+      <div class="page-title">Games</div>
+      <p class="page-sub">Running campaigns. Join one or start your own from a scenario.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('public')">Public Games</button>
+      <button class="tab" onclick="switchTab('mine')" id="tab-mine" style="display:none">My Games</button>
+    </div>
+
+    <div class="tab-panel active" id="panel-public">
+      <div class="sec-hdr"><span class="sec-hdr-label" id="count-label">Public Games</span><div class="sec-hdr-line"></div></div>
+      <div class="game-grid" id="game-grid"><div class="loading">Loading campaigns…</div></div>
+    </div>
+
+    <div class="tab-panel" id="panel-mine">
+      <div class="sec-hdr"><span class="sec-hdr-label">My Campaigns</span><div class="sec-hdr-line"></div></div>
+      <div class="game-grid" id="my-game-grid"><div class="loading">Loading…</div></div>
+    </div>
+  </div>
+
+  <script src="/js/ur-auth.js"></script>
+  <script>
+    let activeTab = 'public';
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('panel-' + tab).classList.add('active');
+      if (tab === 'mine') loadMyGames();
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await new Promise(r => setTimeout(r, 400));
+      if (window.UR_USER) {
+        document.getElementById('tab-mine').style.display = '';
+      }
+      loadPublicGames();
+    });
+
+    async function loadPublicGames() {
+      try {
+        const res = await fetch('/api/games');
+        const games = res.ok ? await res.json() : [];
+        renderGrid('game-grid', 'count-label', games);
+      } catch {
+        document.getElementById('game-grid').innerHTML = err('Failed to load games.');
+      }
+    }
+
+    async function loadMyGames() {
+      if (!window.UR_USER) return;
+      document.getElementById('my-game-grid').innerHTML = '<div class="loading">Loading…</div>';
+      try {
+        const res = await fetch('/api/games/mine', { credentials: 'include' });
+        const games = res.ok ? await res.json() : [];
+        renderGrid('my-game-grid', null, games, true);
+      } catch {
+        document.getElementById('my-game-grid').innerHTML = err('Failed to load your games.');
+      }
+    }
+
+    function renderGrid(gridId, countId, games, mine = false) {
+      if (countId) document.getElementById(countId).textContent = `${games.length} Game${games.length !== 1 ? 's' : ''}`;
+      if (!games.length) {
+        document.getElementById(gridId).innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚑</div>
+            <div class="empty-text">${mine ? 'You\'re not in any games yet.' : 'No public games running.'}</div>
+            <a href="/scenarios.html" class="empty-link">Browse Scenarios →</a>
+          </div>`;
+        return;
+      }
+      document.getElementById(gridId).innerHTML = games.map(renderCard).join('');
+    }
+
+    function renderCard(g) {
+      const members = g.memberCount || 0;
+      return `
+        <a href="/game.html?id=${esc(g.gameId)}" class="game-card">
+          <div class="gc-header">
+            <div class="gc-scenario">⚑ ${esc(g.scenarioName || 'Custom')}</div>
+            <span class="gc-state ${g.state || 'setup'}">${g.state || 'setup'}</span>
+          </div>
+          <div class="gc-name">${esc(g.name)}</div>
+          <div class="gc-tagline">${esc(g.tagline || g.currentInGameDate || '')}</div>
+          <div class="gc-meta">
+            <div class="gc-meta-item"><span>◉</span>${members} Player${members !== 1 ? 's' : ''}</div>
+            <div class="gc-meta-item"><span>◎</span>${esc(g.ownerName || '')}</div>
+            ${g.currentInGameDate ? `<div class="gc-meta-item"><span>✦</span>${esc(g.currentInGameDate)}</div>` : ''}
+          </div>
+          <div class="gc-cta">View Campaign →</div>
+        </a>`;
+    }
+
+    function err(msg) { return `<div class="empty-state"><div class="empty-icon">⚑</div><div class="empty-text">${msg}</div></div>`; }
+    function esc(str) { if (!str) return ''; const d = document.createElement('div'); d.textContent = String(str); return d.innerHTML; }
+  </script>
+</body>
+</html>

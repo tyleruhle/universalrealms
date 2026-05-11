@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Scenario — Universal Realms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#1a1208;--bg-card:#150e04;--bg-card2:#1e1408;--gold:#c8a838;--gold-dim:#8b6914;--gold-border:rgba(200,168,56,0.28);--gold-glow:rgba(200,168,56,0.08);--text:#e8d5a3;--text-muted:#a08848;--text-dim:#7a6030;--text-faint:#4a3a18;--font-d:'Cinzel',serif;--font-b:'EB Garamond',Georgia,serif;}
+    body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);}
+    .ur-nav-shell{height:52px;display:flex;align-items:stretch;background:#2a1c0d;border-bottom:1px solid #3d2b14;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.45);}
+    .ur-nav-shell::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(184,137,42,0.28),transparent);}
+    .ur-logo-btn{padding:0 22px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,0.06);text-decoration:none;flex-shrink:0;}
+    .ur-logo-name{font-family:var(--font-d);font-size:12px;font-weight:600;color:#f5edd8;letter-spacing:2.5px;text-transform:uppercase;line-height:1;}
+    .ur-logo-tag{font-family:var(--font-b);font-size:9px;color:var(--gold);letter-spacing:1.5px;margin-top:3px;font-style:italic;opacity:0.75;}
+    .ur-nav-links{display:flex;align-items:stretch;flex:1;padding:0 4px;overflow-x:auto;}
+    .ur-nav-links::-webkit-scrollbar{display:none;}
+    .ur-nav-lnk{display:flex;align-items:center;gap:7px;padding:0 14px;font-family:var(--font-b);font-size:13.5px;font-style:italic;color:#9a8468;text-decoration:none;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;}
+    .ur-nav-lnk:hover{color:#e8d9bb;background:rgba(255,255,255,0.03);}
+    .ur-nav-lnk.cur{color:var(--gold);border-bottom-color:var(--gold-dim);font-style:normal;font-weight:500;background:var(--gold-glow);}
+    .ur-nav-right{display:flex;align-items:center;padding:0 18px;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.06);}
+    .content{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 24px 80px;}
+    .back-link{font-family:var(--font-d);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:28px;transition:color 0.15s;}
+    .back-link:hover{color:var(--gold);}
+    .scenario-hero{background:var(--bg-card);border:1px solid var(--gold-dim);border-radius:3px;padding:28px;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,0.4);position:relative;}
+    .scenario-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:3px 3px 0 0;}
+    .sh-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+    .sh-badges{display:flex;gap:8px;flex-wrap:wrap;}
+    .badge{font-family:var(--font-d);font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:2px;}
+    .badge-era{border:1px solid var(--gold-border);color:var(--gold);background:var(--gold-glow);}
+    .badge-flagship{border:1px solid rgba(240,216,120,0.3);color:#f0d878;background:rgba(240,216,120,0.07);}
+    .badge-pub{border:1px solid rgba(39,174,96,0.3);color:#27ae60;background:rgba(39,174,96,0.07);}
+    .sh-actions{display:flex;gap:10px;flex-wrap:wrap;}
+    .btn-start{font-family:var(--font-d);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));border:none;border-radius:2px;color:#1a1208;font-weight:700;cursor:pointer;text-decoration:none;transition:filter 0.15s;}
+    .btn-start:hover{filter:brightness(1.1);}
+    .btn-edit{font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;background:transparent;border:1px solid var(--gold-border);border-radius:2px;color:var(--gold);text-decoration:none;transition:all 0.15s;}
+    .btn-edit:hover{background:var(--gold-glow);}
+    .sh-name{font-family:var(--font-d);font-size:clamp(18px,3vw,28px);font-weight:600;color:#f0d878;letter-spacing:3px;margin-bottom:6px;text-shadow:0 2px 16px rgba(200,168,56,0.2);}
+    .sh-tagline{font-family:var(--font-b);font-size:16px;font-style:italic;color:var(--text-muted);margin-bottom:14px;line-height:1.7;}
+    .sh-desc{font-family:var(--font-b);font-size:14px;color:var(--text-muted);line-height:1.8;}
+    .sh-stats{display:flex;gap:1px;background:var(--gold-border);border-radius:2px;overflow:hidden;margin-top:18px;}
+    .sh-stat{flex:1;background:var(--bg-card2);padding:12px 14px;text-align:center;}
+    .sh-stat-num{font-family:var(--font-d);font-size:18px;font-weight:600;color:var(--gold);line-height:1;margin-bottom:3px;}
+    .sh-stat-lbl{font-family:var(--font-d);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);}
+    .sec-hdr{display:flex;align-items:center;gap:14px;margin:28px 0 16px;}
+    .sec-hdr-label{font-family:var(--font-d);font-size:8.5px;letter-spacing:3.5px;color:var(--gold);text-transform:uppercase;white-space:nowrap;opacity:0.9;}
+    .sec-hdr-line{flex:1;height:1px;background:linear-gradient(90deg,var(--gold-border),transparent);}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+    .item-card{background:var(--bg-card);border:1px solid rgba(139,105,20,0.18);border-radius:3px;padding:14px 16px;}
+    .item-icon{font-size:22px;margin-bottom:6px;}
+    .item-name{font-family:var(--font-d);font-size:10px;font-weight:600;color:var(--text);letter-spacing:1px;margin-bottom:4px;}
+    .item-sub{font-family:var(--font-b);font-size:12px;font-style:italic;color:var(--text-muted);line-height:1.5;}
+    .archetype-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;}
+    .arch-card{background:var(--bg-card);border:1px solid rgba(139,105,20,0.18);border-radius:3px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;}
+    .arch-icon{font-size:20px;flex-shrink:0;}
+    .arch-name{font-family:var(--font-d);font-size:9.5px;font-weight:600;color:var(--text);letter-spacing:0.5px;margin-bottom:3px;}
+    .arch-bg{font-family:var(--font-b);font-size:11px;font-style:italic;color:var(--text-muted);line-height:1.4;}
+    .arch-pc{font-family:var(--font-d);font-size:8px;letter-spacing:1px;color:var(--gold);margin-top:3px;}
+
+    /* Create game modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:none;align-items:center;justify-content:center;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--bg-card);border:1px solid var(--gold-dim);border-radius:4px;padding:28px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,0.6);}
+    .modal-title{font-family:var(--font-d);font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+    .field label{font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
+    .field input,.field select,.field textarea{background:rgba(10,8,4,0.7);border:1px solid var(--gold-dim);border-radius:3px;color:var(--text);padding:10px 12px;font-size:14px;font-family:var(--font-b);outline:none;width:100%;transition:border-color 0.15s;}
+    .field input:focus,.field select:focus{border-color:var(--gold);}
+    .field-hint{font-family:var(--font-b);font-size:11px;font-style:italic;color:var(--text-dim);}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+    .btn-modal-ok{background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));border:none;border-radius:2px;color:#1a1208;font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:9px 20px;cursor:pointer;font-weight:700;}
+    .btn-modal-cancel{background:transparent;border:1px solid var(--gold-dim);border-radius:2px;color:var(--text-dim);font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;cursor:pointer;}
+    .form-error{font-family:var(--font-b);font-size:12px;color:#e88070;font-style:italic;margin-bottom:12px;display:none;}
+    .form-error.show{display:block;}
+    .loading{text-align:center;padding:40px;font-family:var(--font-d);font-size:10px;letter-spacing:3px;color:var(--text-dim);}
+  </style>
+</head>
+<body>
+  <nav class="ur-nav-shell">
+    <a href="/" class="ur-logo-btn"><div class="ur-logo-name">Universal Realms</div><div class="ur-logo-tag">World Engine</div></a>
+    <div class="ur-nav-links">
+      <a href="/"                       class="ur-nav-lnk"><span>⌂</span>Dashboard</a>
+      <a href="/character_creator.html" class="ur-nav-lnk"><span>◉</span>Characters</a>
+      <a href="/battle_roller.html"     class="ur-nav-lnk"><span>⚔</span>Battle</a>
+      <a href="/duel_roller.html"       class="ur-nav-lnk"><span>◈</span>Duel</a>
+      <a href="/raid_roller.html"       class="ur-nav-lnk"><span>⚑</span>Raid</a>
+      <a href="/chronicle_map.html"     class="ur-nav-lnk"><span>⊞</span>Map</a>
+      <a href="/players.html"           class="ur-nav-lnk"><span>◎</span>Players</a>
+      <a href="/scenarios.html"         class="ur-nav-lnk cur"><span>✦</span>Scenarios</a>
+      <a href="/games.html"             class="ur-nav-lnk"><span>⚑</span>Games</a>
+    </div>
+    <div class="ur-nav-right" id="ur-auth-nav"></div>
+  </nav>
+
+  <div class="content" id="app">
+    <div class="loading">Loading scenario…</div>
+  </div>
+
+  <!-- Create Game Modal -->
+  <div class="modal-overlay" id="game-modal">
+    <div class="modal">
+      <div class="modal-title">Start a New Game</div>
+      <div class="form-error" id="game-err"></div>
+      <div class="field">
+        <label>Game Name</label>
+        <input type="text" id="g-name" placeholder="e.g. The Godwin Line" maxlength="60"/>
+      </div>
+      <div class="field">
+        <label>Slug <span style="color:var(--text-dim);font-size:9px;">(URL identifier)</span></label>
+        <input type="text" id="g-slug" placeholder="e.g. the-godwin-line" maxlength="50"/>
+        <span class="field-hint">Lowercase letters, numbers and hyphens only.</span>
+      </div>
+      <div class="field">
+        <label>Tagline <span style="color:var(--text-dim);font-size:9px;">(optional)</span></label>
+        <input type="text" id="g-tagline" placeholder="One sentence about your campaign" maxlength="120"/>
+      </div>
+      <div class="field">
+        <label>Visibility</label>
+        <select id="g-vis">
+          <option value="private">Private — only members can see it</option>
+          <option value="unlisted">Unlisted — visible via direct link</option>
+          <option value="public">Public — listed in games directory</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeGameModal()">Cancel</button>
+        <button class="btn-modal-ok" onclick="createGame()" id="create-btn">Create Game</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/ur-auth.js"></script>
+  <script>
+    const params     = new URLSearchParams(window.location.search);
+    const SCENARIO_ID = params.get('id');
+    let SCENARIO = null;
+
+    async function load() {
+      if (!SCENARIO_ID) return showError('No scenario specified.');
+      try {
+        const res = await fetch(`/api/scenarios/${SCENARIO_ID}`);
+        if (!res.ok) return showError('Scenario not found.');
+        SCENARIO = await res.json();
+        render();
+      } catch {
+        showError('Failed to load scenario.');
+      }
+    }
+
+    function render() {
+      const s = SCENARIO;
+      const c = s.content || {};
+      const flagship = s.slug === 'anno-domini-1066';
+      const isAuthor = window.UR_USER?.userId === s.authorUserId || s.authorUserId === 'system';
+
+      document.title = `${s.name} — Universal Realms`;
+
+      const factionsHtml = (c.factions || []).map(f => `
+        <div class="item-card">
+          <div class="item-icon">${f.icon || '⚑'}</div>
+          <div class="item-name">${esc(f.label)}</div>
+          <div class="item-sub">${esc(f.rank)}</div>
+          <div class="item-sub" style="margin-top:4px;">${esc(f.gold)} gold · ${esc(f.army)}</div>
+        </div>`).join('');
+
+      const archetypesHtml = (c.archetypes || []).map(a => `
+        <div class="arch-card">
+          <div class="arch-icon">${a.icon || '◉'}</div>
+          <div>
+            <div class="arch-name">${esc(a.name)}</div>
+            <div class="arch-bg">${esc(a.bg)}</div>
+            <div class="arch-pc">PC ${a.pc} · ${esc(a.primary)}</div>
+          </div>
+        </div>`).join('');
+
+      const culturesHtml = (c.cultures || []).map(cu => `
+        <div class="item-card">
+          <div class="item-name">${esc(cu.label)}</div>
+          <div class="item-sub">${esc(cu.region)}</div>
+          <div class="item-sub" style="margin-top:4px;">${esc(cu.bonuses)}</div>
+        </div>`).join('');
+
+      document.getElementById('app').innerHTML = `
+        <a href="/scenarios.html" class="back-link">← All Scenarios</a>
+
+        <div class="scenario-hero">
+          <div class="sh-top">
+            <div class="sh-badges">
+              <span class="badge badge-era">${esc(s.era || 'Custom Era')}</span>
+              ${flagship ? '<span class="badge badge-flagship">Flagship Scenario</span>' : ''}
+              <span class="badge badge-pub">${s.state}</span>
+            </div>
+            <div class="sh-actions">
+              ${isAuthor && window.UR_USER ? `<a href="/scenario-builder.html?id=${esc(s.scenarioId)}" class="btn-edit">Edit Scenario</a>` : ''}
+              ${window.UR_USER ? '<button class="btn-start" onclick="openGameModal()">▶ Start a Game</button>' : '<a href="/login.html" class="btn-edit">Sign in to Start a Game</a>'}
+            </div>
+          </div>
+          <div class="sh-name">${esc(s.name)}</div>
+          <div class="sh-tagline">${esc(s.tagline)}</div>
+          ${s.description ? `<div class="sh-desc">${esc(s.description)}</div>` : ''}
+          <div class="sh-stats">
+            <div class="sh-stat"><div class="sh-stat-num">${(c.factions||[]).length}</div><div class="sh-stat-lbl">Factions</div></div>
+            <div class="sh-stat"><div class="sh-stat-num">${(c.archetypes||[]).length}</div><div class="sh-stat-lbl">Archetypes</div></div>
+            <div class="sh-stat"><div class="sh-stat-num">${(c.cultures||[]).length}</div><div class="sh-stat-lbl">Cultures</div></div>
+            <div class="sh-stat"><div class="sh-stat-num">${s.gameCount || 0}</div><div class="sh-stat-lbl">Games</div></div>
+          </div>
+        </div>
+
+        ${(c.factions||[]).length ? `<div class="sec-hdr"><span class="sec-hdr-label">Factions</span><div class="sec-hdr-line"></div></div><div class="card-grid">${factionsHtml}</div>` : ''}
+        ${(c.archetypes||[]).length ? `<div class="sec-hdr"><span class="sec-hdr-label">Archetypes</span><div class="sec-hdr-line"></div></div><div class="archetype-grid">${archetypesHtml}</div>` : ''}
+        ${(c.cultures||[]).length ? `<div class="sec-hdr"><span class="sec-hdr-label">Cultures</span><div class="sec-hdr-line"></div></div><div class="card-grid">${culturesHtml}</div>` : ''}
+      `;
+    }
+
+    function openGameModal() {
+      if (!window.UR_USER) { window.location.href = '/login.html'; return; }
+      document.getElementById('game-modal').classList.add('show');
+      // Auto-generate slug from name as user types
+      document.getElementById('g-name').addEventListener('input', function() {
+        document.getElementById('g-slug').value = this.value.toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 50);
+      });
+    }
+    function closeGameModal() { document.getElementById('game-modal').classList.remove('show'); }
+
+    async function createGame() {
+      const errEl = document.getElementById('game-err');
+      const btn   = document.getElementById('create-btn');
+      errEl.classList.remove('show');
+      btn.disabled = true; btn.textContent = 'Creating…';
+
+      const name    = document.getElementById('g-name').value.trim();
+      const slug    = document.getElementById('g-slug').value.trim();
+      const tagline = document.getElementById('g-tagline').value.trim();
+      const vis     = document.getElementById('g-vis').value;
+
+      if (!name || !slug) {
+        errEl.textContent = 'Name and slug are required.';
+        errEl.classList.add('show');
+        btn.disabled = false; btn.textContent = 'Create Game';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/games', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ scenarioId: SCENARIO.scenarioId, name, slug, tagline, visibility: vis }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Failed to create game.';
+          errEl.classList.add('show');
+          btn.disabled = false; btn.textContent = 'Create Game';
+          return;
+        }
+        window.location.href = `/game.html?id=${data.gameId}`;
+      } catch {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.classList.add('show');
+        btn.disabled = false; btn.textContent = 'Create Game';
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('app').innerHTML = `<div style="text-align:center;padding:60px 20px;"><div style="font-family:var(--font-d);font-size:14px;color:var(--text-dim);">${msg}</div><a href="/scenarios.html" style="display:inline-block;margin-top:20px;font-family:var(--font-d);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-decoration:none;">← Back to Scenarios</a></div>`;
+    }
+
+    function esc(str) { if (!str) return ''; const d = document.createElement('div'); d.textContent = String(str); return d.innerHTML; }
+
+    load();
+  </script>
+</body>
+</html>
