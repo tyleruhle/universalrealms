@@ -6,6 +6,8 @@ const path = require('path');
 const authRoutes      = require('./routes/auth');
 const characterRoutes = require('./routes/characters');
 const profileRoutes   = require('./routes/profiles');
+const scenarioRoutes  = require('./routes/scenarios');
+const gameRoutes      = require('./routes/games');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +19,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth',       authRoutes);
 app.use('/api/characters', characterRoutes);
 app.use('/api/profiles',   profileRoutes);
+app.use('/api/scenarios',  scenarioRoutes);
+app.use('/api/games',      gameRoutes);
 
 app.listen(PORT, () => {
   console.log(`Universal Realms running on port ${PORT}`);

@@ -1,6 +1,7 @@
 const express  = require('express');
 const bcrypt   = require('bcryptjs');
 const jwt      = require('jsonwebtoken');
+const crypto   = require('crypto');
 const { PutCommand, GetCommand, QueryCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const { v4: uuidv4 } = require('uuid');
 const dynamo      = require('../lib/dynamo');
@@ -143,6 +144,119 @@ router.get('/me', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('Me error:', err);
     res.status(500).json({ error: 'Failed to retrieve session.' });
+  }
+});
+
+// GET /api/auth/discord — redirect to Discord OAuth
+router.get('/discord', (req, res) => {
+  const state = crypto.randomBytes(16).toString('hex');
+  res.cookie('discord_state', state, { httpOnly: true, maxAge: 5 * 60 * 1000, sameSite: 'lax' });
+
+  const params = new URLSearchParams({
+    client_id:     process.env.DISCORD_CLIENT_ID,
+    redirect_uri:  process.env.DISCORD_REDIRECT_URI,
+    response_type: 'code',
+    scope:         'identify email',
+    state,
+  });
+  res.redirect(`https://discord.com/api/oauth2/authorize?${params}`);
+});
+
+// GET /api/auth/discord/callback — handle Discord OAuth callback
+router.get('/discord/callback', async (req, res) => {
+  const { code, state } = req.query;
+  const storedState = req.cookies.discord_state;
+
+  if (!state || state !== storedState)
+    return res.redirect('/login.html?error=state_mismatch');
+
+  res.clearCookie('discord_state');
+
+  if (!code) return res.redirect('/login.html?error=cancelled');
+
+  try {
+    // Exchange code for access token
+    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id:     process.env.DISCORD_CLIENT_ID,
+        client_secret: process.env.DISCORD_CLIENT_SECRET,
+        code,
+        grant_type:    'authorization_code',
+        redirect_uri:  process.env.DISCORD_REDIRECT_URI,
+      }),
+    });
+
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) throw new Error('No access token from Discord');
+
+    // Fetch Discord user info
+    const userRes = await fetch('https://discord.com/api/users/@me', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const du = await userRes.json();
+
+    // Look up existing user by discordId
+    const existing = await dynamo.send(new QueryCommand({
+      TableName: USERS_TABLE,
+      IndexName: 'discordId-index',
+      KeyConditionExpression: 'discordId = :did',
+      ExpressionAttributeValues: { ':did': du.id },
+      Limit: 1,
+    }));
+
+    let user;
+
+    if (existing.Items?.length > 0) {
+      user = existing.Items[0];
+      await dynamo.send(new UpdateCommand({
+        TableName: USERS_TABLE,
+        Key: { userId: user.userId },
+        UpdateExpression: 'SET lastSeen = :now, discordUsername = :du',
+        ExpressionAttributeValues: { ':now': new Date().toISOString(), ':du': du.username },
+      }));
+    } else {
+      // Build a safe username from Discord handle
+      let base = (du.username || 'player')
+        .toLowerCase().replace(/[^a-z0-9_-]/g, '_').slice(0, 18);
+
+      const taken = await dynamo.send(new QueryCommand({
+        TableName: USERS_TABLE,
+        IndexName: 'username-index',
+        KeyConditionExpression: 'username = :u',
+        ExpressionAttributeValues: { ':u': base },
+        Limit: 1,
+      }));
+      const username = taken.Items?.length > 0
+        ? base.slice(0, 14) + Math.floor(1000 + Math.random() * 9000)
+        : base;
+
+      const userId = uuidv4();
+      const now    = new Date().toISOString();
+      user = {
+        userId,
+        username,
+        displayName:     du.global_name || du.username,
+        email:           du.email || '',
+        discordId:       du.id,
+        discordUsername: du.username,
+        authProvider:    'discord',
+        createdAt:       now,
+        lastSeen:        now,
+        bio:             '',
+        title:           'Wanderer',
+        stats: { charactersCreated: 0, battlesRolled: 0, duelsRolled: 0, raidsRolled: 0 },
+      };
+      await dynamo.send(new PutCommand({ TableName: USERS_TABLE, Item: user }));
+    }
+
+    const token = signToken(user);
+    res.cookie('ur_token', token, COOKIE_OPTS);
+    res.redirect('/');
+  } catch (err) {
+    console.error('Discord OAuth error:', err);
+    res.redirect('/login.html?error=discord_failed');
   }
 });
 
