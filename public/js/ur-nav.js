@@ -61,12 +61,12 @@
     .ur-dropdown.open > .ur-nav-lnk { color: #c8a838; background: rgba(200,168,56,0.08); }
 
     .ur-dd-menu {
-      position: absolute; top: 100%; left: 0;
+      position: fixed;
       min-width: 190px; background: #1a1208;
-      border: 1px solid rgba(139,105,20,0.45); border-top: none;
+      border: 1px solid rgba(139,105,20,0.45);
       border-radius: 0 0 3px 3px;
       box-shadow: 0 10px 28px rgba(0,0,0,0.55);
-      display: none; z-index: 1001;
+      display: none; z-index: 2000;
     }
     .ur-dropdown.open .ur-dd-menu { display: block; }
 
@@ -189,17 +189,22 @@
     shell.style.zIndex    = '1000';
     shell.innerHTML       = buildNav();
 
-    // Dropdown toggle
+    // Dropdown toggle — use fixed positioning to escape overflow:auto clipping
     const dd      = document.getElementById('ur-tools-dd');
     const trigger = dd?.querySelector('button');
-    if (dd && trigger) {
+    const menu    = dd?.querySelector('.ur-dd-menu');
+    if (dd && trigger && menu) {
       trigger.addEventListener('click', e => {
         e.stopPropagation();
+        const opening = !dd.classList.contains('open');
         dd.classList.toggle('open');
+        if (opening) {
+          const rect    = trigger.getBoundingClientRect();
+          menu.style.top  = rect.bottom + 'px';
+          menu.style.left = rect.left   + 'px';
+        }
       });
-      document.addEventListener('click', () => {
-        if (!toolsActive) dd.classList.remove('open');
-      });
+      document.addEventListener('click', () => dd.classList.remove('open'));
     }
   }
 
