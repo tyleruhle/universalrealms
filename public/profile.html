@@ -196,8 +196,11 @@
   <script>
     let USER  = null;
     let CHARS = [];
+    const VIEW_USER = new URLSearchParams(window.location.search).get('u');
+    const IS_OWN    = !VIEW_USER;
 
     async function loadProfile() {
+      if (!IS_OWN) return loadPublicProfile(VIEW_USER);
       try {
         const res = await fetch('/api/auth/me', { credentials: 'include' });
         if (!res.ok) return showNotAuthed();
@@ -208,6 +211,84 @@
       } catch {
         showNotAuthed();
       }
+    }
+
+    async function loadPublicProfile(username) {
+      try {
+        const res = await fetch(`/api/profiles/${encodeURIComponent(username)}`);
+        if (!res.ok) return showNotFound(username);
+        const data = await res.json();
+        USER  = data;
+        CHARS = data.characters || [];
+        renderPublicProfile();
+      } catch {
+        showNotFound(username);
+      }
+    }
+
+    function renderPublicProfile() {
+      const sinceDate = USER.createdAt
+        ? new Date(USER.createdAt).toLocaleDateString('en-GB', { year: 'numeric', month: 'long' })
+        : 'Unknown';
+      const stats = USER.stats || {};
+
+      document.getElementById('app').innerHTML = `
+        <div style="font-family:var(--font-d);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;">
+          Viewing Public Profile
+        </div>
+
+        <div class="profile-hdr">
+          <div class="profile-hdr-top">
+            <div class="profile-avatar">◉</div>
+            <div class="profile-identity">
+              <div class="profile-display">${esc(USER.displayName || USER.username)}</div>
+              <div class="profile-title">${esc(USER.title || 'Wanderer')}</div>
+              <div class="profile-since">Member since ${sinceDate}</div>
+            </div>
+          </div>
+          ${USER.bio ? `<div class="profile-bio">${esc(USER.bio)}</div>` : ''}
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-cell"><div class="stat-cell-num">${CHARS.length}</div><div class="stat-cell-lbl">Characters</div></div>
+          <div class="stat-cell"><div class="stat-cell-num">${stats.battlesRolled || 0}</div><div class="stat-cell-lbl">Battles</div></div>
+          <div class="stat-cell"><div class="stat-cell-num">${stats.duelsRolled || 0}</div><div class="stat-cell-lbl">Duels</div></div>
+          <div class="stat-cell"><div class="stat-cell-num">${stats.raidsRolled || 0}</div><div class="stat-cell-lbl">Raids</div></div>
+        </div>
+
+        <div class="sec-hdr">
+          <span class="sec-hdr-label">Public Roster</span>
+          <div class="sec-hdr-line"></div>
+        </div>
+
+        ${CHARS.length === 0
+          ? `<div class="empty-state"><div class="empty-state-icon">◉</div><div class="empty-state-text">No public characters yet.</div></div>`
+          : `<div class="char-grid">${CHARS.map(renderPublicCharCard).join('')}</div>`
+        }`;
+    }
+
+    function renderPublicCharCard(c) {
+      return `
+        <div class="char-card">
+          <div class="char-card-name" onclick="openCharModal('${c.characterId}')">${esc(c.name)}</div>
+          <div class="char-card-sub">${esc(c.archetypeName || c.archetype)} · ${esc(c.cultureLabel || c.culture)}</div>
+          <div class="char-card-tags">
+            <span class="char-tag">${esc(c.factionLabel || c.faction)}</span>
+            ${c.cultureRegion ? `<span class="char-tag">${esc(c.cultureRegion)}</span>` : ''}
+          </div>
+          <div class="char-card-footer">
+            <span class="char-date">${new Date(c.createdAt).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</span>
+          </div>
+        </div>`;
+    }
+
+    function showNotFound(username) {
+      document.getElementById('app').innerHTML = `
+        <div class="not-authed">
+          <div class="not-authed-title">Player Not Found</div>
+          <div class="not-authed-sub">"${esc(username)}" doesn't exist or has no public profile.</div>
+          <a href="/" class="not-authed-link">← Back to Dashboard</a>
+        </div>`;
     }
 
     function renderProfile() {
@@ -227,7 +308,14 @@
             </div>
           </div>
           <div class="profile-bio ${USER.bio ? '' : 'empty'}">${USER.bio ? esc(USER.bio) : 'No chronicle entry yet…'}</div>
-          <button class="edit-bio-btn" onclick="openBioModal()">Edit</button>
+          <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+            <button class="edit-bio-btn" onclick="openBioModal()">Edit Bio</button>
+            <a href="/profile.html?u=${USER ? USER.username : ''}" target="_blank"
+               style="font-family:var(--font-d);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;border:1px solid var(--gold-border);border-radius:2px;padding:5px 12px;transition:color 0.15s;"
+               onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-dim)'">
+              Share Profile ↗
+            </a>
+          </div>
         </div>
 
         <div class="stats-row">

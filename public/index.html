@@ -16,38 +16,33 @@
       --ink-800:    #2a1c0d;
       --ink-700:    #3d2b14;
       --ink-600:    #52391d;
-      --parch-100:  #fdf8ef;
-      --parch-200:  #f5edd8;
-      --parch-300:  #ecdcc0;
-      --parch-400:  #dfc9a4;
       --gold-300:   #d4ab55;
-      --gold-400:   #c99c3a;
-      --gold-500:   #b8892a;
-      --gold-600:   #8b6520;
-      --gold-border:rgba(184,137,42,0.28);
-      --gold-glow:  rgba(184,137,42,0.10);
-      --text-strong:#1c1208;
-      --text-body:  #2a1c0d;
-      --text-second:#52391d;
-      --text-muted: #8a7055;
-      --text-faint: #b0986e;
-      --surface:    #fdf8ef;
-      --surface-2:  #f7f0e0;
-      --surface-3:  #f0e6ce;
-      --border-xs:  rgba(142,108,58,0.10);
-      --border-sm:  rgba(142,108,58,0.16);
-      --border-md:  rgba(142,108,58,0.26);
-      --border-lg:  rgba(142,108,58,0.42);
+      --gold-400:   #c8a838;
+      --gold-500:   #c8a838;
+      --gold-600:   #8b6914;
+      --gold-border:rgba(200,168,56,0.28);
+      --gold-glow:  rgba(200,168,56,0.08);
+      --text-strong:#e8d5a3;
+      --text-body:  #d4c49a;
+      --text-second:#a08848;
+      --text-muted: #7a6035;
+      --text-faint: #4a3a18;
+      --surface:    #150e04;
+      --surface-2:  #1e1408;
+      --surface-3:  #241a0c;
+      --border-xs:  rgba(139,105,20,0.10);
+      --border-sm:  rgba(139,105,20,0.20);
+      --border-md:  rgba(139,105,20,0.30);
+      --border-lg:  rgba(139,105,20,0.50);
       --font-d:     'Cinzel', serif;
       --font-b:     'EB Garamond', Georgia, serif;
     }
 
-    body { font-family: var(--font-b); background: var(--parch-300); color: var(--text-body); }
+    body { font-family: var(--font-b); background: #1a1208; color: var(--text-body); }
 
     body::before {
       content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      background-repeat: repeat; mix-blend-mode: multiply;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
     }
 
     /* ── NAV ── */
@@ -106,13 +101,13 @@
     /* ── HERO ── */
     .hero {
       position: relative; z-index: 1;
-      background: linear-gradient(180deg, var(--parch-200) 0%, var(--parch-100) 100%);
+      background: linear-gradient(180deg, #1e1408 0%, #150e04 100%);
       border-bottom: 1px solid var(--border-sm);
       padding: 64px 24px 56px; text-align: center; overflow: hidden;
     }
     .hero::before {
       content: ''; position: absolute; inset: 0; pointer-events: none;
-      background-image: radial-gradient(ellipse at 50% 0%, rgba(184,137,42,0.06) 0%, transparent 60%);
+      background-image: radial-gradient(ellipse at 50% 0%, rgba(200,168,56,0.07) 0%, transparent 60%);
     }
     .hero-eyebrow {
       font-family: var(--font-d); font-size: 9px; letter-spacing: 5px;
@@ -120,12 +115,13 @@
     }
     .hero-title {
       font-family: var(--font-d); font-size: clamp(28px, 5vw, 48px); font-weight: 600;
-      color: var(--text-strong); letter-spacing: 5px; text-transform: uppercase;
+      color: #f0d878; letter-spacing: 5px; text-transform: uppercase;
       line-height: 1.15; margin-bottom: 6px;
+      text-shadow: 0 2px 20px rgba(200,168,56,0.2);
     }
     .hero-title-sub {
       font-family: var(--font-d); font-size: clamp(11px, 2vw, 14px); font-weight: 400;
-      color: var(--gold-600); letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gold-400); letter-spacing: 4px; text-transform: uppercase;
       margin-bottom: 24px; opacity: 0.8;
     }
     .hero-divider {
@@ -248,6 +244,7 @@
     .about-card {
       background: var(--surface); border: 1px solid var(--border-sm);
       border-radius: 3px; padding: 20px 22px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
     .about-card-title {
       font-family: var(--font-d); font-size: 9.5px; letter-spacing: 2px;
