@@ -30,10 +30,10 @@ router.get('/', async (req, res) => {
   try {
     const result = await dynamo.send(new ScanCommand({
       TableName: GAMES_TABLE,
-      FilterExpression: 'visibility = :pub',
+      FilterExpression: '#vis = :pub',
+      ExpressionAttributeNames: { '#n': 'name', '#vis': 'visibility', '#st': 'state' },
       ExpressionAttributeValues: { ':pub': 'public' },
-      ProjectionExpression: 'gameId, slug, #n, tagline, state, visibility, scenarioId, scenarioName, ownerUserId, ownerName, memberCount, currentInGameDate, createdAt',
-      ExpressionAttributeNames: { '#n': 'name' },
+      ProjectionExpression: 'gameId, slug, #n, tagline, #st, #vis, scenarioId, scenarioName, ownerUserId, ownerName, memberCount, currentInGameDate, createdAt',
     }));
     res.json((result.Items || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
   } catch (err) {
@@ -335,7 +335,7 @@ router.post('/:id/chronicle', requireAuth, async (req, res) => {
     const entryId = `${now}#${uuidv4()}`;
 
     const entry = {
-      gameId,
+      gameId: req.params.id,
       entryId,
       body:        body.trim(),
       authorUserId: req.user.userId,

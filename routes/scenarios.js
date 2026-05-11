@@ -19,11 +19,10 @@ router.get('/', async (req, res) => {
   try {
     const result = await dynamo.send(new ScanCommand({
       TableName: TABLE,
-      FilterExpression: '#s = :pub AND visibility = :pub2',
-      ExpressionAttributeNames: { '#s': 'state' },
+      FilterExpression: '#st = :pub AND #vis = :pub2',
+      ExpressionAttributeNames: { '#st': 'state', '#vis': 'visibility', '#n': 'name', '#ver': 'version' },
       ExpressionAttributeValues: { ':pub': 'published', ':pub2': 'public' },
-      ProjectionExpression: 'scenarioId, slug, #s, visibility, name, tagline, era, authorUserId, authorName, gameCount, createdAt, publishedAt, version',
-      ExpressionAttributeNames: { '#s': 'state' },
+      ProjectionExpression: 'scenarioId, slug, #st, #vis, #n, tagline, era, authorUserId, authorName, gameCount, createdAt, publishedAt, #ver',
     }));
     res.json((result.Items || []).sort((a, b) => new Date(b.publishedAt || b.createdAt) - new Date(a.publishedAt || a.createdAt)));
   } catch (err) {

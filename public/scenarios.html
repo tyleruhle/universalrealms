@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scenarios — Universal Realms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #1a1208; --bg-card: #150e04; --bg-card2: #1e1408;
+      --gold: #c8a838; --gold-dim: #8b6914;
+      --gold-border: rgba(200,168,56,0.28); --gold-glow: rgba(200,168,56,0.08);
+      --text: #e8d5a3; --text-muted: #a08848; --text-dim: #7a6030; --text-faint: #4a3a18;
+      --font-d: 'Cinzel', serif; --font-b: 'EB Garamond', Georgia, serif;
+    }
+    body { font-family: var(--font-b); background: var(--bg); color: var(--text); min-height: 100vh; }
+    body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px); }
+
+    .ur-nav-shell { height:52px; display:flex; align-items:stretch; background:#2a1c0d; border-bottom:1px solid #3d2b14; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(0,0,0,0.45); }
+    .ur-nav-shell::after { content:''; position:absolute; bottom:-1px; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(184,137,42,0.28),transparent); }
+    .ur-logo-btn { padding:0 22px; display:flex; flex-direction:column; justify-content:center; border-right:1px solid rgba(255,255,255,0.06); text-decoration:none; flex-shrink:0; }
+    .ur-logo-name { font-family:var(--font-d); font-size:12px; font-weight:600; color:#f5edd8; letter-spacing:2.5px; text-transform:uppercase; line-height:1; }
+    .ur-logo-tag  { font-family:var(--font-b); font-size:9px; color:var(--gold); letter-spacing:1.5px; margin-top:3px; font-style:italic; opacity:0.75; }
+    .ur-nav-links { display:flex; align-items:stretch; flex:1; padding:0 4px; overflow-x:auto; }
+    .ur-nav-links::-webkit-scrollbar { display:none; }
+    .ur-nav-lnk { display:flex; align-items:center; gap:7px; padding:0 14px; font-family:var(--font-b); font-size:13.5px; font-style:italic; color:#9a8468; text-decoration:none; border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
+    .ur-nav-lnk:hover { color:#e8d9bb; background:rgba(255,255,255,0.03); }
+    .ur-nav-lnk.cur { color:var(--gold); border-bottom-color:var(--gold-dim); font-style:normal; font-weight:500; background:var(--gold-glow); }
+    .ur-nav-right { display:flex; align-items:center; padding:0 18px; flex-shrink:0; border-left:1px solid rgba(255,255,255,0.06); }
+
+    .content { position:relative; z-index:1; max-width:1020px; margin:0 auto; padding:40px 24px 80px; }
+
+    .page-hero { text-align:center; margin-bottom:40px; }
+    .page-eyebrow { font-family:var(--font-d); font-size:8px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); opacity:0.7; margin-bottom:12px; }
+    .page-title { font-family:var(--font-d); font-size:clamp(20px,4vw,34px); font-weight:600; color:#f0d878; letter-spacing:4px; text-transform:uppercase; margin-bottom:8px; text-shadow:0 2px 20px rgba(200,168,56,0.2); }
+    .page-sub { font-family:var(--font-b); font-size:15px; font-style:italic; color:var(--text-muted); margin-bottom:24px; }
+
+    .hero-actions { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .btn-create { font-family:var(--font-d); font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:10px 24px; background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim)); border:none; border-radius:2px; color:#1a1208; font-weight:700; cursor:pointer; text-decoration:none; transition:filter 0.15s; }
+    .btn-create:hover { filter:brightness(1.1); }
+    .btn-mine { font-family:var(--font-d); font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:10px 24px; background:transparent; border:1px solid var(--gold-border); border-radius:2px; color:var(--gold); text-decoration:none; transition:all 0.15s; }
+    .btn-mine:hover { background:var(--gold-glow); }
+
+    .sec-hdr { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+    .sec-hdr-label { font-family:var(--font-d); font-size:8.5px; letter-spacing:3.5px; color:var(--gold); text-transform:uppercase; white-space:nowrap; opacity:0.9; }
+    .sec-hdr-line { flex:1; height:1px; background:linear-gradient(90deg,var(--gold-border),transparent); }
+
+    .scenario-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+
+    .scenario-card { background:var(--bg-card); border:1px solid rgba(139,105,20,0.2); border-radius:3px; padding:22px 22px 18px; text-decoration:none; display:flex; flex-direction:column; transition:all 0.2s; position:relative; overflow:hidden; }
+    .scenario-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold); opacity:0.3; transition:opacity 0.2s; }
+    .scenario-card:hover { border-color:rgba(200,168,56,0.45); background:var(--bg-card2); transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,0.35); }
+    .scenario-card:hover::before { opacity:0.9; }
+
+    .sc-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; }
+    .sc-era { font-family:var(--font-d); font-size:8px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); opacity:0.7; padding:3px 8px; border:1px solid var(--gold-border); border-radius:2px; background:var(--gold-glow); }
+    .sc-state { font-family:var(--font-d); font-size:7px; letter-spacing:1.5px; text-transform:uppercase; padding:3px 8px; border-radius:2px; }
+    .sc-state.published { color:#27ae60; border:1px solid rgba(39,174,96,0.3); background:rgba(39,174,96,0.07); }
+    .sc-state.draft { color:var(--text-dim); border:1px solid rgba(139,105,20,0.2); }
+
+    .sc-name { font-family:var(--font-d); font-size:14px; font-weight:600; color:var(--text); letter-spacing:1.5px; margin-bottom:6px; }
+    .sc-tagline { font-family:var(--font-b); font-size:14px; font-style:italic; color:var(--text-muted); line-height:1.6; margin-bottom:14px; flex:1; }
+
+    .sc-meta { display:flex; gap:14px; padding-top:12px; border-top:1px solid rgba(139,105,20,0.12); }
+    .sc-meta-item { font-family:var(--font-d); font-size:7.5px; letter-spacing:1px; text-transform:uppercase; color:var(--text-dim); }
+    .sc-meta-item span { color:var(--gold); margin-right:4px; }
+
+    .sc-cta { font-family:var(--font-d); font-size:8px; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-top:12px; opacity:0.6; transition:opacity 0.15s; }
+    .scenario-card:hover .sc-cta { opacity:1; }
+
+    .flagship-badge { font-family:var(--font-d); font-size:7px; letter-spacing:1.5px; text-transform:uppercase; color:#f0d878; background:rgba(240,216,120,0.1); border:1px solid rgba(240,216,120,0.3); padding:2px 8px; border-radius:2px; margin-left:8px; }
+
+    .empty-state { text-align:center; padding:60px 20px; }
+    .empty-icon { font-size:32px; opacity:0.3; margin-bottom:14px; }
+    .empty-text { font-family:var(--font-b); font-size:15px; font-style:italic; color:var(--text-dim); }
+
+    .loading { text-align:center; padding:60px 20px; font-family:var(--font-d); font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--text-dim); }
+
+    @media (max-width:600px) { .scenario-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav class="ur-nav-shell">
+    <a href="/" class="ur-logo-btn">
+      <div class="ur-logo-name">Universal Realms</div>
+      <div class="ur-logo-tag">World Engine</div>
+    </a>
+    <div class="ur-nav-links">
+      <a href="/"                       class="ur-nav-lnk"><span>⌂</span>Dashboard</a>
+      <a href="/character_creator.html" class="ur-nav-lnk"><span>◉</span>Characters</a>
+      <a href="/battle_roller.html"     class="ur-nav-lnk"><span>⚔</span>Battle</a>
+      <a href="/duel_roller.html"       class="ur-nav-lnk"><span>◈</span>Duel</a>
+      <a href="/raid_roller.html"       class="ur-nav-lnk"><span>⚑</span>Raid</a>
+      <a href="/chronicle_map.html"     class="ur-nav-lnk"><span>⊞</span>Map</a>
+      <a href="/players.html"           class="ur-nav-lnk"><span>◎</span>Players</a>
+      <a href="/scenarios.html"         class="ur-nav-lnk cur"><span>✦</span>Scenarios</a>
+      <a href="/games.html"             class="ur-nav-lnk"><span>⚑</span>Games</a>
+    </div>
+    <div class="ur-nav-right" id="ur-auth-nav"></div>
+  </nav>
+
+  <div class="content">
+    <div class="page-hero">
+      <div class="page-eyebrow">World Engine · Game Worlds</div>
+      <div class="page-title">Scenarios</div>
+      <p class="page-sub">Browse published worlds. Start a game, or build your own.</p>
+      <div class="hero-actions" id="hero-actions">
+        <a href="/scenario-builder.html" class="btn-create" id="btn-create" style="display:none">+ Create Scenario</a>
+        <a href="/scenario-builder.html?mine=1" class="btn-mine" id="btn-mine" style="display:none">My Scenarios</a>
+      </div>
+    </div>
+
+    <div class="sec-hdr">
+      <span class="sec-hdr-label" id="count-label">Published Worlds</span>
+      <div class="sec-hdr-line"></div>
+    </div>
+
+    <div class="scenario-grid" id="scenario-grid">
+      <div class="loading">Loading worlds…</div>
+    </div>
+  </div>
+
+  <script src="/js/ur-auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Show create button if logged in
+      await new Promise(r => setTimeout(r, 400));
+      if (window.UR_USER) {
+        document.getElementById('btn-create').style.display = '';
+        document.getElementById('btn-mine').style.display   = '';
+      }
+      loadScenarios();
+    });
+
+    async function loadScenarios() {
+      try {
+        const res = await fetch('/api/scenarios');
+        const scenarios = res.ok ? await res.json() : [];
+        render(scenarios);
+      } catch {
+        document.getElementById('scenario-grid').innerHTML =
+          `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">Failed to load scenarios.</div></div>`;
+      }
+    }
+
+    function render(scenarios) {
+      document.getElementById('count-label').textContent = `${scenarios.length} Published World${scenarios.length !== 1 ? 's' : ''}`;
+      if (!scenarios.length) {
+        document.getElementById('scenario-grid').innerHTML =
+          `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">No published scenarios yet. Be the first to create one.</div></div>`;
+        return;
+      }
+      document.getElementById('scenario-grid').innerHTML = scenarios.map(renderCard).join('');
+    }
+
+    function renderCard(s) {
+      const flagship = s.slug === 'anno-domini-1066';
+      const games = s.gameCount || 0;
+      return `
+        <a href="/scenario.html?id=${esc(s.scenarioId)}" class="scenario-card">
+          <div class="sc-header">
+            <div>
+              <span class="sc-era">${esc(s.era || 'Custom Era')}</span>
+              ${flagship ? '<span class="flagship-badge">Flagship</span>' : ''}
+            </div>
+            <span class="sc-state ${s.state}">${s.state}</span>
+          </div>
+          <div class="sc-name">${esc(s.name)}</div>
+          <div class="sc-tagline">${esc(s.tagline || '')}</div>
+          <div class="sc-meta">
+            <div class="sc-meta-item"><span>⚑</span>${games} Game${games !== 1 ? 's' : ''}</div>
+            <div class="sc-meta-item"><span>◉</span>${esc(s.authorName || 'Unknown')}</div>
+            <div class="sc-meta-item"><span>✦</span>v${esc(s.version || '1.0.0')}</div>
+          </div>
+          <div class="sc-cta">View Scenario →</div>
+        </a>`;
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = String(str);
+      return d.innerHTML;
+    }
+  </script>
+</body>
+</html>
