@@ -26,7 +26,13 @@ router.get('/', requireAuth, async (req, res) => {
 
 // POST /api/characters — save a character
 router.post('/', requireAuth, async (req, res) => {
-  const { name, faction, archetype, culture, stats, notes } = req.body;
+  const {
+    name, faction, archetype, culture, stats, notes,
+    factionLabel, factionRank,
+    archetypeName, archetypeIcon,
+    cultureLabel, cultureRegion, cultureBonuses, cultureCombat,
+    pc, traits, combatTrait,
+  } = req.body;
 
   if (!name || !faction || !archetype)
     return res.status(400).json({ error: 'Name, faction, and archetype are required.' });
@@ -36,16 +42,27 @@ router.post('/', requireAuth, async (req, res) => {
     const now = new Date().toISOString();
 
     const item = {
-      userId:      req.user.userId,
+      userId:        req.user.userId,
       characterId,
-      name:        name.trim(),
+      name:          name.trim(),
       faction,
+      factionLabel:  factionLabel  || '',
+      factionRank:   factionRank   || '',
       archetype,
-      culture:     culture || '',
-      stats:       stats || {},
-      notes:       notes || '',
-      createdAt:   now,
-      isPublic:    false,
+      archetypeName: archetypeName || '',
+      archetypeIcon: archetypeIcon || '',
+      culture:       culture       || '',
+      cultureLabel:  cultureLabel  || '',
+      cultureRegion: cultureRegion || '',
+      cultureBonuses:cultureBonuses|| '',
+      cultureCombat: cultureCombat || '',
+      stats:         stats         || {},
+      pc:            pc            || 0,
+      traits:        traits        || [],
+      combatTrait:   combatTrait   || null,
+      notes:         notes         || '',
+      createdAt:     now,
+      isPublic:      false,
     };
 
     await dynamo.send(new PutCommand({ TableName: CHARS_TABLE, Item: item }));
