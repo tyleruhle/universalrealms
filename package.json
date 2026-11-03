@@ -1,11 +1,13 @@
 {
   "name": "universal-realms",
   "version": "0.2.0",
-  "description": "Universal Realms — World Engine platform",
+  "description": "Universal Realms \u2014 World Engine platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "test": "node --test tests/world-engine.test.js",
+    "engine:setup": "${PYTHON:-python3} -m venv engine/.venv && engine/.venv/bin/pip install -r engine/requirements.txt"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.600.0",
@@ -15,7 +17,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "@aws-sdk/client-s3": "^3.600.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

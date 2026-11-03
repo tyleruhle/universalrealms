@@ -3,3 +3,8 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# World Engine
+data/
+engine/.venv/
+__pycache__/

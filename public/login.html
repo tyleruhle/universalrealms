@@ -212,7 +212,9 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const redirect = params.get('redirect') || '/';
+    // Only same-site paths: "/x" but never "//host", "/\host", "javascript:" or a full URL.
+    const wanted = params.get('redirect') || '/';
+    const redirect = /^\/(?![\/\\])/.test(wanted) ? wanted : '/';
 
     async function handleLogin(e) {
       e.preventDefault();

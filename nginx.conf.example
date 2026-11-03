@@ -10,6 +10,11 @@ server {
     # Cloudflare handles SSL termination — Nginx only sees HTTP from Cloudflare's edge
     # If you add an origin certificate later, switch to port 443 with ssl_certificate
 
+    # World Engine: Atlas Studio saves edits files of up to 6 MB (nginx's default is 1 MB),
+    # and a lore draft can take most of a minute to write.
+    client_max_body_size 8m;
+    proxy_read_timeout   120s;
+
     # Proxy all traffic to Node.js
     location / {
         proxy_pass         http://127.0.0.1:3000;

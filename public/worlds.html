@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Universal Realms — Worlds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Cinzel:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IM+Fell+English+SC&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/world-engine.css">
+<style>
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:22px;margin-top:22px}
+.card{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;cursor:pointer}
+.card:hover{background:var(--bone)}
+.card h3{font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:.02em;overflow-wrap:anywhere}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.card .when{font-size:14px;color:var(--ink-faint);font-style:italic;margin-top:auto}
+.thumb{aspect-ratio:2/1;width:100%;background:var(--parchment-deep);border:1px solid var(--parchment-dark);display:grid;place-items:center;
+  color:var(--ink-faint);font-family:var(--font-fell);font-size:11px;letter-spacing:.14em;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.create{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;max-width:640px}
+.empty{text-align:center;padding:40px 16px}
+.empty .mark{font-family:'Cormorant Garamond',serif;font-size:56px;color:var(--seal-red);line-height:1;border-bottom:2px solid var(--gilt);display:inline-block;padding-bottom:4px;margin-bottom:14px}
+@media (max-width:560px){.create{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="ur-nav-shell" aria-label="Universal Realms">
+  <a href="/" class="ur-logo-btn"><div class="ur-logo-name">Universal Realms</div><div class="ur-logo-tag">World Engine</div></a>
+  <div class="ur-nav-links"><a href="/" class="ur-nav-lnk">Dashboard</a><a href="/worlds.html" class="ur-nav-lnk cur">Worlds</a><a href="/chronicle_map.html" class="ur-nav-lnk">Maps</a></div>
+</nav>
+
+<header class="band"><div class="wrap">
+  <div>
+    <div class="eyebrow">World Engine</div>
+    <h1>Your worlds</h1>
+    <p class="hint" style="margin-top:6px">Build the lore with the worldbuilder, raise the planet, name its map, and run its history.</p>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <section id="signedOut" class="panel signin" hidden>
+    <h2>Sign in to build worlds</h2>
+    <p class="hint">Worlds are saved to your account.</p>
+    <p style="margin-top:14px"><a class="btn primary" href="/login.html?redirect=/worlds.html">Sign in</a></p>
+  </section>
+
+  <section id="signedIn" hidden>
+    <form id="createForm" class="panel create" autocomplete="off">
+      <label class="fld" for="newName">Name a new world
+        <input id="newName" type="text" maxlength="80" placeholder="The Salt Throne" required></label>
+      <button class="btn primary" type="submit" id="createBtn">Create world</button>
+      <p id="createMsg" class="notice err" hidden style="grid-column:1/-1"></p>
+    </form>
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </section>
+</main>
+
+<script src="/js/ur-nav.js"></script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const fmtDate = s => { try { return new Date(s).toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'}); } catch { return ''; } };
+
+function card(w){
+  const a = document.createElement('a');
+  a.className = 'panel card'; a.href = `/world.html?id=${encodeURIComponent(w.worldId)}`;
+  const thumb = document.createElement('div'); thumb.className = 'thumb';
+  if (w.map){ const img = document.createElement('img'); img.alt = `Map of ${w.name}`; img.loading = 'lazy';
+    img.src = `/api/worlds/${encodeURIComponent(w.worldId)}/map/preview.png?v=${encodeURIComponent(w.updatedAt)}`; thumb.appendChild(img); }
+  else thumb.textContent = 'NO MAP YET';
+  const h = document.createElement('h3'); h.textContent = w.name;
+  const steps = document.createElement('div'); steps.className = 'steps';
+  const secs = Object.values(w.bible?.sections || {});
+  const confirmed = secs.filter(s => s === 'confirmed').length;
+  const chip = (text, cls) => { const c = document.createElement('span'); c.className = 'chip ' + (cls || ''); c.textContent = text; steps.appendChild(c); };
+  chip(secs.length ? `Lore · ${confirmed}/${secs.length} confirmed` : 'Lore · not started', confirmed ? 'confirmed' : secs.length ? 'proposed' : '');
+  chip(w.map ? (w.edits ? `Map · ${w.edits.features} named` : 'Map · generated') : 'Map · none', w.map ? 'done' : '');
+  chip(w.history ? `History · ${w.history.span_years} yrs` : 'History · none', w.history ? 'done' : '');
+  if (w.activeJob) chip('Working…', 'proposed');
+  const when = document.createElement('div'); when.className = 'when'; when.textContent = `Updated ${fmtDate(w.updatedAt)}`;
+  a.append(thumb, h, steps, when);
+  return a;
+}
+
+function render(list){
+  const g = $('grid'); g.replaceChildren();
+  if (!list.length){
+    g.innerHTML = '<div class="panel empty" style="grid-column:1/-1"><div class="mark">✧</div><p class="hint">No worlds yet. Name one above and the worldbuilder will start with you from nothing.</p></div>';
+    return;
+  }
+  list.forEach(w => g.appendChild(card(w)));
+}
+
+async function load(){
+  const r = await fetch('/api/worlds', {credentials:'same-origin'});
+  if (r.status === 401){ $('signedOut').hidden = false; return; }
+  $('signedIn').hidden = false;
+  if (!r.ok){ $('grid').innerHTML = '<p class="notice err">Your worlds could not be loaded. Refresh to try again.</p>'; return; }
+  render(await r.json());
+}
+
+$('createForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = $('newName').value.trim(); if (!name) return;
+  $('createBtn').disabled = true; $('createMsg').hidden = true;
+  try {
+    const r = await fetch('/api/worlds', {method:'POST', credentials:'same-origin', headers:{'content-type':'application/json'}, body: JSON.stringify({name})});
+    const body = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(body.error || 'The world could not be created.');
+    location.href = `/world.html?id=${encodeURIComponent(body.worldId)}`;
+  } catch (err){ $('createMsg').textContent = err.message; $('createMsg').hidden = false; $('createBtn').disabled = false; }
+});
+load();
+</script>
+</body>
+</html>

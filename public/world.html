@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Universal Realms — World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Cinzel:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IM+Fell+English+SC&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/world-engine.css">
+<style>
+.tabs{display:flex;gap:2px;margin-top:4px}
+.tab{font-family:var(--font-fell);font-size:12px;letter-spacing:.16em;padding:10px 18px;border:1px solid transparent;border-bottom:none;
+  background:transparent;color:var(--ink-soft);cursor:pointer;text-transform:uppercase}
+.tab[aria-selected="true"]{background:var(--parchment);border-color:var(--parchment-dark);color:var(--seal-red)}
+.namebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.namebar input{max-width:420px;font-family:var(--font-display);font-size:20px}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.lore{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:26px;align-items:start}
+.chat{display:flex;flex-direction:column;gap:12px}
+.msgs{display:flex;flex-direction:column;gap:14px;max-height:62vh;min-height:220px;overflow-y:auto;padding-right:6px}
+.msg{padding:10px 14px;border:1px solid var(--parchment-dark);max-width:92%}
+.msg.user{align-self:flex-end;background:var(--bone);font-style:italic}
+.msg.assistant{align-self:flex-start;background:var(--parchment);border-color:var(--gilt)}
+.msg .who{font-family:var(--font-fell);font-size:10px;letter-spacing:.14em;color:var(--ink-faint);margin-bottom:4px}
+.composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+.sections{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.sec{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--parchment-dark);background:transparent;
+  cursor:pointer;font:inherit;font-size:15px;color:var(--ink);text-align:left}
+.sec:hover{background:var(--bone)}
+.sec[aria-current="true"]{border-color:var(--seal-red);background:var(--bone)}
+.sec .dot{width:8px;height:8px;border-radius:50%;background:var(--parchment-dark);flex-shrink:0}
+.sec .dot.proposed{background:var(--gilt)} .sec .dot.confirmed{background:var(--verdigris)}
+.editor-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.editor-head h3{font-family:var(--font-display);font-size:18px;font-weight:600}
+.view{max-height:52vh;overflow-y:auto;padding:4px 2px}
+.confirmbox{border:1px solid var(--seal-red);padding:10px 12px;background:rgba(139,42,31,.05)}
+.map-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:26px;align-items:start}
+.preview{width:100%;height:auto;display:block;border:1px solid var(--parchment-dark);background:var(--parchment-deep)}
+dl.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 14px}
+dl.facts dt{font-family:var(--font-fell);font-size:10.5px;letter-spacing:.12em;color:var(--ink-faint);align-self:center;text-transform:uppercase}
+dl.facts dd{min-width:0}
+.words{display:flex;gap:6px;flex-wrap:wrap}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:110px minmax(0,1fr) 44px;gap:8px;align-items:center;font-size:14px}
+.bar i{display:block;height:8px;background:var(--gilt);opacity:.75}
+.bar .pct{font-family:var(--font-mono);font-size:12px;text-align:right;color:var(--ink-soft)}
+.seams{list-style:none;display:flex;flex-direction:column;gap:10px}
+.seams li{border-left:2px solid var(--seal-red);padding-left:12px}
+.seams .yr{font-family:var(--font-fell);font-size:10.5px;letter-spacing:.12em;color:var(--seal-red)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.stat{border:1px solid var(--parchment-dark);padding:10px 12px;background:var(--bone)}
+.stat b{display:block;font-family:var(--font-display);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat span{font-family:var(--font-fell);font-size:10px;letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase}
+.preview.eras{max-width:640px;margin-inline:auto}
+.scroll{max-height:60vh;overflow-y:auto;padding-right:6px}
+@media (max-width:900px){.lore,.map-grid{grid-template-columns:1fr}.msgs{max-height:none}}
+@media (max-width:560px){.composer{grid-template-columns:1fr}.band .wrap>div{flex-basis:100%}.tabs{width:100%}.tab{flex:1;padding:9px 6px;letter-spacing:.1em}}
+</style>
+</head>
+<body>
+<nav class="ur-nav-shell" aria-label="Universal Realms">
+  <a href="/" class="ur-logo-btn"><div class="ur-logo-name">Universal Realms</div><div class="ur-logo-tag">World Engine</div></a>
+  <div class="ur-nav-links"><a href="/" class="ur-nav-lnk">Dashboard</a><a href="/worlds.html" class="ur-nav-lnk cur">Worlds</a><a href="/chronicle_map.html" class="ur-nav-lnk">Maps</a></div>
+</nav>
+
+<header class="band"><div class="wrap">
+  <div style="min-width:0;flex:1">
+    <div class="eyebrow"><a href="/worlds.html" style="color:inherit">Worlds</a> · World</div>
+    <div class="namebar">
+      <h1 id="worldName">…</h1>
+      <button class="btn ghost" id="renameBtn" type="button" hidden>Rename</button>
+    </div>
+    <form class="namebar" id="renameForm" hidden autocomplete="off">
+      <input id="renameInput" type="text" maxlength="80" aria-label="World name">
+      <button class="btn primary" type="submit">Save</button><button class="btn ghost" type="button" id="renameCancel">Cancel</button>
+    </form>
+    <div class="steps" id="steps" style="margin-top:8px"></div>
+  </div>
+  <div class="tabs" role="tablist" aria-label="World tools">
+    <button class="tab" role="tab" id="tab-lore" aria-controls="pane-lore" aria-selected="true" type="button">Lore</button>
+    <button class="tab" role="tab" id="tab-map" aria-controls="pane-map" aria-selected="false" type="button">Map</button>
+    <button class="tab" role="tab" id="tab-history" aria-controls="pane-history" aria-selected="false" type="button">History</button>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <section id="signedOut" class="panel signin" hidden><h2>Sign in to open this world</h2>
+    <p style="margin-top:14px"><a class="btn primary" id="signinLink" href="/login.html">Sign in</a></p></section>
+  <section id="missing" class="panel signin" hidden><h2>World not found</h2><p class="hint">It may have been deleted, or it belongs to another account.</p>
+    <p style="margin-top:14px"><a class="btn" href="/worlds.html">Your worlds</a></p></section>
+
+  <div id="jobBar" class="job" hidden role="status" aria-live="polite"><div class="spin"></div><div id="jobText">Working…</div></div>
+  <p id="pageMsg" class="notice" hidden role="status" aria-live="polite" style="margin-bottom:18px"></p>
+
+  <!-- ─────────────────────────────── LORE ─────────────────────────────── -->
+  <section id="pane-lore" role="tabpanel" aria-labelledby="tab-lore" hidden>
+    <div class="lore">
+      <div class="panel chat">
+        <h2>The worldbuilder</h2>
+        <p id="loreOff" class="notice" hidden>The lore assistant is not set up on this server yet. You can still write bible sections by hand.</p>
+        <div class="msgs" id="msgs" aria-live="polite"></div>
+        <form class="composer" id="composer" autocomplete="off">
+          <label class="fld" for="msgInput" style="grid-column:1/-1">Talk it through
+            <textarea id="msgInput" rows="3" maxlength="4000" placeholder="Start from nothing, or tell it what you already know: a feeling, an image, a premise."></textarea></label>
+          <button class="btn ghost" type="button" id="newConv">New conversation</button>
+          <button class="btn primary" type="submit" id="sendBtn">Send</button>
+        </form>
+        <div id="newConvConfirm" class="confirmbox" hidden><p>Clear this conversation? The bible keeps everything you saved.</p>
+          <div class="row" style="margin-top:8px"><button class="btn danger" type="button" id="newConvYes">Clear conversation</button><button class="btn ghost" type="button" id="newConvNo">Keep it</button></div></div>
+      </div>
+
+      <div class="panel stack">
+        <h2>World bible</h2>
+        <div class="sections" id="sectionList" role="list"></div>
+        <div id="editor" class="stack" hidden style="border-top:1px solid var(--parchment-dark);padding-top:14px">
+          <div class="editor-head"><h3 id="secTitle">—</h3><span class="chip" id="secStatus">EMPTY</span></div>
+          <div class="view md" id="secView"></div>
+          <textarea id="secText" rows="14" class="code" hidden aria-label="Section text (Markdown)"></textarea>
+          <div class="row">
+            <button class="btn" type="button" id="editToggle">Edit text</button>
+            <button class="btn primary" type="button" id="saveProposed">Save as proposed</button>
+            <button class="btn seal" type="button" id="confirmBtn">Confirm as canon</button>
+            <button class="btn ghost" type="button" id="clearBtn">Clear</button>
+          </div>
+          <div id="clearConfirm" class="confirmbox" hidden><p>Clear this section from the bible?</p>
+            <div class="row" style="margin-top:8px"><button class="btn danger" type="button" id="clearYes">Clear section</button><button class="btn ghost" type="button" id="clearNo">Keep it</button></div></div>
+          <div class="row" style="align-items:end">
+            <label class="fld" style="flex:1 1 220px">Ask for something specific (optional)
+              <input id="draftNote" type="text" maxlength="1000" placeholder="Keep it to three cultures; lean on the salt trade"></label>
+            <button class="btn" type="button" id="draftBtn">Draft with Claude</button>
+          </div>
+          <p class="hint" style="font-size:14px">Drafts replace the text box but are not saved until you choose Save. Confirmed sections are canon; Claude will not contradict them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── MAP ─────────────────────────────── -->
+  <section id="pane-map" role="tabpanel" aria-labelledby="tab-map" hidden>
+    <div class="map-grid">
+      <div class="stack">
+        <div class="panel" id="mapShown" hidden>
+          <img id="mapImg" class="preview" alt="The world's map" width="1024" height="560">
+          <div class="row" style="margin-top:14px">
+            <a class="btn primary" id="atlasLink" href="#">Open in Atlas Studio</a>
+            <button class="btn" type="button" id="regenBtn">Make a new planet</button>
+          </div>
+        </div>
+        <form class="panel stack" id="mapForm" autocomplete="off">
+          <h2 id="mapFormTitle">Raise the planet</h2>
+          <p id="regenWarn" class="confirmbox" hidden>A new planet replaces this map, its Atlas Studio edits and its history. The bible is kept.</p>
+          <label class="fld" for="brief">Brief — terrain, climate and peoples, in a line
+            <textarea id="brief" rows="2" maxlength="300" placeholder="arid mountainous world, fractured kingdoms, devout"></textarea></label>
+          <div class="row">
+            <button class="btn" type="button" id="suggestBtn">Suggest from the bible</button>
+            <span class="hint" id="suggestWhy" style="font-size:14px"></span>
+          </div>
+          <div class="row">
+            <label class="fld" style="flex:1 1 140px">Size
+              <select id="size"><option value="small">Small · fast</option><option value="medium">Medium</option><option value="large">Large · detailed</option></select></label>
+            <label class="fld" style="flex:1 1 140px">Seed (blank for random)
+              <input id="seed" type="number" min="0" max="2147483646" step="1" inputmode="numeric"></label>
+          </div>
+          <div class="row"><button class="btn primary" type="submit" id="generateBtn">Generate</button>
+            <button class="btn ghost" type="button" id="regenCancel" hidden>Cancel</button></div>
+        </form>
+      </div>
+      <div class="stack" id="mapFacts" hidden>
+        <div class="panel stack">
+          <h2>This planet</h2>
+          <dl class="facts">
+            <dt>Brief</dt><dd id="fBrief"></dd>
+            <dt>Understood</dt><dd><div class="words" id="fMatched"></div></dd>
+            <dt>Seed</dt><dd class="mono" id="fSeed"></dd>
+            <dt>Land</dt><dd id="fLand"></dd>
+          </dl>
+          <div class="bars" id="fBiomes" aria-label="Biomes by share of land"></div>
+        </div>
+        <div class="panel stack" id="featuresPanel" hidden>
+          <h2>From Atlas Studio</h2>
+          <div class="md scroll" id="geoView" style="max-height:34vh"></div>
+          <button class="btn" type="button" id="geoToBible">Add to the Geography section</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── HISTORY ─────────────────────────────── -->
+  <section id="pane-history" role="tabpanel" aria-labelledby="tab-history" hidden>
+    <p id="histNeedsMap" class="notice" hidden>Raise the planet on the Map tab first; history runs on its land, rivers and coasts.</p>
+    <div class="stack" id="histBody" hidden>
+      <form class="panel" id="histForm" autocomplete="off">
+        <h2>Simulate history</h2>
+        <div class="row">
+          <label class="fld" style="flex:1 1 120px">Turns<input id="turns" type="number" min="5" max="60" value="30"></label>
+          <label class="fld" style="flex:1 1 120px">Years per turn<input id="years" type="number" min="1" max="50" value="25"></label>
+          <label class="fld" style="flex:1 1 120px">Seed<input id="hseed" type="number" min="0" max="2147483646" value="1"></label>
+          <button class="btn primary" type="submit" id="runHist">Run history</button>
+        </div>
+        <p class="hint" style="font-size:14px;margin-top:8px">Peoples and polities are placed on your map, including Atlas Studio edits, then centuries of wars, successions and revelations play out. Running again replaces the last history.</p>
+      </form>
+      <div id="histResult" class="stack" hidden>
+        <div class="stats" id="hStats"></div>
+        <div class="map-grid">
+          <div class="panel"><h2>The map through time</h2><img id="erasImg" class="preview eras" alt="Political maps at the start, middle and end"></div>
+          <div class="panel stack"><h2>Story seams</h2><p class="hint" style="font-size:14px">The moments with the most story in them: good places to set a tale.</p><ol class="seams" id="seams"></ol></div>
+        </div>
+        <div class="panel stack">
+          <h2>History, as drafted for the bible</h2>
+          <div class="md scroll" id="histView"></div>
+          <div class="row"><button class="btn primary" type="button" id="histToBible">Add to the History section as proposed</button>
+            <a class="btn ghost" id="timelineLink" href="#" target="_blank" rel="noopener">Full timeline</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="/js/ur-md.js"></script>
+<script src="/js/ur-nav.js"></script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const ID = new URLSearchParams(location.search).get('id') || '';
+const API = `/api/worlds/${encodeURIComponent(ID)}`;
+let world = null, meta = null, bible = {sections: {}}, current = null, editing = false, pollTimer = null;
+
+async function call(method, url, body){
+  const r = await fetch(url, {method, credentials: 'same-origin',
+    headers: body === undefined ? {} : {'content-type': 'application/json'},
+    body: body === undefined ? undefined : JSON.stringify(body)});
+  const type = r.headers.get('content-type') || '';
+  const data = type.includes('json') ? await r.json().catch(() => ({})) : await r.text();
+  if (!r.ok){ const e = new Error((data && data.error) || `Request failed (${r.status}).`); e.status = r.status; throw e; }
+  return data;
+}
+function say(msg, err){ const p = $('pageMsg'); p.textContent = msg; p.classList.toggle('err', !!err); p.hidden = !msg; }
+const pct = x => `${Math.round(x * 100)}%`;
+const titleOf = key => (meta.sections.find(s => s.key === key) || {}).title || key;
+
+/* ── tabs (hash: #lore #map #history) ─────────────────────────────────── */
+const TABS = ['lore', 'map', 'history'];
+function showTab(t){
+  if (!TABS.includes(t)) t = 'lore';
+  TABS.forEach(x => { $(`tab-${x}`).setAttribute('aria-selected', x === t); $(`pane-${x}`).hidden = x !== t; });
+  if (location.hash !== `#${t}`) history.replaceState(null, '', `#${t}`);
+  if (t === 'map') renderMap();
+  if (t === 'history') renderHistory();
+}
+TABS.forEach(t => $(`tab-${t}`).addEventListener('click', () => showTab(t)));
+document.querySelector('[role=tablist]').addEventListener('keydown', e => {
+  const i = TABS.findIndex(t => $(`tab-${t}`).getAttribute('aria-selected') === 'true');
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ const n = TABS.at((i + (e.key === 'ArrowRight' ? 1 : -1)) % 3); showTab(n); $(`tab-${n}`).focus(); }
+});
+window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
+
+/* ── header ─────────────────────────────────────────────────────────── */
+function renderHeader(){
+  document.title = `Universal Realms — ${world.name}`;
+  $('worldName').textContent = world.name; $('renameBtn').hidden = false;
+  const st = $('steps'); st.replaceChildren();
+  const chip = (t, c) => { const s = document.createElement('span'); s.className = 'chip ' + (c || ''); s.textContent = t; st.appendChild(s); };
+  const secs = Object.values(world.bible?.sections || {}), conf = secs.filter(s => s === 'confirmed').length;
+  chip(secs.length ? `Bible · ${secs.length} sections, ${conf} confirmed` : 'Bible · empty', conf ? 'confirmed' : secs.length ? 'proposed' : '');
+  chip(world.map ? `Map · seed ${world.map.seed}` : 'No map yet', world.map ? 'done' : '');
+  if (world.edits) chip(`${world.edits.features} named features`, 'done');
+  chip(world.history ? `History · ${world.history.span_years} years` : 'No history yet', world.history ? 'done' : '');
+}
+$('renameBtn').onclick = () => { $('renameInput').value = world.name; $('renameForm').hidden = false; $('renameBtn').hidden = true; $('worldName').hidden = true; $('renameInput').focus(); };
+$('renameCancel').onclick = () => { $('renameForm').hidden = true; $('renameBtn').hidden = false; $('worldName').hidden = false; };
+$('renameForm').onsubmit = async e => {
+  e.preventDefault();
+  try { world = await call('PATCH', API, {name: $('renameInput').value}); renderHeader(); $('renameCancel').click(); }
+  catch (err){ say(err.message, true); }
+};
+
+/* ── background jobs ────────────────────────────────────────────────── */
+const JOB_WORDS = {map: 'Raising the planet', edits: 'Applying your Atlas Studio edits', history: 'Simulating history'};
+function setBusy(b){ ['generateBtn', 'runHist'].forEach(id => { $(id).disabled = b; }); }
+function watchJob(jobId, kind){
+  clearTimeout(pollTimer);
+  const started = Date.now();
+  $('jobBar').hidden = false; setBusy(true);
+  const tick = async () => {
+    let j;
+    try { j = await call('GET', `${API}/jobs/${encodeURIComponent(jobId)}`); }
+    catch (err){ pollTimer = setTimeout(tick, 4000); return; }
+    const secs = Math.round((Date.now() - started) / 1000);
+    $('jobText').textContent = j.status === 'queued' ? `${JOB_WORDS[kind] || 'Working'}: waiting for a free engine (position ${j.queuePosition})…`
+                                                     : `${JOB_WORDS[kind] || 'Working'}… ${secs}s`;
+    if (j.status === 'done' || j.status === 'failed'){
+      $('jobBar').hidden = true; setBusy(false);
+      world = await call('GET', API); renderHeader();
+      if (j.status === 'failed') say(j.error || 'The job failed.', true);
+      else say(kind === 'map' ? 'The planet is ready.' : kind === 'history' ? 'History is ready.' : 'Edits applied.');
+      renderMap(); renderHistory();
+      return;
+    }
+    pollTimer = setTimeout(tick, 1500);
+  };
+  tick();
+}
+
+/* ── lore: conversation ─────────────────────────────────────────────── */
+function addMsg(role, text){
+  const d = document.createElement('div'); d.className = `msg ${role}`;
+  const who = document.createElement('div'); who.className = 'who'; who.textContent = role === 'user' ? 'YOU' : 'WORLDBUILDER';
+  const body = document.createElement('div'); body.className = 'md';
+  if (role === 'assistant') urMarkdownInto(body, text); else body.textContent = text;
+  d.append(who, body); $('msgs').appendChild(d); $('msgs').scrollTop = $('msgs').scrollHeight;
+  return d;
+}
+async function loadConversation(){
+  const c = await call('GET', `${API}/lore`);
+  $('msgs').replaceChildren();
+  if (!c.messages.length){
+    const d = addMsg('assistant', meta.loreConfigured
+      ? `Welcome to **${world.name}**. Tell me anything you already know about it — a feeling, an image, a premise — or say *start from nothing* and I'll begin the architecture interview.`
+      : 'Write bible sections by hand on the right. The lore assistant is not set up on this server yet.');
+    d.dataset.intro = '1';
+  }
+  c.messages.forEach(m => addMsg(m.role, m.content));
+}
+$('composer').addEventListener('submit', async e => {
+  e.preventDefault();
+  const text = $('msgInput').value.trim(); if (!text) return;
+  document.querySelectorAll('.msg[data-intro]').forEach(n => n.remove());
+  addMsg('user', text); $('msgInput').value = ''; $('sendBtn').disabled = true;
+  const wait = addMsg('assistant', '*Thinking…*');
+  try { const r = await call('POST', `${API}/lore/message`, {text}); wait.remove(); addMsg('assistant', r.reply); }
+  catch (err){ wait.remove(); $('msgInput').value = text; say(err.message, true); }
+  finally { $('sendBtn').disabled = false; $('msgInput').focus(); }
+});
+$('msgInput').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) $('composer').requestSubmit(); });
+$('newConv').onclick = () => { $('newConvConfirm').hidden = false; };
+$('newConvNo').onclick = () => { $('newConvConfirm').hidden = true; };
+$('newConvYes').onclick = async () => { $('newConvConfirm').hidden = true; try { await call('DELETE', `${API}/lore`); await loadConversation(); } catch (err){ say(err.message, true); } };
+
+/* ── lore: bible ────────────────────────────────────────────────────── */
+function renderSections(){
+  const list = $('sectionList'); list.replaceChildren();
+  for (const s of meta.sections){
+    const sec = bible.sections[s.key];
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'sec'; b.setAttribute('role', 'listitem');
+    b.setAttribute('aria-current', current === s.key ? 'true' : 'false');
+    const name = document.createElement('span'); name.textContent = s.title;
+    const dot = document.createElement('span'); dot.className = `dot ${sec ? sec.status : ''}`;
+    dot.title = sec ? sec.status : 'empty';
+    b.append(name, dot); b.onclick = () => openSection(s.key); list.appendChild(b);
+  }
+}
+function setEditing(on){
+  editing = on; $('secText').hidden = !on; $('secView').hidden = on;
+  $('editToggle').textContent = on ? 'Preview' : 'Edit text';
+  if (!on) renderView();
+}
+function renderView(){
+  const t = $('secText').value;
+  if (t.trim()) urMarkdownInto($('secView'), t);
+  else $('secView').innerHTML = '<p class="hint">Empty. Draft it with Claude, or choose Edit text and write it yourself.</p>';
+}
+function openSection(key){
+  current = key; renderSections();
+  const sec = bible.sections[key];
+  $('editor').hidden = false; $('secTitle').textContent = titleOf(key);
+  $('secStatus').textContent = sec ? sec.status.toUpperCase() : 'EMPTY';
+  $('secStatus').className = 'chip ' + (sec ? sec.status : '');
+  $('secText').value = sec ? sec.text : '';
+  $('confirmBtn').textContent = sec && sec.status === 'confirmed' ? 'Mark proposed' : 'Confirm as canon';
+  $('clearConfirm').hidden = true; setEditing(false);
+}
+$('editToggle').onclick = () => setEditing(!editing);
+$('secText').addEventListener('input', () => { $('secStatus').textContent = 'UNSAVED'; $('secStatus').className = 'chip proposed'; });
+async function saveSection(status, text = $('secText').value, source = 'user'){
+  bible = await call('PUT', `${API}/bible/${current}`, {text, status, source});
+  world = await call('GET', API); renderHeader(); openSection(current);
+}
+$('saveProposed').onclick = async () => { try { await saveSection('proposed'); say('Saved as proposed.'); } catch (err){ say(err.message, true); } };
+$('confirmBtn').onclick = async () => {
+  const sec = bible.sections[current];
+  const to = sec && sec.status === 'confirmed' ? 'proposed' : 'confirmed';
+  if (!$('secText').value.trim()){ say('Write or draft the section before confirming it.', true); return; }
+  try { await saveSection(to); say(to === 'confirmed' ? 'Confirmed as canon.' : 'Marked proposed.'); } catch (err){ say(err.message, true); }
+};
+$('clearBtn').onclick = () => { $('clearConfirm').hidden = false; };
+$('clearNo').onclick = () => { $('clearConfirm').hidden = true; };
+$('clearYes').onclick = async () => { try { await saveSection('proposed', ''); say('Section cleared.'); } catch (err){ say(err.message, true); } };
+$('draftBtn').onclick = async () => {
+  if (!current) return;
+  $('draftBtn').disabled = true; $('draftBtn').textContent = 'Drafting…';
+  try {
+    const r = await call('POST', `${API}/lore/draft`, {section: current, instructions: $('draftNote').value.trim()});
+    $('secText').value = r.text; $('secStatus').textContent = 'DRAFT · UNSAVED'; $('secStatus').className = 'chip proposed';
+    setEditing(false); say('Draft ready. Edit it if you like, then Save as proposed.');
+  } catch (err){ say(err.message, true); }
+  finally { $('draftBtn').disabled = false; $('draftBtn').textContent = 'Draft with Claude'; }
+};
+
+/* ── map ────────────────────────────────────────────────────────────── */
+let regen = false;
+async function renderMap(){
+  if (!world) return;
+  const m = world.map, show = m && !regen;
+  $('mapShown').hidden = !show; $('mapFacts').hidden = !m;
+  $('mapForm').hidden = !!show; $('regenWarn').hidden = !(m && regen); $('regenCancel').hidden = !(m && regen);
+  $('mapFormTitle').textContent = m ? 'Make a new planet' : 'Raise the planet';
+  if (!m) return;
+  $('mapImg').src = `${API}/map/preview.png?v=${encodeURIComponent(world.updatedAt)}`;
+  $('atlasLink').href = `/atlas_studio.html?world=${encodeURIComponent(ID)}`;
+  $('fBrief').textContent = m.brief; $('fSeed').textContent = m.seed;
+  $('fLand').textContent = `${pct(m.land_fraction)} of the surface · ${m.size}`;
+  const words = $('fMatched'); words.replaceChildren();
+  (m.matched || []).forEach(w => { const c = document.createElement('span'); c.className = 'chip done'; c.textContent = w; words.appendChild(c); });
+  if (m.unmatched && m.unmatched.length){ const c = document.createElement('span'); c.className = 'hint'; c.style.fontSize = '13px';
+    c.textContent = `Not used: ${m.unmatched.join(', ')}`; words.appendChild(c); }
+  const bars = $('fBiomes'); bars.replaceChildren();
+  (m.biomes || []).forEach(b => { const r = document.createElement('div'); r.className = 'bar';
+    const n = document.createElement('span'); n.textContent = b.name;
+    const t = document.createElement('span'); const i = document.createElement('i'); i.style.width = pct(b.share / (m.biomes[0].share || 1)); t.appendChild(i);
+    const p = document.createElement('span'); p.className = 'pct'; p.textContent = pct(b.share); r.append(n, t, p); bars.appendChild(r); });
+  $('featuresPanel').hidden = !world.edits;
+  if (world.edits){ try { urMarkdownInto($('geoView'), await call('GET', `${API}/map/geography`)); } catch { $('featuresPanel').hidden = true; } }
+}
+$('regenBtn').onclick = () => { regen = true; $('brief').value = world.map.brief; renderMap(); };
+$('regenCancel').onclick = () => { regen = false; renderMap(); };
+$('suggestBtn').onclick = async () => {
+  $('suggestBtn').disabled = true; $('suggestWhy').textContent = 'Reading the bible…';
+  try { const r = await call('POST', `${API}/lore/brief`); $('brief').value = r.brief; $('suggestWhy').textContent = r.why; }
+  catch (err){ $('suggestWhy').textContent = ''; say(err.message, true); }
+  finally { $('suggestBtn').disabled = false; }
+};
+$('mapForm').onsubmit = async e => {
+  e.preventDefault();
+  const seed = $('seed').value.trim();
+  try {
+    const j = await call('POST', `${API}/map`, {brief: $('brief').value, size: $('size').value, ...(seed ? {seed: Number(seed)} : {})});
+    regen = false; say(''); watchJob(j.jobId, 'map');
+  } catch (err){ say(err.message, true); }
+};
+$('geoToBible').onclick = async () => {
+  try {
+    const geo = await call('GET', `${API}/map/geography`);
+    const prev = bible.sections.geography ? bible.sections.geography.text.replace(/(^|\n)## Named features[\s\S]*$/, '').trimEnd() : '';
+    bible = await call('PUT', `${API}/bible/geography`, {text: (prev ? prev + '\n\n' : '') + geo.trim(), status: 'proposed', source: 'map'});
+    world = await call('GET', API); renderHeader(); renderSections(); say('Named features added to the Geography section as proposed.');
+  } catch (err){ say(err.message, true); }
+};
+
+/* ── history ────────────────────────────────────────────────────────── */
+async function renderHistory(){
+  if (!world) return;
+  $('histNeedsMap').hidden = !!world.map; $('histBody').hidden = !world.map;
+  const h = world.history; $('histResult').hidden = !h;
+  if (!h) return;
+  const st = $('hStats'); st.replaceChildren();
+  [[`${h.span_years}`, 'years'], [`${h.events}`, 'events'], [`${h.starting_factions} → ${h.final_states}`, 'realms, start → end'],
+   [`${h.event_types?.war || 0}`, 'wars'], [`${h.event_types?.collapse || 0}`, 'realms fallen']].forEach(([v, l]) => {
+    const d = document.createElement('div'); d.className = 'stat'; const b = document.createElement('b'); b.textContent = v;
+    const s = document.createElement('span'); s.textContent = l; d.append(b, s); st.appendChild(d); });
+  $('erasImg').src = `${API}/history/eras.png?v=${encodeURIComponent(h.ranAt)}`;
+  const ol = $('seams'); ol.replaceChildren();
+  (h.seams || []).forEach(s => { const li = document.createElement('li'); const y = document.createElement('div'); y.className = 'yr';
+    y.textContent = `YEAR ${s.year} · ${String(s.type || '').toUpperCase()}`; const t = document.createElement('div'); t.textContent = s.text; li.append(y, t); ol.appendChild(li); });
+  $('timelineLink').href = `${API}/history/timeline.md`;
+  try { urMarkdownInto($('histView'), await call('GET', `${API}/history/history.md`)); } catch { $('histView').textContent = ''; }
+}
+$('histForm').onsubmit = async e => {
+  e.preventDefault();
+  try { const j = await call('POST', `${API}/history`, {turns: Number($('turns').value), years: Number($('years').value), seed: Number($('hseed').value)});
+        say(''); watchJob(j.jobId, 'history'); }
+  catch (err){ say(err.message, true); }
+};
+$('histToBible').onclick = async () => {
+  try {
+    const md = await call('GET', `${API}/history/history.md`);
+    bible = await call('PUT', `${API}/bible/history`, {text: md, status: 'proposed', source: 'history'});
+    world = await call('GET', API); renderHeader(); renderSections(); say('Added to the History section as proposed. Rename its eras and strike what is not canon in the Lore tab.');
+  } catch (err){ say(err.message, true); }
+};
+
+/* ── boot ───────────────────────────────────────────────────────────── */
+(async function boot(){
+  try {
+    [meta, world] = await Promise.all([call('GET', '/api/worlds/meta'), call('GET', API)]);
+  } catch (err){
+    if (err.status === 401){ $('signedOut').hidden = false; $('signinLink').href = `/login.html?redirect=${encodeURIComponent(location.pathname + location.search)}`; }
+    else $('missing').hidden = false;
+    document.querySelector('[role=tablist]').hidden = true; $('worldName').textContent = 'World';
+    return;
+  }
+  $('loreOff').hidden = meta.loreConfigured;
+  ['sendBtn', 'draftBtn', 'suggestBtn'].forEach(id => { $(id).disabled = !meta.loreConfigured; });
+  renderHeader();
+  bible = await call('GET', `${API}/bible`);
+  renderSections(); openSection('overview');
+  showTab(location.hash.slice(1));
+  await loadConversation();
+  if (world.activeJob) watchJob(world.activeJob.jobId, world.activeJob.kind);
+})();
+</script>
+</body>
+</html>

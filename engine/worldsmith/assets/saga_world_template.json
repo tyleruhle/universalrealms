@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "meta": {
+    "name": "Example World",
+    "start_year": 0,
+    "years_per_turn": 10,
+    "notes": "Edit freely. Regions, factions and cultures are the only required blocks."
+  },
+  "cultures": {
+    "vael": {
+      "syllables": [
+        "vae",
+        "lin",
+        "or",
+        "sa",
+        "rhen",
+        "el"
+      ],
+      "endings": [
+        "",
+        "n",
+        "th"
+      ]
+    },
+    "kor": {
+      "syllables": [
+        "kor",
+        "dra",
+        "gun",
+        "ba",
+        "tor",
+        "ek"
+      ],
+      "endings": [
+        "",
+        "k",
+        "r"
+      ]
+    }
+  },
+  "religions": {
+    "the_flame": {},
+    "the_deep": {}
+  },
+  "regions": [
+    {
+      "id": "r1",
+      "name": "Ashvale",
+      "terrain": "river plain",
+      "wealth": 0.8,
+      "population": 0.8,
+      "defensibility": 0.2,
+      "culture": "vael",
+      "religion": "the_flame",
+      "neighbors": [
+        "r2",
+        "r3"
+      ]
+    },
+    {
+      "id": "r2",
+      "name": "Highmarch",
+      "terrain": "mountains",
+      "wealth": 0.3,
+      "population": 0.3,
+      "defensibility": 0.9,
+      "culture": "vael",
+      "religion": "the_flame",
+      "neighbors": [
+        "r1",
+        "r4"
+      ],
+      "chokepoint": true
+    },
+    {
+      "id": "r3",
+      "name": "Saltreach",
+      "terrain": "coast",
+      "wealth": 0.7,
+      "population": 0.6,
+      "defensibility": 0.4,
+      "culture": "kor",
+      "religion": "the_deep",
+      "neighbors": [
+        "r1",
+        "r4"
+      ]
+    },
+    {
+      "id": "r4",
+      "name": "Dun Kor",
+      "terrain": "steppe",
+      "wealth": 0.4,
+      "population": 0.5,
+      "defensibility": 0.3,
+      "culture": "kor",
+      "religion": "the_deep",
+      "neighbors": [
+        "r2",
+        "r3"
+      ]
+    }
+  ],
+  "factions": [
+    {
+      "id": "f1",
+      "name": "Throne of Ashvale",
+      "culture": "vael",
+      "religion": "the_flame",
+      "succession": "primogeniture",
+      "regions": [
+        "r1",
+        "r2"
+      ],
+      "legitimacy": 0.7,
+      "cohesion": 0.6,
+      "militarism": 0.4,
+      "treasury": 0.5
+    },
+    {
+      "id": "f2",
+      "name": "Kor Hordes",
+      "culture": "kor",
+      "religion": "the_deep",
+      "succession": "tanistry",
+      "regions": [
+        "r3",
+        "r4"
+      ],
+      "legitimacy": 0.5,
+      "cohesion": 0.5,
+      "militarism": 0.8,
+      "treasury": 0.3,
+      "grievances": {
+        "f1": 0.5
+      }
+    }
+  ],
+  "secrets": [
+    {
+      "id": "s1",
+      "about": "f1",
+      "text": "The founding king was a Kor exile.",
+      "potency": 0.7
+    }
+  ]
+}

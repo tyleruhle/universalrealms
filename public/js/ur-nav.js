@@ -2,7 +2,7 @@
  * ur-nav.js — Universal Realms shared navigation
  * Drop-in replacement for ur-auth.js. Handles:
  *   - Nav injection / replacement of existing .ur-nav-shell
- *   - Tools dropdown (Battle, Duel, Raid)
+ *   - Worlds link, Tools dropdown (Battle, Duel, Raid), Maps dropdown (Chronicle Map, Atlas Studio)
  *   - Auth state (sets window.UR_USER, renders Sign In / username)
  */
 (function () {
@@ -117,6 +117,8 @@
   const path = window.location.pathname;
   const TOOL_PAGES = ['/battle_roller.html', '/duel_roller.html', '/raid_roller.html'];
   const toolsActive = TOOL_PAGES.some(p => path.endsWith(p));
+  const MAP_PAGES = ['/chronicle_map.html', '/atlas_studio.html'];
+  const mapsActive = MAP_PAGES.some(p => path.endsWith(p));
 
   function c(pages) {
     return pages.some(p => path === p || path.endsWith(p)) ? ' cur' : '';
@@ -158,9 +160,26 @@
             </a>
           </div>
         </div>
-        <a href="/chronicle_map.html" class="ur-nav-lnk${c(['/chronicle_map.html'])}">
-          <span class="ur-nav-icon">⊞</span>Maps
+        <a href="/worlds.html" class="ur-nav-lnk${c(['/worlds.html', '/world.html'])}">
+          <span class="ur-nav-icon">✧</span>Worlds
         </a>
+        <div class="ur-dropdown" id="ur-maps-dd">
+          <button class="ur-nav-lnk${mapsActive ? ' cur' : ''}">
+            <span class="ur-nav-icon">⊞</span>Maps<span class="ur-dd-arrow">▾</span>
+          </button>
+          <div class="ur-dd-menu">
+            <a href="/chronicle_map.html" class="ur-dd-item${c(['/chronicle_map.html'])}">
+              <span class="ur-dd-icon">⊞</span>
+              <span class="ur-dd-label">Chronicle Map</span>
+              <span class="ur-dd-desc">1066 political map</span>
+            </a>
+            <a href="/atlas_studio.html" class="ur-dd-item${c(['/atlas_studio.html'])}">
+              <span class="ur-dd-icon">✎</span>
+              <span class="ur-dd-label">Atlas Studio</span>
+              <span class="ur-dd-desc">Name &amp; edit your world</span>
+            </a>
+          </div>
+        </div>
         <a href="/players.html" class="ur-nav-lnk${c(['/players.html'])}">
           <span class="ur-nav-icon">◎</span>Players
         </a>
@@ -189,23 +208,31 @@
     shell.style.zIndex    = '1000';
     shell.innerHTML       = buildNav();
 
-    // Dropdown toggle — use fixed positioning to escape overflow:auto clipping
-    const dd      = document.getElementById('ur-tools-dd');
-    const trigger = dd?.querySelector('button');
-    const menu    = dd?.querySelector('.ur-dd-menu');
-    if (dd && trigger && menu) {
+    // Dropdown toggles — fixed positioning escapes overflow:auto clipping.
+    // Every .ur-dropdown in the bar works the same way; opening one closes the others.
+    const dds = [...shell.querySelectorAll('.ur-dropdown')];
+    dds.forEach(dd => {
+      const trigger = dd.querySelector('button');
+      const menu    = dd.querySelector('.ur-dd-menu');
+      if (!trigger || !menu) return;
+      trigger.setAttribute('aria-haspopup', 'true');
+      trigger.setAttribute('aria-expanded', 'false');
       trigger.addEventListener('click', e => {
         e.stopPropagation();
         const opening = !dd.classList.contains('open');
-        dd.classList.toggle('open');
+        dds.forEach(o => { o.classList.remove('open'); o.querySelector('button')?.setAttribute('aria-expanded', 'false'); });
         if (opening) {
-          const rect    = trigger.getBoundingClientRect();
+          dd.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+          const rect      = trigger.getBoundingClientRect();
           menu.style.top  = rect.bottom + 'px';
           menu.style.left = rect.left   + 'px';
         }
       });
-      document.addEventListener('click', () => dd.classList.remove('open'));
-    }
+    });
+    document.addEventListener('click', () => dds.forEach(o => {
+      o.classList.remove('open'); o.querySelector('button')?.setAttribute('aria-expanded', 'false');
+    }));
   }
 
   // ── AUTH ────────────────────────────────────────────────────────
